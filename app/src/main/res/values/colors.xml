@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="dark_base">#FF0A0A0A</color>
+    <color name="dark_surface">#FF111111</color>
+    <color name="dark_elevated">#FF1A1A1A</color>
+    <color name="electric_blue">#FF4D9FFF</color>
+    <color name="pure_black">#FF000000</color>
+    <color name="white_90">#E6FFFFFF</color>
+</resources>
