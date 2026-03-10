@@ -42,6 +42,13 @@ data class UserProfile(
     val avgRating: Float,
 )
 
+data class UserList(
+    val id: String,
+    val title: String,
+    val note: String? = null,
+    val albumIds: List<String> = emptyList(),
+)
+
 
 // ── Static seed data ──────────────────────────────────────────
 
@@ -104,5 +111,14 @@ object SeedData {
         ),
         genres = listOf("Indie", "Rap", "Electronic", "Alt R&B", "2010s", "Avg 3.9 ★"),
         avgRating = 3.9f,
+    )
+
+    val initialLists = listOf(
+        UserList(
+            id = "l1",
+            title = "Albums I Would Defend",
+            note = "All gas, no skips.",
+            albumIds = listOf("1", "4"),
+        ),
     )
 }

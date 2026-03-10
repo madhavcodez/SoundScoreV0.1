@@ -1,0 +1,14 @@
+{
+  "name": "soundscore-monorepo",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "backend",
+    "packages/contracts"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace backend",
+    "build": "npm run build --workspace @soundscore/contracts && npm run build --workspace backend",
+    "typecheck": "npm run typecheck --workspace @soundscore/contracts && npm run typecheck --workspace backend"
+  }
+}

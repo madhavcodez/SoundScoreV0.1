@@ -11,7 +11,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -20,16 +23,19 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import com.soundscore.app.data.model.Album
-import com.soundscore.app.data.model.SeedData
 import com.soundscore.app.ui.components.AlbumArtPlaceholder
 import com.soundscore.app.ui.components.StarRating
 import com.soundscore.app.ui.theme.*
+import com.soundscore.app.ui.viewmodel.LogViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
-fun LogScreen(modifier: Modifier = Modifier) {
-    val ratings = remember {
-        mutableStateMapOf<String, Float>().apply { putAll(SeedData.logInitialRatings) }
-    }
+fun LogScreen(
+    modifier: Modifier = Modifier,
+    logViewModel: LogViewModel = viewModel(),
+) {
+    val uiState by logViewModel.uiState.collectAsStateWithLifecycle()
 
     Column(
         modifier = modifier
@@ -52,7 +58,7 @@ fun LogScreen(modifier: Modifier = Modifier) {
         SectionLabel("Recently played")
 
         // 3-column grid via chunked rows
-        SeedData.albums.chunked(3).forEach { rowAlbums ->
+        uiState.albums.chunked(3).forEach { rowAlbums ->
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -63,8 +69,8 @@ fun LogScreen(modifier: Modifier = Modifier) {
                 rowAlbums.forEach { album ->
                     AlbumTile(
                         album = album,
-                        rating = ratings[album.id] ?: 0f,
-                        onRate = { ratings[album.id] = it },
+                        rating = uiState.ratings[album.id] ?: 0f,
+                        onRate = { logViewModel.updateRating(album.id, it) },
                         modifier = Modifier.weight(1f),
                     )
                 }
@@ -79,7 +85,7 @@ fun LogScreen(modifier: Modifier = Modifier) {
         Spacer(Modifier.height(7.dp))
         SectionLabel("Write later queue")
 
-        SeedData.albums.take(3).forEach { album ->
+        uiState.writeLaterQueue.forEach { album ->
             QueueItem(album = album)
         }
 

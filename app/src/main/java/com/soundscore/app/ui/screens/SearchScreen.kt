@@ -7,24 +7,24 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.soundscore.app.data.model.SeedData
 import com.soundscore.app.ui.components.AlbumArtPlaceholder
 import com.soundscore.app.ui.components.GlassCard
 import com.soundscore.app.ui.theme.*
+import com.soundscore.app.ui.viewmodel.SearchViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
-fun SearchScreen(modifier: Modifier = Modifier) {
-    var query by remember { mutableStateOf("") }
-
-    val filtered = SeedData.albums.filter {
-        query.isBlank() ||
-        it.title.contains(query, ignoreCase = true) ||
-        it.artist.contains(query, ignoreCase = true)
-    }
+fun SearchScreen(
+    modifier: Modifier = Modifier,
+    searchViewModel: SearchViewModel = viewModel(),
+) {
+    val uiState by searchViewModel.uiState.collectAsStateWithLifecycle()
 
     Column(modifier = modifier.fillMaxSize()) {
         // ── Header ──
@@ -36,8 +36,8 @@ fun SearchScreen(modifier: Modifier = Modifier) {
 
         // ── Search bar ──
         OutlinedTextField(
-            value = query,
-            onValueChange = { query = it },
+            value = uiState.query,
+            onValueChange = { searchViewModel.updateQuery(it) },
             placeholder = {
                 Text("Albums, artists, friends…", color = ChromeFaint)
             },
@@ -64,7 +64,7 @@ fun SearchScreen(modifier: Modifier = Modifier) {
 
         // ── Results / browse ──
         Text(
-            if (query.isBlank()) "TRENDING" else "RESULTS",
+            if (uiState.query.isBlank()) "TRENDING" else "RESULTS",
             style = MaterialTheme.typography.labelMedium,
             color = TextTertiary,
             modifier = Modifier.padding(horizontal = 14.dp, vertical = 4.dp),
@@ -74,7 +74,7 @@ fun SearchScreen(modifier: Modifier = Modifier) {
             contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
             verticalArrangement = Arrangement.spacedBy(6.dp),
         ) {
-            items(filtered, key = { it.id }) { album ->
+            items(uiState.results, key = { it.id }) { album ->
                 GlassCard(cornerRadius = 12.dp) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,

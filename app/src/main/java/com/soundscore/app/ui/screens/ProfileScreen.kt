@@ -1,37 +1,82 @@
 package com.soundscore.app.ui.screens
 
+import android.content.Intent
+import android.widget.Toast
 import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
-import com.soundscore.app.data.model.SeedData
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.soundscore.app.ui.components.AlbumArtPlaceholder
 import com.soundscore.app.ui.components.BlueButton
 import com.soundscore.app.ui.components.GhostButton
-import com.soundscore.app.ui.theme.*
+import com.soundscore.app.ui.theme.AlbumColors
+import com.soundscore.app.ui.theme.ChromeFaint
+import com.soundscore.app.ui.theme.ChromeLight
+import com.soundscore.app.ui.theme.ChromeDim
+import com.soundscore.app.ui.theme.DarkBase
+import com.soundscore.app.ui.theme.ElectricBlue
+import com.soundscore.app.ui.theme.ElectricBlueDim
+import com.soundscore.app.ui.theme.GlassBorder
+import com.soundscore.app.ui.theme.GlassBg
+import com.soundscore.app.ui.theme.TextSecondary
+import com.soundscore.app.ui.theme.TextTertiary
+import com.soundscore.app.ui.viewmodel.ProfileViewModel
 
 @Composable
-fun ProfileScreen(modifier: Modifier = Modifier) {
-    val profile = SeedData.myProfile
-    
-    // Profile stat counter
+fun ProfileScreen(
+    modifier: Modifier = Modifier,
+    profileViewModel: ProfileViewModel = viewModel(),
+) {
+    val uiState by profileViewModel.uiState.collectAsStateWithLifecycle()
+    val profile = uiState.profile
+
+    if (profile == null) {
+        Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Text("Loading profile…", color = TextSecondary)
+        }
+        return
+    }
+
+    val context = LocalContext.current
+    val clipboard = LocalClipboardManager.current
+
     var startAnimation by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) {
         startAnimation = true
@@ -40,24 +85,23 @@ fun ProfileScreen(modifier: Modifier = Modifier) {
     val logCountAnimate by animateIntAsState(
         targetValue = if (startAnimation) profile.logCount else 0,
         animationSpec = tween(durationMillis = 800),
-        label = "logCount"
+        label = "logCount",
     )
     val reviewCountAnimate by animateIntAsState(
         targetValue = if (startAnimation) profile.reviewCount else 0,
         animationSpec = tween(durationMillis = 800),
-        label = "reviewCount"
+        label = "reviewCount",
     )
     val listCountAnimate by animateIntAsState(
         targetValue = if (startAnimation) profile.listCount else 0,
         animationSpec = tween(durationMillis = 800),
-        label = "listCount"
+        label = "listCount",
     )
 
     LazyColumn(
         modifier = modifier.fillMaxSize(),
         contentPadding = PaddingValues(bottom = 24.dp),
     ) {
-        // ── Header ──
         item {
             Row(
                 Modifier
@@ -71,7 +115,6 @@ fun ProfileScreen(modifier: Modifier = Modifier) {
             }
         }
 
-        // ── Avatar + stats ──
         item {
             Row(
                 Modifier
@@ -79,21 +122,20 @@ fun ProfileScreen(modifier: Modifier = Modifier) {
                     .padding(horizontal = 16.dp, vertical = 4.dp),
                 verticalAlignment = Alignment.Top,
             ) {
-                // Avatar
                 Box(
                     modifier = Modifier
                         .size(56.dp)
                         .clip(CircleShape)
                         .background(
-                            Brush.linearGradient(listOf(ElectricBlue, AlbumColors.purple.last()))
+                            Brush.linearGradient(listOf(ElectricBlue, AlbumColors.purple.last())),
                         )
                         .border(2.dp, ElectricBlue.copy(alpha = 0.4f), CircleShape),
                 )
-                Spacer(Modifier.width(14.dp))
+                Spacer(Modifier.size(14.dp))
                 Column {
                     Text(profile.handle, style = MaterialTheme.typography.titleLarge)
                     Text(profile.bio, style = MaterialTheme.typography.bodySmall, color = TextSecondary)
-                    Spacer(Modifier.height(10.dp))
+                    Spacer(Modifier.size(10.dp))
                     Row(horizontalArrangement = Arrangement.spacedBy(20.dp)) {
                         StatChip("$logCountAnimate", "Logs")
                         StatChip("$reviewCountAnimate", "Reviews")
@@ -103,7 +145,6 @@ fun ProfileScreen(modifier: Modifier = Modifier) {
             }
         }
 
-        // ── Top albums ──
         item {
             Spacer(Modifier.height(16.dp))
             Text(
@@ -127,7 +168,6 @@ fun ProfileScreen(modifier: Modifier = Modifier) {
                 items(profile.topAlbums) { (album, rating) ->
                     Box(
                         modifier = Modifier
-                            .aspectRatio(1f)
                             .clip(RoundedCornerShape(9.dp))
                             .border(1.dp, GlassBorder, RoundedCornerShape(9.dp)),
                     ) {
@@ -136,7 +176,6 @@ fun ProfileScreen(modifier: Modifier = Modifier) {
                             cornerRadius = 9.dp,
                             modifier = Modifier.fillMaxSize(),
                         )
-                        // Score badge
                         Box(
                             modifier = Modifier
                                 .align(Alignment.BottomStart)
@@ -146,8 +185,8 @@ fun ProfileScreen(modifier: Modifier = Modifier) {
                                         listOf(
                                             DarkBase.copy(alpha = 0f),
                                             DarkBase.copy(alpha = 0.75f),
-                                        )
-                                    )
+                                        ),
+                                    ),
                                 )
                                 .padding(4.dp),
                         ) {
@@ -162,7 +201,6 @@ fun ProfileScreen(modifier: Modifier = Modifier) {
             }
         }
 
-        // ── Taste DNA ──
         item {
             Spacer(Modifier.height(14.dp))
             Text(
@@ -183,14 +221,14 @@ fun ProfileScreen(modifier: Modifier = Modifier) {
             ) {
                 val highlighted = setOf("Indie", "Rap", "Avg 3.9 ★")
                 profile.genres.forEach { genre ->
-                    val isHl = genre in highlighted
+                    val isHighlighted = genre in highlighted
                     Box(
                         modifier = Modifier
                             .clip(RoundedCornerShape(20.dp))
-                            .background(if (isHl) ElectricBlueDim else GlassBg)
+                            .background(if (isHighlighted) ElectricBlueDim else GlassBg)
                             .border(
                                 1.dp,
-                                if (isHl) ElectricBlue.copy(alpha = 0.3f) else GlassBorder,
+                                if (isHighlighted) ElectricBlue.copy(alpha = 0.3f) else GlassBorder,
                                 RoundedCornerShape(20.dp),
                             )
                             .padding(horizontal = 10.dp, vertical = 5.dp),
@@ -198,14 +236,13 @@ fun ProfileScreen(modifier: Modifier = Modifier) {
                         Text(
                             genre,
                             style = MaterialTheme.typography.labelSmall,
-                            color = if (isHl) ElectricBlue else ChromeDim,
+                            color = if (isHighlighted) ElectricBlue else ChromeDim,
                         )
                     }
                 }
             }
         }
 
-        // ── CTAs ──
         item {
             Spacer(Modifier.height(16.dp))
             Row(
@@ -214,8 +251,27 @@ fun ProfileScreen(modifier: Modifier = Modifier) {
                     .padding(horizontal = 12.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                BlueButton("Share profile card", onClick = { /* TODO */ }, modifier = Modifier.weight(1.2f))
-                GhostButton("Export data", onClick = { /* TODO */ }, modifier = Modifier.weight(1f))
+                BlueButton(
+                    "Share profile card",
+                    onClick = {
+                        val text = profileViewModel.buildShareText()
+                        val intent = Intent(Intent.ACTION_SEND).apply {
+                            type = "text/plain"
+                            putExtra(Intent.EXTRA_TEXT, text)
+                        }
+                        context.startActivity(Intent.createChooser(intent, "Share profile"))
+                    },
+                    modifier = Modifier.weight(1.2f),
+                )
+                GhostButton(
+                    "Export data",
+                    onClick = {
+                        val snapshot = profileViewModel.exportDataSnapshot()
+                        clipboard.setText(AnnotatedString(snapshot))
+                        Toast.makeText(context, "Export snapshot copied", Toast.LENGTH_SHORT).show()
+                    },
+                    modifier = Modifier.weight(1f),
+                )
             }
         }
     }

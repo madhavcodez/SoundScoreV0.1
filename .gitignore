@@ -1,0 +1,16 @@
+# Node / monorepo
+node_modules/
+*.tsbuildinfo
+
+# Backend runtime
+backend/dist/
+backend/.env
+
+# Android/Gradle local artifacts
+.gradle/
+.idea/
+local.properties
+**/build/
+
+# macOS
+.DS_Store

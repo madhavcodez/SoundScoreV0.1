@@ -4,6 +4,7 @@ import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -23,15 +24,22 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import com.soundscore.app.data.model.FeedItem
-import com.soundscore.app.data.model.SeedData
 import com.soundscore.app.ui.components.AlbumArtPlaceholder
 import com.soundscore.app.ui.components.GlassCard
 import com.soundscore.app.ui.components.StarRating
 import com.soundscore.app.ui.theme.*
+import com.soundscore.app.ui.viewmodel.FeedViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.delay
 
 @Composable
-fun FeedScreen(modifier: Modifier = Modifier) {
+fun FeedScreen(
+    modifier: Modifier = Modifier,
+    feedViewModel: FeedViewModel = viewModel(),
+) {
+    val uiState by feedViewModel.uiState.collectAsStateWithLifecycle()
+
     LazyColumn(
         modifier = modifier.fillMaxSize(),
         contentPadding = PaddingValues(bottom = 16.dp),
@@ -104,7 +112,7 @@ fun FeedScreen(modifier: Modifier = Modifier) {
         }
 
         // ── Feed items ──
-        itemsIndexed(SeedData.feedItems, key = { _, item -> item.id }) { index, item ->
+        itemsIndexed(uiState.items, key = { _, item -> item.id }) { index, item ->
             // Staggered list entrance
             var visible by remember { mutableStateOf(false) }
             LaunchedEffect(Unit) {
@@ -117,14 +125,20 @@ fun FeedScreen(modifier: Modifier = Modifier) {
                 enter = fadeIn(animationSpec = tween(400)) + 
                         slideInVertically(initialOffsetY = { 40 }, animationSpec = tween(400)),
             ) {
-                FeedCard(item)
+                FeedCard(
+                    item = item,
+                    onToggleLike = { feedViewModel.toggleLike(item.id) },
+                )
             }
         }
     }
 }
 
 @Composable
-private fun FeedCard(item: FeedItem) {
+private fun FeedCard(
+    item: FeedItem,
+    onToggleLike: () -> Unit,
+) {
     // Pulsing glow on liked heart
     val infiniteTransition = rememberInfiniteTransition(label = "pulse")
     val pulseAlpha by infiniteTransition.animateFloat(
@@ -190,7 +204,7 @@ private fun FeedCard(item: FeedItem) {
                         color = if (item.isLiked) ElectricBlue else TextTertiary,
                         modifier = Modifier.graphicsLayer {
                             alpha = if (item.isLiked) pulseAlpha else 1f
-                        }
+                        }.clickable { onToggleLike() }
                     )
                     Text("💬 ${item.comments}", style = MaterialTheme.typography.labelSmall, color = TextTertiary)
                     Text("+ Log", style = MaterialTheme.typography.labelSmall, color = TextTertiary)
