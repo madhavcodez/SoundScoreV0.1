@@ -7,6 +7,7 @@ gh.pat
 # Backend runtime
 backend/dist/
 backend/.env
+packages/contracts/dist/
 
 # Android/Gradle local artifacts
 .gradle/

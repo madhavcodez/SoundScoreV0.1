@@ -5,9 +5,12 @@ import {
   RefreshRequestSchema,
   SignUpRequestSchema,
 } from "@soundscore/contracts";
-import type { InMemoryStore } from "../types";
+import { compare, hash } from "bcryptjs";
+import type { Db } from "../db/client";
 import { conflict, unauthorized } from "../lib/errors";
+import { mapUserProfile } from "../lib/mappers";
 import { nowIso, uid } from "../lib/util";
+import { env } from "../config/env";
 
 const buildAuthResponse = (
   accessToken: string,
@@ -16,91 +19,187 @@ const buildAuthResponse = (
   handle: string,
 ) => AuthResponseSchema.parse({ accessToken, refreshToken, userId, handle });
 
-export const registerAuthRoutes = (app: FastifyInstance, store: InMemoryStore) => {
+const writeProfileCache = async (db: Db, userId: string) => {
+  const profile = await db.query<{
+    id: string;
+    handle: string;
+    bio: string;
+    log_count: number;
+    review_count: number;
+    list_count: number;
+    avg_rating: number;
+  }>(
+    `
+      SELECT id, handle, bio, log_count, review_count, list_count, avg_rating
+      FROM users
+      WHERE id = $1
+    `,
+    [userId],
+  );
+
+  if (profile.rowCount) {
+    await db.redis.setex(
+      `profile:${userId}`,
+      90,
+      JSON.stringify(mapUserProfile(profile.rows[0])),
+    );
+  }
+};
+
+export const registerAuthRoutes = (app: FastifyInstance, db: Db) => {
   app.post("/v1/auth/signup", async (request) => {
     const payload = SignUpRequestSchema.parse(request.body);
-    if (store.usersByEmail.has(payload.email.toLowerCase())) {
+    const existing = await db.query<{ id: string }>(
+      "SELECT id FROM users WHERE email = $1",
+      [payload.email.toLowerCase()],
+    );
+    if (existing.rowCount) {
       throw conflict("EMAIL_ALREADY_IN_USE", "Email is already registered");
     }
 
     const userId = uid("usr");
     const accessToken = uid("atk");
     const refreshToken = uid("rtk");
+    const now = nowIso();
+    const passwordHash = await hash(payload.password, env.auth.saltRounds);
 
-    store.users.set(userId, {
-      id: userId,
-      email: payload.email.toLowerCase(),
-      password: payload.password,
-      refreshToken,
-      profile: {
-        id: userId,
-        handle: payload.handle.startsWith("@") ? payload.handle : `@${payload.handle}`,
-        bio: "",
-        logCount: 0,
-        reviewCount: 0,
-        listCount: 0,
-        avgRating: 0,
-      },
-    });
-    store.usersByEmail.set(payload.email.toLowerCase(), userId);
-    store.sessions.set(accessToken, {
+    await db.query(
+      `
+        INSERT INTO users(
+          id, email, password_hash, handle, bio, log_count, review_count, list_count, avg_rating, refresh_token, created_at, updated_at
+        ) VALUES ($1, $2, $3, $4, '', 0, 0, 0, 0, $5, $6, $6)
+      `,
+      [
+        userId,
+        payload.email.toLowerCase(),
+        passwordHash,
+        payload.handle.startsWith("@") ? payload.handle : `@${payload.handle}`,
+        refreshToken,
+        now,
+      ],
+    );
+
+    await db.query(
+      `
+        INSERT INTO sessions(access_token, user_id, created_at)
+        VALUES($1, $2, $3)
+      `,
+      [accessToken, userId, now],
+    );
+
+    await db.query(
+      `
+        INSERT INTO notification_preferences(user_id)
+        VALUES($1)
+        ON CONFLICT(user_id) DO NOTHING
+      `,
+      [userId],
+    );
+
+    await writeProfileCache(db, userId);
+
+    return buildAuthResponse(
       accessToken,
+      refreshToken,
       userId,
-      createdAt: nowIso(),
-    });
-
-    return buildAuthResponse(accessToken, refreshToken, userId, store.users.get(userId)!.profile.handle);
+      payload.handle.startsWith("@") ? payload.handle : `@${payload.handle}`,
+    );
   });
 
   app.post("/v1/auth/login", async (request) => {
     const payload = LoginRequestSchema.parse(request.body);
-    const userId = store.usersByEmail.get(payload.email.toLowerCase());
-    if (!userId) {
+    const userResult = await db.query<{
+      id: string;
+      password_hash: string;
+      handle: string;
+    }>(
+      "SELECT id, password_hash, handle FROM users WHERE email = $1",
+      [payload.email.toLowerCase()],
+    );
+
+    if (!userResult.rowCount) {
       throw unauthorized("Invalid credentials");
     }
 
-    const user = store.users.get(userId)!;
-    if (user.password !== payload.password) {
+    const user = userResult.rows[0];
+    const matches = await compare(payload.password, user.password_hash);
+    if (!matches) {
       throw unauthorized("Invalid credentials");
     }
 
     const accessToken = uid("atk");
     const refreshToken = uid("rtk");
-    user.refreshToken = refreshToken;
-    store.sessions.set(accessToken, {
-      accessToken,
-      userId,
-      createdAt: nowIso(),
-    });
+    const now = nowIso();
 
-    return buildAuthResponse(accessToken, refreshToken, userId, user.profile.handle);
+    await db.query(
+      "UPDATE users SET refresh_token = $2, updated_at = NOW() WHERE id = $1",
+      [user.id, refreshToken],
+    );
+    await db.query(
+      "INSERT INTO sessions(access_token, user_id, created_at) VALUES($1, $2, $3)",
+      [accessToken, user.id, now],
+    );
+
+    return buildAuthResponse(accessToken, refreshToken, user.id, user.handle);
   });
 
   app.post("/v1/auth/refresh", async (request) => {
     const payload = RefreshRequestSchema.parse(request.body);
-    const user = [...store.users.values()].find((candidate) => candidate.refreshToken === payload.refreshToken);
-    if (!user) {
+    const userResult = await db.query<{ id: string; handle: string }>(
+      "SELECT id, handle FROM users WHERE refresh_token = $1",
+      [payload.refreshToken],
+    );
+
+    if (!userResult.rowCount) {
       throw unauthorized("Refresh token is invalid");
     }
 
+    const user = userResult.rows[0];
     const accessToken = uid("atk");
     const nextRefreshToken = uid("rtk");
-    user.refreshToken = nextRefreshToken;
-    store.sessions.set(accessToken, {
-      accessToken,
-      userId: user.id,
-      createdAt: nowIso(),
-    });
+    const now = nowIso();
 
-    return buildAuthResponse(accessToken, nextRefreshToken, user.id, user.profile.handle);
+    await db.query(
+      "UPDATE users SET refresh_token = $2, updated_at = NOW() WHERE id = $1",
+      [user.id, nextRefreshToken],
+    );
+    await db.query(
+      "INSERT INTO sessions(access_token, user_id, created_at) VALUES($1, $2, $3)",
+      [accessToken, user.id, now],
+    );
+
+    return buildAuthResponse(accessToken, nextRefreshToken, user.id, user.handle);
   });
 
   app.get("/v1/me", async (request) => {
-    const userId = app.requireAuth(request);
-    const user = store.users.get(userId);
-    if (!user) {
+    const userId = await app.requireAuth(request);
+    const cached = await db.redis.get(`profile:${userId}`);
+    if (cached) {
+      return JSON.parse(cached) as unknown;
+    }
+
+    const user = await db.query<{
+      id: string;
+      handle: string;
+      bio: string;
+      log_count: number;
+      review_count: number;
+      list_count: number;
+      avg_rating: number;
+    }>(
+      `
+        SELECT id, handle, bio, log_count, review_count, list_count, avg_rating
+        FROM users
+        WHERE id = $1
+      `,
+      [userId],
+    );
+    if (!user.rowCount) {
       throw unauthorized();
     }
-    return user.profile;
+
+    const profile = mapUserProfile(user.rows[0]);
+    await db.redis.setex(`profile:${userId}`, 90, JSON.stringify(profile));
+    return profile;
   });
 };

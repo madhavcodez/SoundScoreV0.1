@@ -4,148 +4,311 @@ import {
   CreateReviewRequestSchema,
   UpdateReviewRequestSchema,
 } from "@soundscore/contracts";
-import type { InMemoryStore } from "../types";
+import type { Db } from "../db/client";
 import { conflict, notFound } from "../lib/errors";
-import { nowIso, uid } from "../lib/util";
 import { withIdempotency } from "../lib/idempotency";
+import {
+  invalidateFeedCacheForUserAndFollowers,
+  queueFollowerNotifications,
+} from "../lib/notifications";
+import { nowIso, uid } from "../lib/util";
 
-export const registerOpinionRoutes = (app: FastifyInstance, store: InMemoryStore) => {
+const updateUserAndAlbumAggregates = async (db: Db, userId: string, albumId: string) => {
+  await db.query(
+    `
+      UPDATE users
+      SET log_count = stat.log_count,
+          avg_rating = stat.avg_rating,
+          updated_at = NOW()
+      FROM (
+        SELECT
+          COUNT(*)::int AS log_count,
+          COALESCE(AVG(value), 0)::real AS avg_rating
+        FROM ratings
+        WHERE user_id = $1
+      ) stat
+      WHERE users.id = $1
+    `,
+    [userId],
+  );
+
+  await db.query(
+    `
+      UPDATE albums
+      SET avg_rating = stat.avg_rating,
+          log_count = stat.log_count
+      FROM (
+        SELECT
+          COALESCE(AVG(value), 0)::real AS avg_rating,
+          COUNT(*)::int AS log_count
+        FROM ratings
+        WHERE album_id = $1
+      ) stat
+      WHERE albums.id = $1
+    `,
+    [albumId],
+  );
+};
+
+export const registerOpinionRoutes = (app: FastifyInstance, db: Db) => {
   app.get("/v1/log/recently-played", async (request) => {
-    const userId = app.requireAuth(request);
-    const recentlyPlayed = store.listeningEvents
-      .filter((event) => event.userId === userId)
-      .sort((a, b) => b.playedAt.localeCompare(a.playedAt))
-      .slice(0, 30);
+    const userId = await app.requireAuth(request);
+
+    const recentlyPlayed = await db.query<{
+      id: string;
+      user_id: string;
+      album_id: string;
+      played_at: string;
+      source: "manual" | "spotify" | "apple";
+      source_ref: Record<string, unknown>;
+    }>(
+      `
+        SELECT id, user_id, album_id, played_at, source, source_ref
+        FROM listening_events
+        WHERE user_id = $1
+        ORDER BY played_at DESC
+        LIMIT 30
+      `,
+      [userId],
+    );
 
     return {
-      items: recentlyPlayed,
+      items: recentlyPlayed.rows.map((row) => ({
+        id: row.id,
+        userId: row.user_id,
+        albumId: row.album_id,
+        playedAt: row.played_at,
+        source: row.source,
+        sourceRef: row.source_ref,
+      })),
       nextCursor: null,
     };
   });
 
-  app.post("/v1/ratings", async (request, reply) => {
-    const userId = app.requireAuth(request);
+  app.post("/v1/ratings", async (request) => {
+    const userId = await app.requireAuth(request);
     const payload = CreateRatingRequestSchema.parse(request.body);
-    if (!store.albums.has(payload.albumId)) {
+
+    const albumExists = await db.query<{ id: string }>("SELECT id FROM albums WHERE id = $1", [payload.albumId]);
+    if (!albumExists.rowCount) {
       throw notFound("Album");
     }
 
-    return withIdempotency(request, reply, store, userId, async () => {
-      const existing = [...store.ratings.values()].find((rating) => rating.userId === userId && rating.albumId === payload.albumId);
+    return withIdempotency(request, db, userId, async () => {
       const now = nowIso();
-      const rating = existing
-        ? { ...existing, value: payload.value, updatedAt: now }
-        : {
-            id: uid("rat"),
-            userId,
-            albumId: payload.albumId,
-            value: payload.value,
-            createdAt: now,
-            updatedAt: now,
-          };
+      const ratingId = uid("rat");
 
-      store.ratings.set(rating.id, rating);
-      const user = store.users.get(userId);
-      if (user) {
-        const userRatings = [...store.ratings.values()].filter((candidate) => candidate.userId === userId);
-        const avgRating = userRatings.length
-          ? userRatings.reduce((sum, candidate) => sum + candidate.value, 0) / userRatings.length
-          : 0;
-        user.profile = {
-          ...user.profile,
-          logCount: userRatings.length,
-          avgRating: Number(avgRating.toFixed(2)),
-        };
-      }
+      const ratingResult = await db.query<{
+        id: string;
+        user_id: string;
+        album_id: string;
+        value: number;
+        created_at: string;
+        updated_at: string;
+      }>(
+        `
+          INSERT INTO ratings (id, user_id, album_id, value, created_at, updated_at)
+          VALUES ($1, $2, $3, $4, $5, $5)
+          ON CONFLICT (user_id, album_id)
+          DO UPDATE SET value = EXCLUDED.value, updated_at = EXCLUDED.updated_at
+          RETURNING id, user_id, album_id, value, created_at, updated_at
+        `,
+        [ratingId, userId, payload.albumId, payload.value, now],
+      );
 
-      store.listeningEvents.push({
-        id: uid("lst"),
+      await db.query(
+        `
+          INSERT INTO listening_events(id, user_id, album_id, played_at, source, source_ref)
+          VALUES ($1, $2, $3, $4, 'manual', '{}'::jsonb)
+        `,
+        [uid("lst"), userId, payload.albumId, now],
+      );
+
+      const activityId = uid("act");
+      await db.query(
+        `
+          INSERT INTO activity_events(id, actor_id, type, object_type, object_id, created_at, payload)
+          VALUES ($1, $2, 'RATED_ALBUM', 'album', $3, $4, $5::jsonb)
+        `,
+        [activityId, userId, payload.albumId, now, JSON.stringify({ albumId: payload.albumId, rating: payload.value })],
+      );
+
+      await updateUserAndAlbumAggregates(db, userId, payload.albumId);
+      await db.redis.del(`profile:${userId}`);
+      await invalidateFeedCacheForUserAndFollowers(db, userId);
+      await queueFollowerNotifications(
+        db,
         userId,
-        albumId: payload.albumId,
-        playedAt: now,
-        source: "manual",
-        sourceRef: {},
-      });
-      store.activity.unshift({
-        id: uid("act"),
-        actorId: userId,
-        type: "RATED_ALBUM",
-        object: { type: "album", id: payload.albumId },
-        createdAt: now,
-        payload: { albumId: payload.albumId, rating: payload.value },
-        reactions: 0,
-        comments: 0,
-      });
+        "SOCIAL_RATING",
+        {
+          actorId: userId,
+          activityId,
+          albumId: payload.albumId,
+          rating: payload.value,
+        },
+        {
+          collapseKey: `actor:${userId}:social`,
+          dedupeKey: `${activityId}:social-rating`,
+        },
+      );
 
-      return rating;
-    });
-  });
-
-  app.post("/v1/reviews", async (request, reply) => {
-    const userId = app.requireAuth(request);
-    const payload = CreateReviewRequestSchema.parse(request.body);
-    if (!store.albums.has(payload.albumId)) {
-      throw notFound("Album");
-    }
-
-    return withIdempotency(request, reply, store, userId, async () => {
-      const now = nowIso();
-      const review = {
-        id: uid("rev"),
-        userId,
-        albumId: payload.albumId,
-        body: payload.body,
-        revision: 0,
-        createdAt: now,
-        updatedAt: now,
+      const rating = ratingResult.rows[0];
+      return {
+        id: rating.id,
+        userId: rating.user_id,
+        albumId: rating.album_id,
+        value: Number(rating.value),
+        createdAt: rating.created_at,
+        updatedAt: rating.updated_at,
       };
-
-      store.reviews.set(review.id, review);
-      const user = store.users.get(userId);
-      if (user) {
-        const reviewCount = [...store.reviews.values()].filter((candidate) => candidate.userId === userId).length;
-        user.profile = {
-          ...user.profile,
-          reviewCount,
-        };
-      }
-      store.activity.unshift({
-        id: uid("act"),
-        actorId: userId,
-        type: "WROTE_REVIEW",
-        object: { type: "review", id: review.id },
-        createdAt: now,
-        payload: { albumId: payload.albumId, reviewId: review.id },
-        reactions: 0,
-        comments: 0,
-      });
-
-      return review;
     });
   });
 
-  app.put("/v1/reviews/:id", async (request, reply) => {
-    const userId = app.requireAuth(request);
+  app.post("/v1/reviews", async (request) => {
+    const userId = await app.requireAuth(request);
+    const payload = CreateReviewRequestSchema.parse(request.body);
+
+    const albumExists = await db.query<{ id: string }>("SELECT id FROM albums WHERE id = $1", [payload.albumId]);
+    if (!albumExists.rowCount) {
+      throw notFound("Album");
+    }
+
+    return withIdempotency(request, db, userId, async () => {
+      const now = nowIso();
+      const reviewId = uid("rev");
+
+      const reviewResult = await db.query<{
+        id: string;
+        user_id: string;
+        album_id: string;
+        body: string;
+        revision: number;
+        created_at: string;
+        updated_at: string;
+      }>(
+        `
+          INSERT INTO reviews(id, user_id, album_id, body, revision, created_at, updated_at)
+          VALUES ($1, $2, $3, $4, 0, $5, $5)
+          RETURNING id, user_id, album_id, body, revision, created_at, updated_at
+        `,
+        [reviewId, userId, payload.albumId, payload.body, now],
+      );
+
+      const activityId = uid("act");
+      await db.query(
+        `
+          INSERT INTO activity_events(id, actor_id, type, object_type, object_id, created_at, payload)
+          VALUES ($1, $2, 'WROTE_REVIEW', 'review', $3, $4, $5::jsonb)
+        `,
+        [activityId, userId, reviewId, now, JSON.stringify({ albumId: payload.albumId, reviewId })],
+      );
+
+      await db.query(
+        `
+          UPDATE users
+          SET review_count = stat.review_count,
+              updated_at = NOW()
+          FROM (
+            SELECT COUNT(*)::int AS review_count
+            FROM reviews
+            WHERE user_id = $1
+          ) stat
+          WHERE users.id = $1
+        `,
+        [userId],
+      );
+
+      await db.redis.del(`profile:${userId}`);
+      await invalidateFeedCacheForUserAndFollowers(db, userId);
+      await queueFollowerNotifications(
+        db,
+        userId,
+        "SOCIAL_REVIEW",
+        {
+          actorId: userId,
+          activityId,
+          albumId: payload.albumId,
+          reviewId,
+        },
+        {
+          collapseKey: `actor:${userId}:social`,
+          dedupeKey: `${activityId}:social-review`,
+        },
+      );
+
+      const review = reviewResult.rows[0];
+      return {
+        id: review.id,
+        userId: review.user_id,
+        albumId: review.album_id,
+        body: review.body,
+        revision: review.revision,
+        createdAt: review.created_at,
+        updatedAt: review.updated_at,
+      };
+    });
+  });
+
+  app.put("/v1/reviews/:id", async (request) => {
+    const userId = await app.requireAuth(request);
     const reviewId = (request.params as { id: string }).id;
     const payload = UpdateReviewRequestSchema.parse(request.body);
 
-    return withIdempotency(request, reply, store, userId, async () => {
-      const review = store.reviews.get(reviewId);
-      if (!review || review.userId !== userId) {
+    return withIdempotency(request, db, userId, async () => {
+      const review = await db.query<{
+        id: string;
+        user_id: string;
+        album_id: string;
+        body: string;
+        revision: number;
+        created_at: string;
+        updated_at: string;
+      }>(
+        `
+          SELECT id, user_id, album_id, body, revision, created_at, updated_at
+          FROM reviews
+          WHERE id = $1
+        `,
+        [reviewId],
+      );
+
+      if (!review.rowCount || review.rows[0].user_id !== userId) {
         throw notFound("Review");
       }
-      if (review.revision !== payload.expectedRevision) {
+      if (review.rows[0].revision !== payload.expectedRevision) {
         throw conflict("REVIEW_REVISION_CONFLICT", "Review has been updated on another device");
       }
 
-      const updated = {
-        ...review,
-        body: payload.body,
-        revision: review.revision + 1,
-        updatedAt: nowIso(),
+      const updated = await db.query<{
+        id: string;
+        user_id: string;
+        album_id: string;
+        body: string;
+        revision: number;
+        created_at: string;
+        updated_at: string;
+      }>(
+        `
+          UPDATE reviews
+          SET body = $2,
+              revision = revision + 1,
+              updated_at = NOW()
+          WHERE id = $1
+          RETURNING id, user_id, album_id, body, revision, created_at, updated_at
+        `,
+        [reviewId, payload.body],
+      );
+
+      const row = updated.rows[0];
+      return {
+        id: row.id,
+        userId: row.user_id,
+        albumId: row.album_id,
+        body: row.body,
+        revision: row.revision,
+        createdAt: row.created_at,
+        updatedAt: row.updated_at,
       };
-      store.reviews.set(updated.id, updated);
-      return updated;
     });
   });
 };

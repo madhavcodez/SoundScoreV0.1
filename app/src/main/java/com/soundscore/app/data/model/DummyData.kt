@@ -49,18 +49,37 @@ data class UserList(
     val albumIds: List<String> = emptyList(),
 )
 
+data class NotificationPreferences(
+    val socialEnabled: Boolean = true,
+    val recapEnabled: Boolean = true,
+    val commentEnabled: Boolean = true,
+    val reactionEnabled: Boolean = true,
+    val quietHoursStart: Int = 22,
+    val quietHoursEnd: Int = 7,
+)
+
+data class WeeklyRecap(
+    val id: String,
+    val weekStart: String,
+    val weekEnd: String,
+    val totalLogs: Int,
+    val averageRating: Float,
+    val shareText: String,
+    val deepLink: String,
+)
+
 
 // ── Static seed data ──────────────────────────────────────────
 
 object SeedData {
 
     val albums = listOf(
-        Album("1", "CHROMAKOPIA", "Tyler, the Creator", 2024, AlbumColors.purple, 4.3f, 2100),
-        Album("2", "GNX", "Kendrick Lamar", 2024, AlbumColors.indigo, 4.1f, 1800),
-        Album("3", "Short n' Sweet", "Sabrina Carpenter", 2024, AlbumColors.teal, 3.8f, 950),
-        Album("4", "Brat", "Charli XCX", 2024, AlbumColors.pink, 4.0f, 3200),
-        Album("5", "Manning Fireside", "Mk.gee", 2024, AlbumColors.blue, 3.9f, 620),
-        Album("6", "The Great Impersonator", "Halsey", 2024, AlbumColors.gold, 3.5f, 430),
+        Album("alb_1", "CHROMAKOPIA", "Tyler, the Creator", 2024, AlbumColors.purple, 4.3f, 2100),
+        Album("alb_2", "GNX", "Kendrick Lamar", 2024, AlbumColors.indigo, 4.1f, 1800),
+        Album("alb_3", "Short n' Sweet", "Sabrina Carpenter", 2024, AlbumColors.teal, 3.8f, 950),
+        Album("alb_4", "Brat", "Charli XCX", 2024, AlbumColors.pink, 4.0f, 3200),
+        Album("alb_5", "Manning Fireside", "Mk.gee", 2024, AlbumColors.blue, 3.9f, 620),
+        Album("alb_6", "The Great Impersonator", "Halsey", 2024, AlbumColors.gold, 3.5f, 430),
     )
 
     val feedItems = listOf(
@@ -93,7 +112,7 @@ object SeedData {
     )
 
     // Initial ratings for the Log screen (matches mockup visual state)
-    val logInitialRatings = mapOf("1" to 5f, "2" to 4f, "3" to 3f)
+    val logInitialRatings = mapOf("alb_1" to 5f, "alb_2" to 4f, "alb_3" to 3f)
 
     val myProfile = UserProfile(
         handle = "@madhav",
@@ -118,7 +137,19 @@ object SeedData {
             id = "l1",
             title = "Albums I Would Defend",
             note = "All gas, no skips.",
-            albumIds = listOf("1", "4"),
+            albumIds = listOf("alb_1", "alb_4"),
         ),
+    )
+
+    val defaultNotificationPreferences = NotificationPreferences()
+
+    val initialRecap = WeeklyRecap(
+        id = "rcp_local",
+        weekStart = "2026-03-03",
+        weekEnd = "2026-03-10",
+        totalLogs = 12,
+        averageRating = 4.1f,
+        shareText = "My SoundScore week: 12 logs, avg 4.1★",
+        deepLink = "https://soundscore.app/recaps/weekly/2026-03-03",
     )
 }

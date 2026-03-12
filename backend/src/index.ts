@@ -1,11 +1,16 @@
 import { buildServer } from "./server";
+import { env } from "./config/env";
 
-const port = Number(process.env.PORT ?? 8080);
-const host = process.env.HOST ?? "0.0.0.0";
+const run = async () => {
+  const app = await buildServer();
+  await app.listen({
+    port: env.app.port,
+    host: env.app.host,
+  });
+};
 
-const app = buildServer();
-
-app.listen({ port, host }).catch((error) => {
-  app.log.error(error);
+run().catch((error) => {
+  // eslint-disable-next-line no-console
+  console.error(error);
   process.exit(1);
 });

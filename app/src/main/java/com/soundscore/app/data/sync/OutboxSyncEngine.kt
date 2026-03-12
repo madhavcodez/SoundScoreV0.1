@@ -1,16 +1,32 @@
 package com.soundscore.app.data.sync
 
-/**
- * Phase 1A sync scaffold. A later phase will replace this with WorkManager-backed flush logic
- * that dispatches queued operations to the backend when network is available.
- */
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+
 class OutboxSyncEngine(
     private val outboxStore: OutboxStore,
+    private val dispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) {
-    fun flushNoop() {
-        // Intentionally no-op for now; foundation layer only.
-        outboxStore.pending.value.forEach { operation ->
-            outboxStore.markDispatched(operation.id)
+    suspend fun flush(
+        handler: suspend (OutboxOperation) -> Unit,
+    ) = withContext(dispatcher) {
+        val now = System.currentTimeMillis()
+        val snapshot = outboxStore.pending.value
+        snapshot.forEach { operation ->
+            if (operation.nextAttemptAtMs > now) {
+                return@forEach
+            }
+            runCatching {
+                handler(operation)
+            }.onSuccess {
+                outboxStore.markDispatched(operation.id)
+            }.onFailure { error ->
+                outboxStore.markFailed(
+                    operationId = operation.id,
+                    message = error.message ?: "sync_failed",
+                )
+            }
         }
     }
 }

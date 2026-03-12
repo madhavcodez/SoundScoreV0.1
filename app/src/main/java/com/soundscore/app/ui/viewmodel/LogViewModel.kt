@@ -8,11 +8,13 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 data class LogUiState(
     val albums: List<Album> = emptyList(),
     val ratings: Map<String, Float> = emptyMap(),
     val writeLaterQueue: List<Album> = emptyList(),
+    val syncMessage: String? = null,
 )
 
 class LogViewModel : ViewModel() {
@@ -21,11 +23,13 @@ class LogViewModel : ViewModel() {
     val uiState: StateFlow<LogUiState> = combine(
         repository.albums,
         repository.ratings,
-    ) { albums, ratings ->
+        repository.syncMessage,
+    ) { albums, ratings, syncMessage ->
         LogUiState(
             albums = albums,
             ratings = ratings,
             writeLaterQueue = albums.take(3),
+            syncMessage = syncMessage,
         )
     }.stateIn(
         scope = viewModelScope,
@@ -34,6 +38,8 @@ class LogViewModel : ViewModel() {
     )
 
     fun updateRating(albumId: String, rating: Float) {
-        repository.updateRating(albumId, rating)
+        viewModelScope.launch {
+            repository.updateRating(albumId, rating)
+        }
     }
 }

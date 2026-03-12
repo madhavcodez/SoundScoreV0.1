@@ -1,47 +1,23 @@
-import type {
-  ActivityEvent,
-  Album,
-  ListeningEvent,
-  Rating,
-  Review,
-  SoundScoreList,
-  UserProfile,
-} from "@soundscore/contracts";
-
-export type UserRecord = {
+export type UserProfileRow = {
   id: string;
-  email: string;
-  password: string;
-  profile: UserProfile;
-  refreshToken: string | null;
+  handle: string;
+  bio: string;
+  log_count: number;
+  review_count: number;
+  list_count: number;
+  avg_rating: number;
 };
 
-export type SessionRecord = {
-  accessToken: string;
-  userId: string;
-  createdAt: string;
+export type AuthenticatedUser = {
+  id: string;
+  handle: string;
 };
 
-export type ExportPayload = {
-  profile: UserProfile;
-  ratings: Rating[];
-  reviews: Review[];
-  lists: SoundScoreList[];
-  following: string[];
-  listeningEvents: ListeningEvent[];
-  activity: ActivityEvent[];
-};
-
-export type InMemoryStore = {
-  users: Map<string, UserRecord>;
-  usersByEmail: Map<string, string>;
-  sessions: Map<string, SessionRecord>;
-  albums: Map<string, Album>;
-  ratings: Map<string, Rating>;
-  reviews: Map<string, Review>;
-  lists: Map<string, SoundScoreList>;
-  follows: Map<string, Set<string>>;
-  listeningEvents: ListeningEvent[];
-  activity: ActivityEvent[];
-  idempotency: Map<string, unknown>;
+export type NotificationPreferences = {
+  socialEnabled: boolean;
+  recapEnabled: boolean;
+  commentEnabled: boolean;
+  reactionEnabled: boolean;
+  quietHoursStart: number;
+  quietHoursEnd: number;
 };

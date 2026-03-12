@@ -55,8 +55,47 @@ export const ListSchema = z.object({
   updatedAt: z.string().datetime(),
 });
 
+export const RecapAlbumSchema = z.object({
+  albumId: z.string(),
+  rating: z.number().min(0).max(5),
+});
+
+export const WeeklyRecapSchema = z.object({
+  id: z.string(),
+  userId: z.string(),
+  weekStart: z.string(),
+  weekEnd: z.string(),
+  totalLogs: z.number().int().nonnegative(),
+  averageRating: z.number().min(0).max(5),
+  topAlbums: z.array(RecapAlbumSchema),
+  shareText: z.string(),
+  deepLink: z.string(),
+  createdAt: z.string().datetime(),
+});
+
+export const NotificationPreferenceSchema = z.object({
+  socialEnabled: z.boolean(),
+  recapEnabled: z.boolean(),
+  commentEnabled: z.boolean(),
+  reactionEnabled: z.boolean(),
+  quietHoursStart: z.number().int().min(0).max(23),
+  quietHoursEnd: z.number().int().min(0).max(23),
+});
+
+export const DeviceTokenSchema = z.object({
+  id: z.string(),
+  userId: z.string(),
+  platform: z.enum(["android", "ios"]),
+  deviceToken: z.string().min(8),
+  createdAt: z.string().datetime(),
+  lastSeenAt: z.string().datetime(),
+});
+
 export type Album = z.infer<typeof AlbumSchema>;
 export type Rating = z.infer<typeof RatingSchema>;
 export type Review = z.infer<typeof ReviewSchema>;
 export type UserProfile = z.infer<typeof UserProfileSchema>;
 export type SoundScoreList = z.infer<typeof ListSchema>;
+export type WeeklyRecap = z.infer<typeof WeeklyRecapSchema>;
+export type NotificationPreference = z.infer<typeof NotificationPreferenceSchema>;
+export type DeviceToken = z.infer<typeof DeviceTokenSchema>;

@@ -54,3 +54,17 @@ export const ReactActivityRequestSchema = z.object({
 export const CommentActivityRequestSchema = z.object({
   body: z.string().min(1),
 });
+
+export const UpsertNotificationPreferenceSchema = z.object({
+  socialEnabled: z.boolean(),
+  recapEnabled: z.boolean(),
+  commentEnabled: z.boolean(),
+  reactionEnabled: z.boolean(),
+  quietHoursStart: z.number().int().min(0).max(23),
+  quietHoursEnd: z.number().int().min(0).max(23),
+});
+
+export const RegisterDeviceTokenRequestSchema = z.object({
+  platform: z.enum(["android", "ios"]),
+  deviceToken: z.string().min(8),
+});

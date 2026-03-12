@@ -26,7 +26,9 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -43,13 +45,15 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.soundscore.app.data.model.NotificationPreferences
 import com.soundscore.app.ui.components.AlbumArtPlaceholder
 import com.soundscore.app.ui.components.BlueButton
 import com.soundscore.app.ui.components.GhostButton
+import com.soundscore.app.ui.components.GlassCard
 import com.soundscore.app.ui.theme.AlbumColors
+import com.soundscore.app.ui.theme.ChromeDim
 import com.soundscore.app.ui.theme.ChromeFaint
 import com.soundscore.app.ui.theme.ChromeLight
-import com.soundscore.app.ui.theme.ChromeDim
 import com.soundscore.app.ui.theme.DarkBase
 import com.soundscore.app.ui.theme.ElectricBlue
 import com.soundscore.app.ui.theme.ElectricBlueDim
@@ -245,6 +249,34 @@ fun ProfileScreen(
 
         item {
             Spacer(Modifier.height(16.dp))
+            Text(
+                "NOTIFICATIONS",
+                style = MaterialTheme.typography.labelMedium,
+                color = TextTertiary,
+                modifier = Modifier.padding(horizontal = 14.dp, vertical = 4.dp),
+            )
+            NotificationPreferencesCard(
+                preferences = uiState.notificationPreferences,
+                onPreferencesChange = profileViewModel::updateNotificationPreferences,
+            )
+        }
+
+        item {
+            Spacer(Modifier.height(12.dp))
+            Text(
+                "WEEKLY RECAP",
+                style = MaterialTheme.typography.labelMedium,
+                color = TextTertiary,
+                modifier = Modifier.padding(horizontal = 14.dp, vertical = 4.dp),
+            )
+            RecapCard(
+                summary = uiState.latestRecap?.shareText ?: "No recap yet",
+                onGenerate = profileViewModel::generateRecap,
+            )
+        }
+
+        item {
+            Spacer(Modifier.height(16.dp))
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -266,14 +298,113 @@ fun ProfileScreen(
                 GhostButton(
                     "Export data",
                     onClick = {
-                        val snapshot = profileViewModel.exportDataSnapshot()
-                        clipboard.setText(AnnotatedString(snapshot))
-                        Toast.makeText(context, "Export snapshot copied", Toast.LENGTH_SHORT).show()
+                        profileViewModel.exportDataSnapshot { snapshot ->
+                            clipboard.setText(AnnotatedString(snapshot))
+                            Toast.makeText(context, "Export snapshot copied", Toast.LENGTH_SHORT).show()
+                        }
                     },
                     modifier = Modifier.weight(1f),
                 )
             }
         }
+
+        if (!uiState.syncMessage.isNullOrBlank()) {
+            item {
+                Spacer(Modifier.height(10.dp))
+                Text(
+                    text = uiState.syncMessage ?: "",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = TextSecondary,
+                    modifier = Modifier.padding(horizontal = 14.dp),
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun NotificationPreferencesCard(
+    preferences: NotificationPreferences,
+    onPreferencesChange: (NotificationPreferences) -> Unit,
+) {
+    GlassCard(cornerRadius = 14.dp, modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)) {
+        PreferenceRow(
+            label = "Social activity",
+            enabled = preferences.socialEnabled,
+            onToggle = { onPreferencesChange(preferences.copy(socialEnabled = it)) },
+        )
+        PreferenceRow(
+            label = "Recap ready",
+            enabled = preferences.recapEnabled,
+            onToggle = { onPreferencesChange(preferences.copy(recapEnabled = it)) },
+        )
+        PreferenceRow(
+            label = "Comments",
+            enabled = preferences.commentEnabled,
+            onToggle = { onPreferencesChange(preferences.copy(commentEnabled = it)) },
+        )
+        PreferenceRow(
+            label = "Reactions",
+            enabled = preferences.reactionEnabled,
+            onToggle = { onPreferencesChange(preferences.copy(reactionEnabled = it)) },
+        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                text = "Quiet hours: ${preferences.quietHoursStart}:00–${preferences.quietHoursEnd}:00",
+                style = MaterialTheme.typography.bodySmall,
+                color = TextSecondary,
+                modifier = Modifier.weight(1f),
+            )
+            TextButton(onClick = {
+                val nextStart = if (preferences.quietHoursStart == 0) 23 else preferences.quietHoursStart - 1
+                onPreferencesChange(preferences.copy(quietHoursStart = nextStart))
+            }) {
+                Text("-1h")
+            }
+            TextButton(onClick = {
+                val nextStart = (preferences.quietHoursStart + 1) % 24
+                onPreferencesChange(preferences.copy(quietHoursStart = nextStart))
+            }) {
+                Text("+1h")
+            }
+        }
+    }
+}
+
+@Composable
+private fun PreferenceRow(
+    label: String,
+    enabled: Boolean,
+    onToggle: (Boolean) -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.bodyMedium,
+            color = ChromeLight,
+            modifier = Modifier.weight(1f),
+        )
+        Switch(checked = enabled, onCheckedChange = onToggle)
+    }
+}
+
+@Composable
+private fun RecapCard(
+    summary: String,
+    onGenerate: () -> Unit,
+) {
+    GlassCard(cornerRadius = 14.dp, modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)) {
+        Text(summary, style = MaterialTheme.typography.bodySmall, color = TextSecondary)
+        Spacer(Modifier.height(8.dp))
+        BlueButton(text = "Generate latest recap", onClick = onGenerate)
     }
 }
 

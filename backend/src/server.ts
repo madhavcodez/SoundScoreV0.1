@@ -1,6 +1,6 @@
 import Fastify, { type FastifyRequest } from "fastify";
 import cors from "@fastify/cors";
-import { createStore } from "./lib/store";
+import rateLimit from "@fastify/rate-limit";
 import { ApiError, unauthorized } from "./lib/errors";
 import { registerAuthRoutes } from "./modules/auth";
 import { registerCatalogRoutes } from "./modules/catalog";
@@ -8,70 +8,103 @@ import { registerOpinionRoutes } from "./modules/opinions";
 import { registerSocialRoutes } from "./modules/social";
 import { registerListRoutes } from "./modules/lists";
 import { registerTrustRoutes } from "./modules/trust";
-import type { InMemoryStore } from "./types";
+import { registerRecapRoutes } from "./modules/recaps";
+import { registerPushRoutes } from "./modules/push";
+import { createDb, type Db } from "./db/client";
+import { runMigrations } from "./db/runMigrations";
 
 declare module "fastify" {
   interface FastifyInstance {
-    store: InMemoryStore;
-    requireAuth: (request: FastifyRequest) => string;
+    db: Db;
+    requireAuth: (request: FastifyRequest) => Promise<string>;
   }
 }
 
-const seedAlbums = (store: InMemoryStore) => {
-  [
-    ["alb_1", "CHROMAKOPIA", "Tyler, the Creator", 2024, 4.3, 2100],
-    ["alb_2", "GNX", "Kendrick Lamar", 2024, 4.1, 1800],
-    ["alb_3", "Short n' Sweet", "Sabrina Carpenter", 2024, 3.8, 950],
-    ["alb_4", "Brat", "Charli XCX", 2024, 4.0, 3200],
-    ["alb_5", "Manning Fireside", "Mk.gee", 2024, 3.9, 620],
-    ["alb_6", "The Great Impersonator", "Halsey", 2024, 3.5, 430],
-  ].forEach(([id, title, artist, year, avgRating, logCount]) => {
-    store.albums.set(id as string, {
-      id: id as string,
-      title: title as string,
-      artist: artist as string,
-      year: year as number,
-      artworkUrl: null,
-      avgRating: avgRating as number,
-      logCount: logCount as number,
-    });
-  });
-};
-
-const resolveUserIdFromRequest = (request: FastifyRequest, store: InMemoryStore): string => {
+const resolveUserIdFromRequest = async (request: FastifyRequest, db: Db): Promise<string> => {
   const authHeader = request.headers.authorization;
   if (!authHeader?.startsWith("Bearer ")) {
     throw unauthorized();
   }
 
   const token = authHeader.replace("Bearer ", "").trim();
-  const session = store.sessions.get(token);
-  if (!session) {
+  const session = await db.query<{ user_id: string }>(
+    "SELECT user_id FROM sessions WHERE access_token = $1",
+    [token],
+  );
+
+  if (!session.rowCount) {
     throw unauthorized();
   }
-  return session.userId;
+  return session.rows[0].user_id;
 };
 
-export const buildServer = () => {
+export const buildServer = async () => {
   const app = Fastify({ logger: true });
-  const store = createStore();
-  seedAlbums(store);
+  const db = createDb();
+  await runMigrations(db);
 
-  app.decorate("store", store);
-  app.decorate("requireAuth", (request: FastifyRequest) => resolveUserIdFromRequest(request, store));
+  app.decorate("db", db);
+  app.decorate("requireAuth", (request: FastifyRequest) => resolveUserIdFromRequest(request, db));
 
   app.register(cors, { origin: true });
+  app.register(rateLimit, {
+    global: true,
+    max: 100,
+    timeWindow: "1 minute",
+    addHeadersOnExceeding: {
+      "x-ratelimit-limit": true,
+      "x-ratelimit-remaining": true,
+      "x-ratelimit-reset": true,
+    },
+  });
 
-  app.get("/health", async () => ({ status: "ok", service: "soundscore-backend" }));
+  app.get("/health", async () => ({
+    status: "ok",
+    service: "soundscore-backend",
+    checks: {
+      postgres: "up",
+      redis: db.redis.status,
+    },
+  }));
 
-  registerAuthRoutes(app, store);
-  registerCatalogRoutes(app, store);
-  registerOpinionRoutes(app, store);
-  registerSocialRoutes(app, store);
-  registerListRoutes(app, store);
-  registerTrustRoutes(app, store);
+  registerAuthRoutes(app, db);
+  registerCatalogRoutes(app, db);
+  registerOpinionRoutes(app, db);
+  registerSocialRoutes(app, db);
+  registerListRoutes(app, db);
+  registerTrustRoutes(app, db);
+  registerPushRoutes(app, db);
+  registerRecapRoutes(app, db);
 
-  app.setErrorHandler((error, request, reply) => {
+  app.addHook("onRequest", (request, _reply, done) => {
+    // Attach start timestamp for latency logging.
+    (request as FastifyRequest & { _startedAt?: bigint })._startedAt = process.hrtime.bigint();
+    done();
+  });
+
+  app.addHook("onResponse", (request, reply, done) => {
+    const startedAt = (request as FastifyRequest & { _startedAt?: bigint })._startedAt;
+    if (startedAt) {
+      const elapsedMs = Number(process.hrtime.bigint() - startedAt) / 1_000_000;
+      const routePath = request.routeOptions.url ?? request.url;
+      app.log.info(
+        {
+          path: routePath,
+          method: request.method,
+          statusCode: reply.statusCode,
+          latencyMs: Number(elapsedMs.toFixed(2)),
+        },
+        "request_complete",
+      );
+    }
+    done();
+  });
+
+  app.addHook("onClose", async () => {
+    await db.close();
+  });
+
+  app.setErrorHandler((error: unknown, request, reply) => {
     if (error instanceof ApiError) {
       return reply.status(error.statusCode).send({
         error: {

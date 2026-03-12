@@ -7,6 +7,9 @@ enum class OutboxOperationType {
     TOGGLE_REACTION,
     CREATE_LIST,
     EXPORT_DATA,
+    REGISTER_DEVICE_TOKEN,
+    UPSERT_NOTIFICATION_PREFERENCES,
+    GENERATE_RECAP,
 }
 
 data class OutboxOperation(
@@ -15,4 +18,7 @@ data class OutboxOperation(
     val payload: Map<String, String>,
     val idempotencyKey: String = UUID.randomUUID().toString(),
     val createdAtMs: Long = System.currentTimeMillis(),
+    val attemptCount: Int = 0,
+    val nextAttemptAtMs: Long = 0L,
+    val lastError: String? = null,
 )

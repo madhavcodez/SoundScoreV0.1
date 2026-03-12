@@ -8,6 +8,32 @@ on:
 jobs:
   backend-contracts:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: soundscore
+          POSTGRES_USER: soundscore
+          POSTGRES_PASSWORD: soundscore
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U soundscore -d soundscore"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DATABASE_URL: postgresql://soundscore:soundscore@localhost:5432/soundscore
+      REDIS_URL: redis://localhost:6379
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -21,8 +47,17 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Run migrations
+        run: npm run migrate --workspace backend
+
       - name: Typecheck contracts and backend
         run: npm run typecheck
+
+      - name: Backend tests
+        run: npm run test --workspace backend
+
+      - name: Build contracts and backend
+        run: npm run build
 
   android:
     runs-on: ubuntu-latest
@@ -41,3 +76,6 @@ jobs:
 
       - name: Build Debug APK
         run: ./gradlew :app:assembleDebug
+
+      - name: Run Android unit tests
+        run: ./gradlew :app:testDebugUnitTest

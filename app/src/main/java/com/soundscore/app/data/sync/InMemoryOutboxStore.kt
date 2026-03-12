@@ -9,6 +9,7 @@ interface OutboxStore {
     val pending: StateFlow<List<OutboxOperation>>
     fun enqueue(operation: OutboxOperation)
     fun markDispatched(operationId: String)
+    fun markFailed(operationId: String, message: String)
 }
 
 class InMemoryOutboxStore : OutboxStore {
@@ -22,5 +23,23 @@ class InMemoryOutboxStore : OutboxStore {
 
     override fun markDispatched(operationId: String) {
         operations.update { current -> current.filterNot { it.id == operationId } }
+    }
+
+    override fun markFailed(operationId: String, message: String) {
+        operations.update { current ->
+            current.map { operation ->
+                if (operation.id != operationId) {
+                    operation
+                } else {
+                    val nextAttempt = operation.attemptCount + 1
+                    val backoffMs = (1L shl minOf(nextAttempt, 6)) * 1_000L
+                    operation.copy(
+                        attemptCount = nextAttempt,
+                        nextAttemptAtMs = System.currentTimeMillis() + backoffMs,
+                        lastError = message,
+                    )
+                }
+            }
+        }
     }
 }

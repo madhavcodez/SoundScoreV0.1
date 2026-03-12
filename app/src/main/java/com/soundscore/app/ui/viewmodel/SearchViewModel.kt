@@ -10,10 +10,12 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 data class SearchUiState(
     val query: String = "",
     val results: List<Album> = emptyList(),
+    val syncMessage: String? = null,
 )
 
 class SearchViewModel : ViewModel() {
@@ -23,18 +25,25 @@ class SearchViewModel : ViewModel() {
     val uiState: StateFlow<SearchUiState> = combine(
         query,
         repository.albums,
-    ) { text, albums ->
+        repository.syncMessage,
+    ) { text, albums, syncMessage ->
         val results = if (text.isBlank()) {
             albums
         } else {
             repository.searchAlbums(text)
         }
-        SearchUiState(query = text, results = results)
+        SearchUiState(query = text, results = results, syncMessage = syncMessage)
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5_000),
         initialValue = SearchUiState(),
     )
+
+    init {
+        viewModelScope.launch {
+            repository.refresh()
+        }
+    }
 
     fun updateQuery(next: String) {
         query.update { next }

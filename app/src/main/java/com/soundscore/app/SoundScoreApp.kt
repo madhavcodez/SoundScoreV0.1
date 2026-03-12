@@ -19,22 +19,25 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.soundscore.app.ui.navigation.DeepLinkResolver
 import com.soundscore.app.ui.navigation.Screen
 import com.soundscore.app.ui.screens.*
 import com.soundscore.app.ui.theme.*
 import com.soundscore.app.ui.components.GlassCard
 
 @Composable
-fun SoundScoreApp() {
+fun SoundScoreApp(startDeepLink: String? = null) {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
+    val snackbarHostState = remember { SnackbarHostState() }
 
     Box(modifier = Modifier
         .fillMaxSize()
         .background(DarkBase)) {
         Scaffold(
             containerColor = Color.Transparent,
+            snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
             bottomBar = {
                 FloatingNavigationBar(
                     screens = Screen.all,
@@ -51,6 +54,16 @@ fun SoundScoreApp() {
                 )
             }
         ) { innerPadding ->
+            LaunchedEffect(startDeepLink) {
+                val deepLink = startDeepLink ?: return@LaunchedEffect
+                val destination = DeepLinkResolver.resolve(deepLink)
+
+                navController.navigate(destination.screen) {
+                    launchSingleTop = true
+                }
+                snackbarHostState.showSnackbar(destination.message)
+            }
+
             NavHost(
                 navController = navController,
                 startDestination = Screen.Feed,
