@@ -1,6 +1,8 @@
 # Node / monorepo
 node_modules/
 *.tsbuildinfo
+ghpat.txt
+gh.pat
 
 # Backend runtime
 backend/dist/
@@ -9,6 +11,7 @@ backend/.env
 # Android/Gradle local artifacts
 .gradle/
 .idea/
+.local/
 local.properties
 **/build/
 

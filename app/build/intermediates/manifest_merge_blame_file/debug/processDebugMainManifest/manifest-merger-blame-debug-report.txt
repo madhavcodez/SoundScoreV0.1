@@ -9,136 +9,199 @@
 9        android:targetSdkVersion="35" />
 10
 11    <uses-permission android:name="android.permission.INTERNET" />
-11-->C:\Users\sahil\SoundScore\app\src\main\AndroidManifest.xml:5:5-67
-11-->C:\Users\sahil\SoundScore\app\src\main\AndroidManifest.xml:5:22-64
+11-->/Users/madhavschauhan/Desktop/SoundScorev0.1/app/src/main/AndroidManifest.xml:5:5-67
+11-->/Users/madhavschauhan/Desktop/SoundScorev0.1/app/src/main/AndroidManifest.xml:5:22-64
 12
 13    <permission
-13-->[androidx.core:core:1.15.0] C:\Users\sahil\.gradle\caches\8.11.1\transforms\6d67a9c42695ae257539c0278d095b70\transformed\core-1.15.0\AndroidManifest.xml:22:5-24:47
+13-->[androidx.core:core:1.15.0] /Users/madhavschauhan/.gradle/caches/8.13/transforms/38f10d47493bdf1a796bdb4d3e409f18/transformed/core-1.15.0/AndroidManifest.xml:22:5-24:47
 14        android:name="com.soundscore.app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
-14-->[androidx.core:core:1.15.0] C:\Users\sahil\.gradle\caches\8.11.1\transforms\6d67a9c42695ae257539c0278d095b70\transformed\core-1.15.0\AndroidManifest.xml:23:9-81
+14-->[androidx.core:core:1.15.0] /Users/madhavschauhan/.gradle/caches/8.13/transforms/38f10d47493bdf1a796bdb4d3e409f18/transformed/core-1.15.0/AndroidManifest.xml:23:9-81
 15        android:protectionLevel="signature" />
-15-->[androidx.core:core:1.15.0] C:\Users\sahil\.gradle\caches\8.11.1\transforms\6d67a9c42695ae257539c0278d095b70\transformed\core-1.15.0\AndroidManifest.xml:24:9-44
+15-->[androidx.core:core:1.15.0] /Users/madhavschauhan/.gradle/caches/8.13/transforms/38f10d47493bdf1a796bdb4d3e409f18/transformed/core-1.15.0/AndroidManifest.xml:24:9-44
 16
 17    <uses-permission android:name="com.soundscore.app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
-17-->[androidx.core:core:1.15.0] C:\Users\sahil\.gradle\caches\8.11.1\transforms\6d67a9c42695ae257539c0278d095b70\transformed\core-1.15.0\AndroidManifest.xml:26:5-97
-17-->[androidx.core:core:1.15.0] C:\Users\sahil\.gradle\caches\8.11.1\transforms\6d67a9c42695ae257539c0278d095b70\transformed\core-1.15.0\AndroidManifest.xml:26:22-94
+17-->[androidx.core:core:1.15.0] /Users/madhavschauhan/.gradle/caches/8.13/transforms/38f10d47493bdf1a796bdb4d3e409f18/transformed/core-1.15.0/AndroidManifest.xml:26:5-97
+17-->[androidx.core:core:1.15.0] /Users/madhavschauhan/.gradle/caches/8.13/transforms/38f10d47493bdf1a796bdb4d3e409f18/transformed/core-1.15.0/AndroidManifest.xml:26:22-94
 18
 19    <application
-19-->C:\Users\sahil\SoundScore\app\src\main\AndroidManifest.xml:7:5-26:19
+19-->/Users/madhavschauhan/Desktop/SoundScorev0.1/app/src/main/AndroidManifest.xml:7:5-59:19
 20        android:allowBackup="true"
-20-->C:\Users\sahil\SoundScore\app\src\main\AndroidManifest.xml:8:9-35
+20-->/Users/madhavschauhan/Desktop/SoundScorev0.1/app/src/main/AndroidManifest.xml:8:9-35
 21        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
-21-->[androidx.core:core:1.15.0] C:\Users\sahil\.gradle\caches\8.11.1\transforms\6d67a9c42695ae257539c0278d095b70\transformed\core-1.15.0\AndroidManifest.xml:28:18-86
+21-->[androidx.core:core:1.15.0] /Users/madhavschauhan/.gradle/caches/8.13/transforms/38f10d47493bdf1a796bdb4d3e409f18/transformed/core-1.15.0/AndroidManifest.xml:28:18-86
 22        android:debuggable="true"
 23        android:extractNativeLibs="false"
 24        android:icon="@mipmap/ic_launcher"
-24-->C:\Users\sahil\SoundScore\app\src\main\AndroidManifest.xml:9:9-43
+24-->/Users/madhavschauhan/Desktop/SoundScorev0.1/app/src/main/AndroidManifest.xml:9:9-43
 25        android:label="@string/app_name"
-25-->C:\Users\sahil\SoundScore\app\src\main\AndroidManifest.xml:10:9-41
+25-->/Users/madhavschauhan/Desktop/SoundScorev0.1/app/src/main/AndroidManifest.xml:10:9-41
 26        android:supportsRtl="true"
-26-->C:\Users\sahil\SoundScore\app\src\main\AndroidManifest.xml:11:9-35
-27        android:testOnly="true"
-28        android:theme="@style/Theme.SoundScore" >
-28-->C:\Users\sahil\SoundScore\app\src\main\AndroidManifest.xml:12:9-48
-29        <activity
-29-->C:\Users\sahil\SoundScore\app\src\main\AndroidManifest.xml:15:9-24:20
-30            android:name="com.soundscore.app.MainActivity"
-30-->C:\Users\sahil\SoundScore\app\src\main\AndroidManifest.xml:16:13-41
-31            android:exported="true"
-31-->C:\Users\sahil\SoundScore\app\src\main\AndroidManifest.xml:17:13-36
-32            android:theme="@style/Theme.SoundScore"
-32-->C:\Users\sahil\SoundScore\app\src\main\AndroidManifest.xml:18:13-52
-33            android:windowSoftInputMode="adjustResize" >
-33-->C:\Users\sahil\SoundScore\app\src\main\AndroidManifest.xml:19:13-55
-34            <intent-filter>
-34-->C:\Users\sahil\SoundScore\app\src\main\AndroidManifest.xml:20:13-23:29
-35                <action android:name="android.intent.action.MAIN" />
-35-->C:\Users\sahil\SoundScore\app\src\main\AndroidManifest.xml:21:17-69
-35-->C:\Users\sahil\SoundScore\app\src\main\AndroidManifest.xml:21:25-66
-36
-37                <category android:name="android.intent.category.LAUNCHER" />
-37-->C:\Users\sahil\SoundScore\app\src\main\AndroidManifest.xml:22:17-77
-37-->C:\Users\sahil\SoundScore\app\src\main\AndroidManifest.xml:22:27-74
-38            </intent-filter>
-39        </activity>
-40        <activity
-40-->[androidx.compose.ui:ui-test-manifest:1.7.6] C:\Users\sahil\.gradle\caches\8.11.1\transforms\44221c1f1b5dfeaf9ca86c891372a77d\transformed\ui-test-manifest-1.7.6\AndroidManifest.xml:23:9-25:39
-41            android:name="androidx.activity.ComponentActivity"
-41-->[androidx.compose.ui:ui-test-manifest:1.7.6] C:\Users\sahil\.gradle\caches\8.11.1\transforms\44221c1f1b5dfeaf9ca86c891372a77d\transformed\ui-test-manifest-1.7.6\AndroidManifest.xml:24:13-63
-42            android:exported="true" />
-42-->[androidx.compose.ui:ui-test-manifest:1.7.6] C:\Users\sahil\.gradle\caches\8.11.1\transforms\44221c1f1b5dfeaf9ca86c891372a77d\transformed\ui-test-manifest-1.7.6\AndroidManifest.xml:25:13-36
-43        <activity
-43-->[androidx.compose.ui:ui-tooling-android:1.7.6] C:\Users\sahil\.gradle\caches\8.11.1\transforms\0cdb037e5611f7fde256d06e2a8835e3\transformed\ui-tooling-release\AndroidManifest.xml:23:9-25:39
-44            android:name="androidx.compose.ui.tooling.PreviewActivity"
-44-->[androidx.compose.ui:ui-tooling-android:1.7.6] C:\Users\sahil\.gradle\caches\8.11.1\transforms\0cdb037e5611f7fde256d06e2a8835e3\transformed\ui-tooling-release\AndroidManifest.xml:24:13-71
-45            android:exported="true" />
-45-->[androidx.compose.ui:ui-tooling-android:1.7.6] C:\Users\sahil\.gradle\caches\8.11.1\transforms\0cdb037e5611f7fde256d06e2a8835e3\transformed\ui-tooling-release\AndroidManifest.xml:25:13-36
-46
-47        <provider
-47-->[androidx.emoji2:emoji2:1.3.0] C:\Users\sahil\.gradle\caches\8.11.1\transforms\dbb6aba12e8f4688e96f051321cbac9d\transformed\emoji2-1.3.0\AndroidManifest.xml:24:9-32:20
-48            android:name="androidx.startup.InitializationProvider"
-48-->[androidx.emoji2:emoji2:1.3.0] C:\Users\sahil\.gradle\caches\8.11.1\transforms\dbb6aba12e8f4688e96f051321cbac9d\transformed\emoji2-1.3.0\AndroidManifest.xml:25:13-67
-49            android:authorities="com.soundscore.app.androidx-startup"
-49-->[androidx.emoji2:emoji2:1.3.0] C:\Users\sahil\.gradle\caches\8.11.1\transforms\dbb6aba12e8f4688e96f051321cbac9d\transformed\emoji2-1.3.0\AndroidManifest.xml:26:13-68
-50            android:exported="false" >
-50-->[androidx.emoji2:emoji2:1.3.0] C:\Users\sahil\.gradle\caches\8.11.1\transforms\dbb6aba12e8f4688e96f051321cbac9d\transformed\emoji2-1.3.0\AndroidManifest.xml:27:13-37
-51            <meta-data
-51-->[androidx.emoji2:emoji2:1.3.0] C:\Users\sahil\.gradle\caches\8.11.1\transforms\dbb6aba12e8f4688e96f051321cbac9d\transformed\emoji2-1.3.0\AndroidManifest.xml:29:13-31:52
-52                android:name="androidx.emoji2.text.EmojiCompatInitializer"
-52-->[androidx.emoji2:emoji2:1.3.0] C:\Users\sahil\.gradle\caches\8.11.1\transforms\dbb6aba12e8f4688e96f051321cbac9d\transformed\emoji2-1.3.0\AndroidManifest.xml:30:17-75
-53                android:value="androidx.startup" />
-53-->[androidx.emoji2:emoji2:1.3.0] C:\Users\sahil\.gradle\caches\8.11.1\transforms\dbb6aba12e8f4688e96f051321cbac9d\transformed\emoji2-1.3.0\AndroidManifest.xml:31:17-49
-54            <meta-data
-54-->[androidx.lifecycle:lifecycle-process:2.8.7] C:\Users\sahil\.gradle\caches\8.11.1\transforms\fecdefc21d864bc98a5b7c28bd337d3b\transformed\lifecycle-process-2.8.7\AndroidManifest.xml:29:13-31:52
-55                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
-55-->[androidx.lifecycle:lifecycle-process:2.8.7] C:\Users\sahil\.gradle\caches\8.11.1\transforms\fecdefc21d864bc98a5b7c28bd337d3b\transformed\lifecycle-process-2.8.7\AndroidManifest.xml:30:17-78
-56                android:value="androidx.startup" />
-56-->[androidx.lifecycle:lifecycle-process:2.8.7] C:\Users\sahil\.gradle\caches\8.11.1\transforms\fecdefc21d864bc98a5b7c28bd337d3b\transformed\lifecycle-process-2.8.7\AndroidManifest.xml:31:17-49
-57            <meta-data
-57-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\sahil\.gradle\caches\8.11.1\transforms\9cb5359e4ff6f34dce519549fc4f2dfc\transformed\profileinstaller-1.3.1\AndroidManifest.xml:29:13-31:52
-58                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
-58-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\sahil\.gradle\caches\8.11.1\transforms\9cb5359e4ff6f34dce519549fc4f2dfc\transformed\profileinstaller-1.3.1\AndroidManifest.xml:30:17-85
-59                android:value="androidx.startup" />
-59-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\sahil\.gradle\caches\8.11.1\transforms\9cb5359e4ff6f34dce519549fc4f2dfc\transformed\profileinstaller-1.3.1\AndroidManifest.xml:31:17-49
-60        </provider>
-61
-62        <receiver
-62-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\sahil\.gradle\caches\8.11.1\transforms\9cb5359e4ff6f34dce519549fc4f2dfc\transformed\profileinstaller-1.3.1\AndroidManifest.xml:34:9-52:20
-63            android:name="androidx.profileinstaller.ProfileInstallReceiver"
-63-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\sahil\.gradle\caches\8.11.1\transforms\9cb5359e4ff6f34dce519549fc4f2dfc\transformed\profileinstaller-1.3.1\AndroidManifest.xml:35:13-76
-64            android:directBootAware="false"
-64-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\sahil\.gradle\caches\8.11.1\transforms\9cb5359e4ff6f34dce519549fc4f2dfc\transformed\profileinstaller-1.3.1\AndroidManifest.xml:36:13-44
-65            android:enabled="true"
-65-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\sahil\.gradle\caches\8.11.1\transforms\9cb5359e4ff6f34dce519549fc4f2dfc\transformed\profileinstaller-1.3.1\AndroidManifest.xml:37:13-35
-66            android:exported="true"
-66-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\sahil\.gradle\caches\8.11.1\transforms\9cb5359e4ff6f34dce519549fc4f2dfc\transformed\profileinstaller-1.3.1\AndroidManifest.xml:38:13-36
-67            android:permission="android.permission.DUMP" >
-67-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\sahil\.gradle\caches\8.11.1\transforms\9cb5359e4ff6f34dce519549fc4f2dfc\transformed\profileinstaller-1.3.1\AndroidManifest.xml:39:13-57
-68            <intent-filter>
-68-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\sahil\.gradle\caches\8.11.1\transforms\9cb5359e4ff6f34dce519549fc4f2dfc\transformed\profileinstaller-1.3.1\AndroidManifest.xml:40:13-42:29
-69                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
-69-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\sahil\.gradle\caches\8.11.1\transforms\9cb5359e4ff6f34dce519549fc4f2dfc\transformed\profileinstaller-1.3.1\AndroidManifest.xml:41:17-91
-69-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\sahil\.gradle\caches\8.11.1\transforms\9cb5359e4ff6f34dce519549fc4f2dfc\transformed\profileinstaller-1.3.1\AndroidManifest.xml:41:25-88
-70            </intent-filter>
-71            <intent-filter>
-71-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\sahil\.gradle\caches\8.11.1\transforms\9cb5359e4ff6f34dce519549fc4f2dfc\transformed\profileinstaller-1.3.1\AndroidManifest.xml:43:13-45:29
-72                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
-72-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\sahil\.gradle\caches\8.11.1\transforms\9cb5359e4ff6f34dce519549fc4f2dfc\transformed\profileinstaller-1.3.1\AndroidManifest.xml:44:17-85
-72-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\sahil\.gradle\caches\8.11.1\transforms\9cb5359e4ff6f34dce519549fc4f2dfc\transformed\profileinstaller-1.3.1\AndroidManifest.xml:44:25-82
-73            </intent-filter>
-74            <intent-filter>
-74-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\sahil\.gradle\caches\8.11.1\transforms\9cb5359e4ff6f34dce519549fc4f2dfc\transformed\profileinstaller-1.3.1\AndroidManifest.xml:46:13-48:29
-75                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE" />
-75-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\sahil\.gradle\caches\8.11.1\transforms\9cb5359e4ff6f34dce519549fc4f2dfc\transformed\profileinstaller-1.3.1\AndroidManifest.xml:47:17-88
-75-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\sahil\.gradle\caches\8.11.1\transforms\9cb5359e4ff6f34dce519549fc4f2dfc\transformed\profileinstaller-1.3.1\AndroidManifest.xml:47:25-85
-76            </intent-filter>
-77            <intent-filter>
-77-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\sahil\.gradle\caches\8.11.1\transforms\9cb5359e4ff6f34dce519549fc4f2dfc\transformed\profileinstaller-1.3.1\AndroidManifest.xml:49:13-51:29
-78                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
-78-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\sahil\.gradle\caches\8.11.1\transforms\9cb5359e4ff6f34dce519549fc4f2dfc\transformed\profileinstaller-1.3.1\AndroidManifest.xml:50:17-95
-78-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\sahil\.gradle\caches\8.11.1\transforms\9cb5359e4ff6f34dce519549fc4f2dfc\transformed\profileinstaller-1.3.1\AndroidManifest.xml:50:25-92
-79            </intent-filter>
-80        </receiver>
-81    </application>
-82
-83</manifest>
+26-->/Users/madhavschauhan/Desktop/SoundScorev0.1/app/src/main/AndroidManifest.xml:11:9-35
+27        android:theme="@style/Theme.SoundScore" >
+27-->/Users/madhavschauhan/Desktop/SoundScorev0.1/app/src/main/AndroidManifest.xml:12:9-48
+28        <activity
+28-->/Users/madhavschauhan/Desktop/SoundScorev0.1/app/src/main/AndroidManifest.xml:15:9-57:20
+29            android:name="com.soundscore.app.MainActivity"
+29-->/Users/madhavschauhan/Desktop/SoundScorev0.1/app/src/main/AndroidManifest.xml:16:13-41
+30            android:exported="true"
+30-->/Users/madhavschauhan/Desktop/SoundScorev0.1/app/src/main/AndroidManifest.xml:17:13-36
+31            android:theme="@style/Theme.SoundScore"
+31-->/Users/madhavschauhan/Desktop/SoundScorev0.1/app/src/main/AndroidManifest.xml:18:13-52
+32            android:windowSoftInputMode="adjustResize" >
+32-->/Users/madhavschauhan/Desktop/SoundScorev0.1/app/src/main/AndroidManifest.xml:19:13-55
+33            <intent-filter>
+33-->/Users/madhavschauhan/Desktop/SoundScorev0.1/app/src/main/AndroidManifest.xml:20:13-23:29
+34                <action android:name="android.intent.action.MAIN" />
+34-->/Users/madhavschauhan/Desktop/SoundScorev0.1/app/src/main/AndroidManifest.xml:21:17-69
+34-->/Users/madhavschauhan/Desktop/SoundScorev0.1/app/src/main/AndroidManifest.xml:21:25-66
+35
+36                <category android:name="android.intent.category.LAUNCHER" />
+36-->/Users/madhavschauhan/Desktop/SoundScorev0.1/app/src/main/AndroidManifest.xml:22:17-77
+36-->/Users/madhavschauhan/Desktop/SoundScorev0.1/app/src/main/AndroidManifest.xml:22:27-74
+37            </intent-filter>
+38            <intent-filter android:autoVerify="true" >
+38-->/Users/madhavschauhan/Desktop/SoundScorev0.1/app/src/main/AndroidManifest.xml:25:13-47:29
+38-->/Users/madhavschauhan/Desktop/SoundScorev0.1/app/src/main/AndroidManifest.xml:25:28-53
+39                <action android:name="android.intent.action.VIEW" />
+39-->/Users/madhavschauhan/Desktop/SoundScorev0.1/app/src/main/AndroidManifest.xml:26:17-69
+39-->/Users/madhavschauhan/Desktop/SoundScorev0.1/app/src/main/AndroidManifest.xml:26:25-66
+40
+41                <category android:name="android.intent.category.DEFAULT" />
+41-->/Users/madhavschauhan/Desktop/SoundScorev0.1/app/src/main/AndroidManifest.xml:28:17-76
+41-->/Users/madhavschauhan/Desktop/SoundScorev0.1/app/src/main/AndroidManifest.xml:28:27-73
+42                <category android:name="android.intent.category.BROWSABLE" />
+42-->/Users/madhavschauhan/Desktop/SoundScorev0.1/app/src/main/AndroidManifest.xml:29:17-78
+42-->/Users/madhavschauhan/Desktop/SoundScorev0.1/app/src/main/AndroidManifest.xml:29:27-75
+43
+44                <data
+44-->/Users/madhavschauhan/Desktop/SoundScorev0.1/app/src/main/AndroidManifest.xml:31:17-34:46
+45                    android:host="soundscore.app"
+45-->/Users/madhavschauhan/Desktop/SoundScorev0.1/app/src/main/AndroidManifest.xml:32:21-50
+46                    android:pathPrefix="/u/"
+46-->/Users/madhavschauhan/Desktop/SoundScorev0.1/app/src/main/AndroidManifest.xml:33:21-45
+47                    android:scheme="https" />
+47-->/Users/madhavschauhan/Desktop/SoundScorev0.1/app/src/main/AndroidManifest.xml:34:21-43
+48                <data
+48-->/Users/madhavschauhan/Desktop/SoundScorev0.1/app/src/main/AndroidManifest.xml:31:17-34:46
+49                    android:host="soundscore.app"
+49-->/Users/madhavschauhan/Desktop/SoundScorev0.1/app/src/main/AndroidManifest.xml:32:21-50
+50                    android:pathPrefix="/lists/"
+50-->/Users/madhavschauhan/Desktop/SoundScorev0.1/app/src/main/AndroidManifest.xml:33:21-45
+51                    android:scheme="https" />
+51-->/Users/madhavschauhan/Desktop/SoundScorev0.1/app/src/main/AndroidManifest.xml:34:21-43
+52                <data
+52-->/Users/madhavschauhan/Desktop/SoundScorev0.1/app/src/main/AndroidManifest.xml:31:17-34:46
+53                    android:host="soundscore.app"
+53-->/Users/madhavschauhan/Desktop/SoundScorev0.1/app/src/main/AndroidManifest.xml:32:21-50
+54                    android:pathPrefix="/recaps/"
+54-->/Users/madhavschauhan/Desktop/SoundScorev0.1/app/src/main/AndroidManifest.xml:33:21-45
+55                    android:scheme="https" />
+55-->/Users/madhavschauhan/Desktop/SoundScorev0.1/app/src/main/AndroidManifest.xml:34:21-43
+56                <data
+56-->/Users/madhavschauhan/Desktop/SoundScorev0.1/app/src/main/AndroidManifest.xml:31:17-34:46
+57                    android:host="soundscore.app"
+57-->/Users/madhavschauhan/Desktop/SoundScorev0.1/app/src/main/AndroidManifest.xml:32:21-50
+58                    android:pathPrefix="/album/"
+58-->/Users/madhavschauhan/Desktop/SoundScorev0.1/app/src/main/AndroidManifest.xml:33:21-45
+59                    android:scheme="https" />
+59-->/Users/madhavschauhan/Desktop/SoundScorev0.1/app/src/main/AndroidManifest.xml:34:21-43
+60            </intent-filter>
+61            <intent-filter>
+61-->/Users/madhavschauhan/Desktop/SoundScorev0.1/app/src/main/AndroidManifest.xml:49:13-56:29
+62                <action android:name="android.intent.action.VIEW" />
+62-->/Users/madhavschauhan/Desktop/SoundScorev0.1/app/src/main/AndroidManifest.xml:26:17-69
+62-->/Users/madhavschauhan/Desktop/SoundScorev0.1/app/src/main/AndroidManifest.xml:26:25-66
+63
+64                <category android:name="android.intent.category.DEFAULT" />
+64-->/Users/madhavschauhan/Desktop/SoundScorev0.1/app/src/main/AndroidManifest.xml:28:17-76
+64-->/Users/madhavschauhan/Desktop/SoundScorev0.1/app/src/main/AndroidManifest.xml:28:27-73
+65                <category android:name="android.intent.category.BROWSABLE" />
+65-->/Users/madhavschauhan/Desktop/SoundScorev0.1/app/src/main/AndroidManifest.xml:29:17-78
+65-->/Users/madhavschauhan/Desktop/SoundScorev0.1/app/src/main/AndroidManifest.xml:29:27-75
+66
+67                <data android:scheme="soundscore" />
+67-->/Users/madhavschauhan/Desktop/SoundScorev0.1/app/src/main/AndroidManifest.xml:31:17-34:46
+67-->/Users/madhavschauhan/Desktop/SoundScorev0.1/app/src/main/AndroidManifest.xml:34:21-43
+68            </intent-filter>
+69        </activity>
+70        <activity
+70-->[androidx.compose.ui:ui-test-manifest:1.7.6] /Users/madhavschauhan/.gradle/caches/8.13/transforms/c5d1367a76bb738b070f693ace3122b2/transformed/ui-test-manifest-1.7.6/AndroidManifest.xml:23:9-25:39
+71            android:name="androidx.activity.ComponentActivity"
+71-->[androidx.compose.ui:ui-test-manifest:1.7.6] /Users/madhavschauhan/.gradle/caches/8.13/transforms/c5d1367a76bb738b070f693ace3122b2/transformed/ui-test-manifest-1.7.6/AndroidManifest.xml:24:13-63
+72            android:exported="true" />
+72-->[androidx.compose.ui:ui-test-manifest:1.7.6] /Users/madhavschauhan/.gradle/caches/8.13/transforms/c5d1367a76bb738b070f693ace3122b2/transformed/ui-test-manifest-1.7.6/AndroidManifest.xml:25:13-36
+73        <activity
+73-->[androidx.compose.ui:ui-tooling-android:1.7.6] /Users/madhavschauhan/.gradle/caches/8.13/transforms/03f90d9b3611f82d2015c340606e0d3c/transformed/ui-tooling-release/AndroidManifest.xml:23:9-25:39
+74            android:name="androidx.compose.ui.tooling.PreviewActivity"
+74-->[androidx.compose.ui:ui-tooling-android:1.7.6] /Users/madhavschauhan/.gradle/caches/8.13/transforms/03f90d9b3611f82d2015c340606e0d3c/transformed/ui-tooling-release/AndroidManifest.xml:24:13-71
+75            android:exported="true" />
+75-->[androidx.compose.ui:ui-tooling-android:1.7.6] /Users/madhavschauhan/.gradle/caches/8.13/transforms/03f90d9b3611f82d2015c340606e0d3c/transformed/ui-tooling-release/AndroidManifest.xml:25:13-36
+76
+77        <provider
+77-->[androidx.emoji2:emoji2:1.3.0] /Users/madhavschauhan/.gradle/caches/8.13/transforms/1d478cf41977bbc7bdcdd06dfa98b1ba/transformed/emoji2-1.3.0/AndroidManifest.xml:24:9-32:20
+78            android:name="androidx.startup.InitializationProvider"
+78-->[androidx.emoji2:emoji2:1.3.0] /Users/madhavschauhan/.gradle/caches/8.13/transforms/1d478cf41977bbc7bdcdd06dfa98b1ba/transformed/emoji2-1.3.0/AndroidManifest.xml:25:13-67
+79            android:authorities="com.soundscore.app.androidx-startup"
+79-->[androidx.emoji2:emoji2:1.3.0] /Users/madhavschauhan/.gradle/caches/8.13/transforms/1d478cf41977bbc7bdcdd06dfa98b1ba/transformed/emoji2-1.3.0/AndroidManifest.xml:26:13-68
+80            android:exported="false" >
+80-->[androidx.emoji2:emoji2:1.3.0] /Users/madhavschauhan/.gradle/caches/8.13/transforms/1d478cf41977bbc7bdcdd06dfa98b1ba/transformed/emoji2-1.3.0/AndroidManifest.xml:27:13-37
+81            <meta-data
+81-->[androidx.emoji2:emoji2:1.3.0] /Users/madhavschauhan/.gradle/caches/8.13/transforms/1d478cf41977bbc7bdcdd06dfa98b1ba/transformed/emoji2-1.3.0/AndroidManifest.xml:29:13-31:52
+82                android:name="androidx.emoji2.text.EmojiCompatInitializer"
+82-->[androidx.emoji2:emoji2:1.3.0] /Users/madhavschauhan/.gradle/caches/8.13/transforms/1d478cf41977bbc7bdcdd06dfa98b1ba/transformed/emoji2-1.3.0/AndroidManifest.xml:30:17-75
+83                android:value="androidx.startup" />
+83-->[androidx.emoji2:emoji2:1.3.0] /Users/madhavschauhan/.gradle/caches/8.13/transforms/1d478cf41977bbc7bdcdd06dfa98b1ba/transformed/emoji2-1.3.0/AndroidManifest.xml:31:17-49
+84            <meta-data
+84-->[androidx.lifecycle:lifecycle-process:2.8.7] /Users/madhavschauhan/.gradle/caches/8.13/transforms/5f8e87869af4d0ffdbfddce007dd2623/transformed/lifecycle-process-2.8.7/AndroidManifest.xml:29:13-31:52
+85                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
+85-->[androidx.lifecycle:lifecycle-process:2.8.7] /Users/madhavschauhan/.gradle/caches/8.13/transforms/5f8e87869af4d0ffdbfddce007dd2623/transformed/lifecycle-process-2.8.7/AndroidManifest.xml:30:17-78
+86                android:value="androidx.startup" />
+86-->[androidx.lifecycle:lifecycle-process:2.8.7] /Users/madhavschauhan/.gradle/caches/8.13/transforms/5f8e87869af4d0ffdbfddce007dd2623/transformed/lifecycle-process-2.8.7/AndroidManifest.xml:31:17-49
+87            <meta-data
+87-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/madhavschauhan/.gradle/caches/8.13/transforms/f79322f7eafdd2ee4e173072c0422b63/transformed/profileinstaller-1.3.1/AndroidManifest.xml:29:13-31:52
+88                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
+88-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/madhavschauhan/.gradle/caches/8.13/transforms/f79322f7eafdd2ee4e173072c0422b63/transformed/profileinstaller-1.3.1/AndroidManifest.xml:30:17-85
+89                android:value="androidx.startup" />
+89-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/madhavschauhan/.gradle/caches/8.13/transforms/f79322f7eafdd2ee4e173072c0422b63/transformed/profileinstaller-1.3.1/AndroidManifest.xml:31:17-49
+90        </provider>
+91
+92        <receiver
+92-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/madhavschauhan/.gradle/caches/8.13/transforms/f79322f7eafdd2ee4e173072c0422b63/transformed/profileinstaller-1.3.1/AndroidManifest.xml:34:9-52:20
+93            android:name="androidx.profileinstaller.ProfileInstallReceiver"
+93-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/madhavschauhan/.gradle/caches/8.13/transforms/f79322f7eafdd2ee4e173072c0422b63/transformed/profileinstaller-1.3.1/AndroidManifest.xml:35:13-76
+94            android:directBootAware="false"
+94-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/madhavschauhan/.gradle/caches/8.13/transforms/f79322f7eafdd2ee4e173072c0422b63/transformed/profileinstaller-1.3.1/AndroidManifest.xml:36:13-44
+95            android:enabled="true"
+95-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/madhavschauhan/.gradle/caches/8.13/transforms/f79322f7eafdd2ee4e173072c0422b63/transformed/profileinstaller-1.3.1/AndroidManifest.xml:37:13-35
+96            android:exported="true"
+96-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/madhavschauhan/.gradle/caches/8.13/transforms/f79322f7eafdd2ee4e173072c0422b63/transformed/profileinstaller-1.3.1/AndroidManifest.xml:38:13-36
+97            android:permission="android.permission.DUMP" >
+97-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/madhavschauhan/.gradle/caches/8.13/transforms/f79322f7eafdd2ee4e173072c0422b63/transformed/profileinstaller-1.3.1/AndroidManifest.xml:39:13-57
+98            <intent-filter>
+98-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/madhavschauhan/.gradle/caches/8.13/transforms/f79322f7eafdd2ee4e173072c0422b63/transformed/profileinstaller-1.3.1/AndroidManifest.xml:40:13-42:29
+99                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
+99-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/madhavschauhan/.gradle/caches/8.13/transforms/f79322f7eafdd2ee4e173072c0422b63/transformed/profileinstaller-1.3.1/AndroidManifest.xml:41:17-91
+99-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/madhavschauhan/.gradle/caches/8.13/transforms/f79322f7eafdd2ee4e173072c0422b63/transformed/profileinstaller-1.3.1/AndroidManifest.xml:41:25-88
+100            </intent-filter>
+101            <intent-filter>
+101-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/madhavschauhan/.gradle/caches/8.13/transforms/f79322f7eafdd2ee4e173072c0422b63/transformed/profileinstaller-1.3.1/AndroidManifest.xml:43:13-45:29
+102                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
+102-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/madhavschauhan/.gradle/caches/8.13/transforms/f79322f7eafdd2ee4e173072c0422b63/transformed/profileinstaller-1.3.1/AndroidManifest.xml:44:17-85
+102-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/madhavschauhan/.gradle/caches/8.13/transforms/f79322f7eafdd2ee4e173072c0422b63/transformed/profileinstaller-1.3.1/AndroidManifest.xml:44:25-82
+103            </intent-filter>
+104            <intent-filter>
+104-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/madhavschauhan/.gradle/caches/8.13/transforms/f79322f7eafdd2ee4e173072c0422b63/transformed/profileinstaller-1.3.1/AndroidManifest.xml:46:13-48:29
+105                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE" />
+105-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/madhavschauhan/.gradle/caches/8.13/transforms/f79322f7eafdd2ee4e173072c0422b63/transformed/profileinstaller-1.3.1/AndroidManifest.xml:47:17-88
+105-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/madhavschauhan/.gradle/caches/8.13/transforms/f79322f7eafdd2ee4e173072c0422b63/transformed/profileinstaller-1.3.1/AndroidManifest.xml:47:25-85
+106            </intent-filter>
+107            <intent-filter>
+107-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/madhavschauhan/.gradle/caches/8.13/transforms/f79322f7eafdd2ee4e173072c0422b63/transformed/profileinstaller-1.3.1/AndroidManifest.xml:49:13-51:29
+108                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
+108-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/madhavschauhan/.gradle/caches/8.13/transforms/f79322f7eafdd2ee4e173072c0422b63/transformed/profileinstaller-1.3.1/AndroidManifest.xml:50:17-95
+108-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/madhavschauhan/.gradle/caches/8.13/transforms/f79322f7eafdd2ee4e173072c0422b63/transformed/profileinstaller-1.3.1/AndroidManifest.xml:50:25-92
+109            </intent-filter>
+110        </receiver>
+111    </application>
+112
+113</manifest>

@@ -4,7 +4,7 @@
             "outputFile": "com.soundscore.app-mergeDebugResources-54:/values-pt-rBR/values-pt-rBR.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\sahil\\.gradle\\caches\\8.11.1\\transforms\\6d67a9c42695ae257539c0278d095b70\\transformed\\core-1.15.0\\res\\values-pt-rBR\\values-pt-rBR.xml",
+                    "source": "/Users/madhavschauhan/.gradle/caches/8.13/transforms/38f10d47493bdf1a796bdb4d3e409f18/transformed/core-1.15.0/res/values-pt-rBR/values-pt-rBR.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,7,8,9",
                         "startColumns": "4,4,4,4,4,4,4,4",
@@ -21,7 +21,7 @@
                     }
                 },
                 {
-                    "source": "C:\\Users\\sahil\\.gradle\\caches\\8.11.1\\transforms\\93bfa7de016f4aa37286dbf180354bb6\\transformed\\material3-release\\res\\values-pt-rBR\\values-pt-rBR.xml",
+                    "source": "/Users/madhavschauhan/.gradle/caches/8.13/transforms/fc5107dd0264fdc78923c70fb433e796/transformed/material3-release/res/values-pt-rBR/values-pt-rBR.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58",
                         "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
@@ -38,7 +38,7 @@
                     }
                 },
                 {
-                    "source": "C:\\Users\\sahil\\.gradle\\caches\\8.11.1\\transforms\\be1bdc36a65e082f5a0661799c204962\\transformed\\foundation-release\\res\\values-pt-rBR\\values-pt-rBR.xml",
+                    "source": "/Users/madhavschauhan/.gradle/caches/8.13/transforms/6a701330e6817318bf7e6182c1173e8a/transformed/foundation-release/res/values-pt-rBR/values-pt-rBR.xml",
                     "from": {
                         "startLines": "2,3",
                         "startColumns": "4,4",
@@ -55,7 +55,7 @@
                     }
                 },
                 {
-                    "source": "C:\\Users\\sahil\\.gradle\\caches\\8.11.1\\transforms\\c264577dd9ccf3cb4d3364921efa921a\\transformed\\ui-release\\res\\values-pt-rBR\\values-pt-rBR.xml",
+                    "source": "/Users/madhavschauhan/.gradle/caches/8.13/transforms/b2a1d3ec9af78e69edd17a564dc3ff7e/transformed/ui-release/res/values-pt-rBR/values-pt-rBR.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19",
                         "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
