@@ -7,7 +7,8 @@ Date: 2026-03-11 (America/Chicago)
 - Repo: `madhavcodez/SoundScoreV0.1`
 - Branch target: `main`
 - Hygiene commit (artifacts cleanup): `b7ba542`
-- Phase 1 baseline commit: `TBD (filled after baseline commit + push)`
+- Phase 1 baseline commit: `4a60d5a` (pushed to `origin/main`)
+- Release tag: `phase1-complete-2026-03-11`
 
 ## Runtime/tooling setup
 

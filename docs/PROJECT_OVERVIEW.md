@@ -32,7 +32,9 @@ SoundScore V1 is designed to be:
 
 | Doc | Purpose |
 |-----|--------|
-| [NEXT_PHASE_PLAN.md](NEXT_PHASE_PLAN.md) | **Next phase:** Phase 1B stabilization and M1 closure; tracks, exit criteria, build verification, external-contributor handoff. |
+| [PHASE_2_EXECUTION_PLAN.md](PHASE_2_EXECUTION_PLAN.md) | **Current next phase:** executable Phase 2 reset plan (workstreams, sequencing, dependencies, acceptance gates). |
+| [PHASE_2_ISSUE_CATALOG.md](PHASE_2_ISSUE_CATALOG.md) | Source-of-truth mapping for fresh Phase 2 issues (`#109`-`#124`) and legacy M2 supersession map. |
+| [NEXT_PHASE_PLAN.md](NEXT_PHASE_PLAN.md) | Phase 1B stabilization/closure plan (historical execution context for Phase 1 completion). |
 | [CONTEXT_01_PRODUCT_AND_MARKET.md](CONTEXT_01_PRODUCT_AND_MARKET.md) | Why we exist, wedge, success criteria, competitors, strategy (from deep research + PDF). |
 | [CONTEXT_02_ARCHITECTURE_AND_SYSTEM.md](CONTEXT_02_ARCHITECTURE_AND_SYSTEM.md) | Domains, data flow, provider adapters, catalog, feed, API, trust stack (from PDF). |
 | [CONTEXT_03_MOBILE_APP_SPEC.md](CONTEXT_03_MOBILE_APP_SPEC.md) | Mobile principles, journeys, current Android implementation, perf, offline, push (from PDF + codebase). |
