@@ -2,35 +2,51 @@ import SwiftUI
 
 struct ContentView: View {
     @State private var selectedTab: Tab = .feed
+    @State private var selectedAlbum: Album?
+    @State private var showSettings = false
 
     var body: some View {
-        ZStack(alignment: .bottom) {
-            AppBackdrop()
+        NavigationStack {
+            ZStack(alignment: .bottom) {
+                AppBackdrop()
 
-            TabContent(selectedTab: selectedTab)
+                TabContent(
+                    selectedTab: selectedTab,
+                    onSelectAlbum: { selectedAlbum = $0 },
+                    onOpenSettings: { showSettings = true }
+                )
 
-            FloatingTabBar(selectedTab: $selectedTab)
-                .padding(.horizontal, 24)
-                .padding(.bottom, 8)
+                FloatingTabBar(selectedTab: $selectedTab)
+                    .padding(.horizontal, 24)
+                    .padding(.bottom, 8)
+            }
+            .navigationDestination(item: $selectedAlbum) { album in
+                AlbumDetailScreen(album: album)
+            }
+            .navigationDestination(isPresented: $showSettings) {
+                SettingsScreen()
+            }
         }
     }
 }
 
 struct TabContent: View {
     let selectedTab: Tab
+    var onSelectAlbum: (Album) -> Void = { _ in }
+    var onOpenSettings: () -> Void = {}
 
     var body: some View {
         switch selectedTab {
         case .feed:
-            FeedScreen()
+            FeedScreen(onSelectAlbum: onSelectAlbum)
         case .log:
-            LogScreen()
+            LogScreen(onSelectAlbum: onSelectAlbum)
         case .search:
-            SearchScreen()
+            SearchScreen(onSelectAlbum: onSelectAlbum)
         case .lists:
-            ListsScreen()
+            ListsScreen(onSelectAlbum: onSelectAlbum)
         case .profile:
-            ProfileScreen()
+            ProfileScreen(onSelectAlbum: onSelectAlbum, onOpenSettings: onOpenSettings)
         }
     }
 }

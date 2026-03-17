@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct Album: Identifiable {
+struct Album: Identifiable, Hashable {
     let id: String
     let title: String
     let artist: String
@@ -9,4 +9,7 @@ struct Album: Identifiable {
     var artworkUrl: String?
     var avgRating: Float
     var logCount: Int
+
+    static func == (lhs: Album, rhs: Album) -> Bool { lhs.id == rhs.id }
+    func hash(into hasher: inout Hasher) { hasher.combine(id) }
 }

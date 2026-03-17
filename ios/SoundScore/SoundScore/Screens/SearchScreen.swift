@@ -2,6 +2,7 @@ import SwiftUI
 
 struct SearchScreen: View {
     @StateObject private var viewModel = SearchViewModel()
+    var onSelectAlbum: (Album) -> Void = { _ in }
 
     var body: some View {
         ScrollView {
@@ -33,6 +34,10 @@ struct SearchScreen: View {
                 LazyHStack(spacing: 14) {
                     ForEach(viewModel.chartEntries.prefix(4)) { entry in
                         TrendingSearchCard(album: entry.album, rank: entry.rank)
+                            .onTapGesture {
+                                UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                onSelectAlbum(entry.album)
+                            }
                     }
                 }
                 .padding(.trailing, 8)
@@ -57,6 +62,10 @@ struct SearchScreen: View {
 
         ForEach(viewModel.chartEntries) { entry in
             TrendChartRow(entry: entry)
+                .onTapGesture {
+                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                    onSelectAlbum(entry.album)
+                }
         }
 
         EmptyState(
@@ -72,6 +81,10 @@ struct SearchScreen: View {
 
         ForEach(viewModel.results) { album in
             SearchResultCard(album: album)
+                .onTapGesture {
+                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                    onSelectAlbum(album)
+                }
         }
     }
 }

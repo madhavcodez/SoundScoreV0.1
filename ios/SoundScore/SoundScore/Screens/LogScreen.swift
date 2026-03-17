@@ -2,6 +2,7 @@ import SwiftUI
 
 struct LogScreen: View {
     @StateObject private var viewModel = LogViewModel()
+    var onSelectAlbum: (Album) -> Void = { _ in }
 
     var body: some View {
         ZStack(alignment: .bottomTrailing) {
@@ -36,7 +37,8 @@ struct LogScreen: View {
                                 QuickRateCard(
                                     album: album,
                                     rating: viewModel.ratings[album.id] ?? 0,
-                                    onRate: { viewModel.updateRating(albumId: album.id, rating: $0) }
+                                    onRate: { viewModel.updateRating(albumId: album.id, rating: $0) },
+                                    onSelectAlbum: onSelectAlbum
                                 )
                             }
                         }
@@ -48,7 +50,7 @@ struct LogScreen: View {
 
                         ForEach(viewModel.recentLogs) { entry in
                             TimelineEntry(dateLabel: entry.dateLabel, timeLabel: entry.timeLabel) {
-                                DiaryEntryCard(entry: entry)
+                                DiaryEntryCard(entry: entry, onSelectAlbum: onSelectAlbum)
                             }
                         }
                     }
@@ -90,6 +92,7 @@ private struct QuickRateCard: View {
     let album: Album
     let rating: Float
     let onRate: (Float) -> Void
+    var onSelectAlbum: (Album) -> Void = { _ in }
 
     var body: some View {
         GlassCard(cornerRadius: 20, borderColor: SSColors.feedItemBorder, contentPadding: EdgeInsets(top: 8, leading: 8, bottom: 8, trailing: 8)) {
@@ -97,6 +100,10 @@ private struct QuickRateCard: View {
                 ZStack(alignment: .topTrailing) {
                     AlbumArtwork(artworkUrl: album.artworkUrl, colors: album.artColors, cornerRadius: 14)
                         .frame(width: 124, height: 130)
+                        .onTapGesture {
+                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                            onSelectAlbum(album)
+                        }
                     if rating > 0 {
                         Text(String(format: "%.1f", rating))
                             .font(SSTypography.labelSmall)
@@ -127,12 +134,17 @@ private struct QuickRateCard: View {
 
 private struct DiaryEntryCard: View {
     let entry: RecentLogEntry
+    var onSelectAlbum: (Album) -> Void = { _ in }
 
     var body: some View {
         GlassCard(cornerRadius: 18, borderColor: SSColors.feedItemBorder, contentPadding: EdgeInsets(top: 10, leading: 10, bottom: 10, trailing: 10)) {
             HStack(spacing: 10) {
                 AlbumArtwork(artworkUrl: entry.album.artworkUrl, colors: entry.album.artColors, cornerRadius: 14)
                     .frame(width: 56, height: 56)
+                    .onTapGesture {
+                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                        onSelectAlbum(entry.album)
+                    }
                 VStack(alignment: .leading, spacing: 2) {
                     Text(entry.album.title)
                         .font(SSTypography.titleMedium)

@@ -2,6 +2,8 @@ import SwiftUI
 
 struct FeedScreen: View {
     @StateObject private var viewModel = FeedViewModel()
+    var onSelectAlbum: (Album) -> Void = { _ in }
+    @State private var appeared = false
 
     var body: some View {
         ScrollView {
@@ -20,6 +22,10 @@ struct FeedScreen: View {
                         LazyHStack(spacing: 14) {
                             ForEach(viewModel.trendingAlbums) { album in
                                 TrendingHeroCard(album: album)
+                                    .onTapGesture {
+                                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                        onSelectAlbum(album)
+                                    }
                             }
                         }
                         .padding(.trailing, 8)
@@ -36,11 +42,12 @@ struct FeedScreen: View {
                     SectionHeader(eyebrow: "Activity", title: "From your circle")
 
                     ForEach(Array(viewModel.items.enumerated()), id: \.element.id) { index, item in
-                        FeedActivityCard(item: item) {
+                        FeedActivityCard(item: item, onSelectAlbum: onSelectAlbum) {
                             viewModel.toggleLike(item.id)
                         }
-                        .transition(.opacity.combined(with: .move(edge: .bottom)))
-                        .animation(.easeOut(duration: 0.3).delay(Double(index) * 0.04), value: viewModel.items.count)
+                        .opacity(appeared ? 1 : 0)
+                        .offset(y: appeared ? 0 : 20)
+                        .animation(.easeOut(duration: 0.35).delay(Double(index) * 0.04), value: appeared)
                     }
                 }
             }
@@ -48,6 +55,7 @@ struct FeedScreen: View {
             .padding(.top, 16)
             .padding(.bottom, 120)
         }
+        .onAppear { appeared = true }
     }
 }
 
@@ -96,6 +104,7 @@ private struct TrendingHeroCard: View {
 
 private struct FeedActivityCard: View {
     let item: FeedItem
+    var onSelectAlbum: (Album) -> Void = { _ in }
     let onToggleLike: () -> Void
 
     var body: some View {
@@ -123,6 +132,10 @@ private struct FeedActivityCard: View {
                 HStack(spacing: 12) {
                     AlbumArtwork(artworkUrl: item.album.artworkUrl, colors: item.album.artColors, cornerRadius: 16)
                         .frame(width: 72, height: 72)
+                        .onTapGesture {
+                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                            onSelectAlbum(item.album)
+                        }
                     VStack(alignment: .leading, spacing: 4) {
                         Text(item.album.title)
                             .font(SSTypography.titleLarge)
@@ -157,6 +170,11 @@ private func avatarColors(_ username: String) -> [Color] {
     case "rohan": return AlbumColors.forest
     case "priya": return AlbumColors.rose
     case "kai": return AlbumColors.orchid
+    case "zara": return AlbumColors.lagoon
+    case "alex": return AlbumColors.amber
+    case "jordan": return AlbumColors.midnight
+    case "mia": return AlbumColors.lime
+    case "sam": return AlbumColors.ember
     default: return [SSColors.accentGreen, SSColors.accentCoral]
     }
 }

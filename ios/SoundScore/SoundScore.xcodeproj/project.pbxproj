@@ -48,6 +48,10 @@
 		D10000010000000000000014 /* TrendChartRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10000020000000000000014; };
 		D10000010000000000000015 /* AppBackdrop.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10000020000000000000015; };
 		D10000010000000000000016 /* SSButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10000020000000000000016; };
+		E10000010000000000000001 /* AlbumDetailScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = E10000020000000000000001; };
+		E10000010000000000000002 /* SettingsScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = E10000020000000000000002; };
+		E10000010000000000000003 /* ReviewSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = E10000020000000000000003; };
+		E10000010000000000000004 /* SkeletonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E10000020000000000000004; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -93,6 +97,10 @@
 		D10000020000000000000014 /* TrendChartRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrendChartRow.swift; sourceTree = "<group>"; };
 		D10000020000000000000015 /* AppBackdrop.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppBackdrop.swift; sourceTree = "<group>"; };
 		D10000020000000000000016 /* SSButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SSButton.swift; sourceTree = "<group>"; };
+		E10000020000000000000001 /* AlbumDetailScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumDetailScreen.swift; sourceTree = "<group>"; };
+		E10000020000000000000002 /* SettingsScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsScreen.swift; sourceTree = "<group>"; };
+		E10000020000000000000003 /* ReviewSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewSheet.swift; sourceTree = "<group>"; };
+		E10000020000000000000004 /* SkeletonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkeletonView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -149,6 +157,8 @@
 				D10000020000000000000014 /* TrendChartRow.swift */,
 				D10000020000000000000015 /* AppBackdrop.swift */,
 				D10000020000000000000016 /* SSButton.swift */,
+				E10000020000000000000003 /* ReviewSheet.swift */,
+				E10000020000000000000004 /* SkeletonView.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -161,6 +171,8 @@
 				A10000020000000000000010 /* SearchScreen.swift */,
 				A10000020000000000000011 /* ListsScreen.swift */,
 				A10000020000000000000012 /* ProfileScreen.swift */,
+				E10000020000000000000001 /* AlbumDetailScreen.swift */,
+				E10000020000000000000002 /* SettingsScreen.swift */,
 			);
 			path = Screens;
 			sourceTree = "<group>";
@@ -292,6 +304,10 @@
 				D10000010000000000000014 /* TrendChartRow.swift in Sources */,
 				D10000010000000000000015 /* AppBackdrop.swift in Sources */,
 				D10000010000000000000016 /* SSButton.swift in Sources */,
+				E10000010000000000000001 /* AlbumDetailScreen.swift in Sources */,
+				E10000010000000000000002 /* SettingsScreen.swift in Sources */,
+				E10000010000000000000003 /* ReviewSheet.swift in Sources */,
+				E10000010000000000000004 /* SkeletonView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
