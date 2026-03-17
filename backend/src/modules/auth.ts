@@ -7,6 +7,7 @@ import {
 } from "@soundscore/contracts";
 import { compare, hash } from "bcryptjs";
 import type { Db } from "../db/client";
+import { logAuditEvent } from "../lib/audit";
 import { conflict, unauthorized } from "../lib/errors";
 import { mapUserProfile } from "../lib/mappers";
 import { nowIso, uid } from "../lib/util";
@@ -98,6 +99,14 @@ export const registerAuthRoutes = (app: FastifyInstance, db: Db) => {
 
     await writeProfileCache(db, userId);
 
+    logAuditEvent(db, {
+      userId,
+      type: "user.signup",
+      details: { handle: payload.handle.startsWith("@") ? payload.handle : `@${payload.handle}` },
+      ipAddress: request.ip,
+      userAgent: request.headers["user-agent"],
+    }).catch(() => {});
+
     return buildAuthResponse(
       accessToken,
       refreshToken,
@@ -139,6 +148,13 @@ export const registerAuthRoutes = (app: FastifyInstance, db: Db) => {
       "INSERT INTO sessions(access_token, user_id, created_at) VALUES($1, $2, $3)",
       [accessToken, user.id, now],
     );
+
+    logAuditEvent(db, {
+      userId: user.id,
+      type: "user.login",
+      ipAddress: request.ip,
+      userAgent: request.headers["user-agent"],
+    }).catch(() => {});
 
     return buildAuthResponse(accessToken, refreshToken, user.id, user.handle);
   });

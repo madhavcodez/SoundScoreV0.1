@@ -1,5 +1,6 @@
 import type { FastifyInstance } from "fastify";
 import type { Db } from "../db/client";
+import { logAuditEvent } from "../lib/audit";
 
 export const registerTrustRoutes = (app: FastifyInstance, db: Db) => {
   app.post("/v1/account/export", async (request) => {
@@ -125,6 +126,13 @@ export const registerTrustRoutes = (app: FastifyInstance, db: Db) => {
       [userId],
     );
 
+    logAuditEvent(db, {
+      userId,
+      type: "account.export",
+      ipAddress: request.ip,
+      userAgent: request.headers["user-agent"],
+    }).catch(() => {});
+
     return {
       generatedAt: new Date().toISOString(),
       profile: profile.rowCount
@@ -197,6 +205,13 @@ export const registerTrustRoutes = (app: FastifyInstance, db: Db) => {
     const userId = await app.requireAuth(request);
 
     await db.query("DELETE FROM users WHERE id = $1", [userId]);
+
+    logAuditEvent(db, {
+      userId,
+      type: "account.delete",
+      ipAddress: request.ip,
+      userAgent: request.headers["user-agent"],
+    }).catch(() => {});
 
     await db.redis.del(
       `profile:${userId}`,
