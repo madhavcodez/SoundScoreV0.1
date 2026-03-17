@@ -54,6 +54,10 @@
 		E10000010000000000000004 /* OutboxStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E10000020000000000000004; };
 		E10000010000000000000005 /* SoundScoreRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = E10000020000000000000005; };
 		A10000010000000000000013 /* AuthScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000013; };
+		F10000010000000000000001 /* AlbumDetailScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = F10000020000000000000001; };
+		F10000010000000000000002 /* SettingsScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = F10000020000000000000002; };
+		F10000010000000000000003 /* ReviewSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = F10000020000000000000003; };
+		F10000010000000000000004 /* SkeletonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F10000020000000000000004; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -105,6 +109,10 @@
 		E10000020000000000000004 /* OutboxStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutboxStore.swift; sourceTree = "<group>"; };
 		E10000020000000000000005 /* SoundScoreRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundScoreRepository.swift; sourceTree = "<group>"; };
 		A10000020000000000000013 /* AuthScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthScreen.swift; sourceTree = "<group>"; };
+		F10000020000000000000001 /* AlbumDetailScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumDetailScreen.swift; sourceTree = "<group>"; };
+		F10000020000000000000002 /* SettingsScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsScreen.swift; sourceTree = "<group>"; };
+		F10000020000000000000003 /* ReviewSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewSheet.swift; sourceTree = "<group>"; };
+		F10000020000000000000004 /* SkeletonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkeletonView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -162,6 +170,8 @@
 				D10000020000000000000014 /* TrendChartRow.swift */,
 				D10000020000000000000015 /* AppBackdrop.swift */,
 				D10000020000000000000016 /* SSButton.swift */,
+				F10000020000000000000003 /* ReviewSheet.swift */,
+				F10000020000000000000004 /* SkeletonView.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -175,6 +185,8 @@
 				A10000020000000000000011 /* ListsScreen.swift */,
 				A10000020000000000000012 /* ProfileScreen.swift */,
 				A10000020000000000000013 /* AuthScreen.swift */,
+				F10000020000000000000001 /* AlbumDetailScreen.swift */,
+				F10000020000000000000002 /* SettingsScreen.swift */,
 			);
 			path = Screens;
 			sourceTree = "<group>";
@@ -324,6 +336,10 @@
 				E10000010000000000000004 /* OutboxStore.swift in Sources */,
 				E10000010000000000000005 /* SoundScoreRepository.swift in Sources */,
 				A10000010000000000000013 /* AuthScreen.swift in Sources */,
+				F10000010000000000000001 /* AlbumDetailScreen.swift in Sources */,
+				F10000010000000000000002 /* SettingsScreen.swift in Sources */,
+				F10000010000000000000003 /* ReviewSheet.swift in Sources */,
+				F10000010000000000000004 /* SkeletonView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
