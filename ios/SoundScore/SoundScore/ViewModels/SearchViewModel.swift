@@ -9,13 +9,12 @@ class SearchViewModel: ObservableObject {
     @Published var syncMessage: String?
 
     private var cancellables = Set<AnyCancellable>()
-    private let albums: [Album]
 
     init() {
-        self.albums = SeedData.albums
+        let repo = SoundScoreRepository.shared
         self.browseGenres = buildBrowseGenres()
-        self.chartEntries = buildChartEntries(SeedData.albums)
-        self.syncMessage = nil
+        self.chartEntries = buildChartEntries(repo.albums)
+        self.syncMessage = repo.syncMessage
 
         $query
             .debounce(for: .milliseconds(200), scheduler: RunLoop.main)
@@ -23,6 +22,15 @@ class SearchViewModel: ObservableObject {
                 self?.performSearch(q)
             }
             .store(in: &cancellables)
+
+        repo.$albums
+            .receive(on: RunLoop.main)
+            .map { buildChartEntries($0) }
+            .assign(to: &$chartEntries)
+
+        repo.$syncMessage
+            .receive(on: RunLoop.main)
+            .assign(to: &$syncMessage)
     }
 
     func updateQuery(_ text: String) {
@@ -33,10 +41,7 @@ class SearchViewModel: ObservableObject {
         if q.trimmingCharacters(in: .whitespaces).isEmpty {
             results = []
         } else {
-            let lower = q.lowercased()
-            results = albums.filter {
-                $0.title.lowercased().contains(lower) || $0.artist.lowercased().contains(lower)
-            }
+            results = SoundScoreRepository.shared.searchAlbums(query: q)
         }
     }
 }
