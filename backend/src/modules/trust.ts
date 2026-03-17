@@ -206,17 +206,4 @@ export const registerTrustRoutes = (app: FastifyInstance, db: Db) => {
     reply.code(204).send();
   });
 
-  app.post("/v1/providers/:provider/connect", async (_request, reply) => {
-    return reply.code(501).send({
-      code: "PROVIDER_NOT_ENABLED",
-      message: "Provider connections are out of scope for provider-free phase 1",
-    });
-  });
-
-  app.post("/v1/providers/:provider/disconnect", async (_request, reply) => {
-    return reply.code(501).send({
-      code: "PROVIDER_NOT_ENABLED",
-      message: "Provider connections are out of scope for provider-free phase 1",
-    });
-  });
 };
