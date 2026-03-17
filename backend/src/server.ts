@@ -2,6 +2,7 @@ import Fastify, { type FastifyRequest } from "fastify";
 import cors from "@fastify/cors";
 import rateLimit from "@fastify/rate-limit";
 import { ApiError, unauthorized } from "./lib/errors";
+import { applyRouteRateLimits } from "./lib/rate-limit";
 import { registerAuthRoutes } from "./modules/auth";
 import { registerCatalogRoutes } from "./modules/catalog";
 import { registerOpinionRoutes } from "./modules/opinions";
@@ -54,12 +55,20 @@ export const buildServer = async () => {
     global: true,
     max: 100,
     timeWindow: "1 minute",
+    addHeaders: {
+      "x-ratelimit-limit": true,
+      "x-ratelimit-remaining": true,
+      "x-ratelimit-reset": true,
+      "retry-after": true,
+    },
     addHeadersOnExceeding: {
       "x-ratelimit-limit": true,
       "x-ratelimit-remaining": true,
       "x-ratelimit-reset": true,
     },
   });
+
+  applyRouteRateLimits(app);
 
   app.get("/health", async () => ({
     status: "ok",

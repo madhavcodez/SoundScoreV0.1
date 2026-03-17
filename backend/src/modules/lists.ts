@@ -1,6 +1,7 @@
 import type { FastifyInstance } from "fastify";
 import { AddListItemRequestSchema, CreateListRequestSchema } from "@soundscore/contracts";
 import type { Db } from "../db/client";
+import { logAuditEvent } from "../lib/audit";
 import { notFound } from "../lib/errors";
 import { withIdempotency } from "../lib/idempotency";
 import { invalidateFeedCacheForUserAndFollowers, queueFollowerNotifications } from "../lib/notifications";
@@ -67,6 +68,14 @@ export const registerListRoutes = (app: FastifyInstance, db: Db) => {
           dedupeKey: `${activityId}:social-list`,
         },
       );
+
+      logAuditEvent(db, {
+        userId,
+        type: "list.create",
+        details: { listId },
+        ipAddress: request.ip,
+        userAgent: request.headers["user-agent"],
+      }).catch(() => {});
 
       return {
         id: listId,

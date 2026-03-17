@@ -1,9 +1,13 @@
 import { z } from "zod";
 
 export const SignUpRequestSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(8),
-  handle: z.string().min(2).max(24),
+  email: z.string().email().max(254),
+  password: z.string().min(8).max(128),
+  handle: z
+    .string()
+    .min(2)
+    .max(30)
+    .regex(/^[\w]+$/, "Handle must contain only alphanumeric characters and underscores"),
 });
 
 export const LoginRequestSchema = z.object({
@@ -23,36 +27,36 @@ export const AuthResponseSchema = z.object({
 });
 
 export const CreateRatingRequestSchema = z.object({
-  albumId: z.string(),
+  albumId: z.string().max(100),
   value: z.number().min(0).max(5),
 });
 
 export const CreateReviewRequestSchema = z.object({
-  albumId: z.string(),
-  body: z.string().min(1),
+  albumId: z.string().max(100),
+  body: z.string().min(1).max(5000),
 });
 
 export const UpdateReviewRequestSchema = z.object({
-  body: z.string().min(1),
+  body: z.string().min(1).max(5000),
   expectedRevision: z.number().int().nonnegative(),
 });
 
 export const CreateListRequestSchema = z.object({
-  title: z.string().min(1),
-  note: z.string().optional(),
+  title: z.string().min(1).max(200),
+  note: z.string().max(1000).optional(),
 });
 
 export const AddListItemRequestSchema = z.object({
-  albumId: z.string(),
-  note: z.string().optional(),
+  albumId: z.string().max(100),
+  note: z.string().max(1000).optional(),
 });
 
 export const ReactActivityRequestSchema = z.object({
-  reaction: z.string().min(1),
+  reaction: z.string().min(1).max(50),
 });
 
 export const CommentActivityRequestSchema = z.object({
-  body: z.string().min(1),
+  body: z.string().min(1).max(2000),
 });
 
 export const UpsertNotificationPreferenceSchema = z.object({
