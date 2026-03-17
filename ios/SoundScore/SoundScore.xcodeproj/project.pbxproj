@@ -1,0 +1,428 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		A10000010000000000000001 /* SoundScoreApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000001; };
+		A10000010000000000000002 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000002; };
+		A10000010000000000000003 /* SSColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000003; };
+		A10000010000000000000004 /* SSTypography.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000004; };
+		A10000010000000000000005 /* Tab.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000005; };
+		A10000010000000000000006 /* FloatingTabBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000006; };
+		A10000010000000000000007 /* GlassCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000007; };
+		A10000010000000000000008 /* FeedScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000008; };
+		A10000010000000000000009 /* LogScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000009; };
+		A10000010000000000000010 /* SearchScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000010; };
+		A10000010000000000000011 /* ListsScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000011; };
+		A10000010000000000000012 /* ProfileScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000012; };
+		B10000010000000000000001 /* Album.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000020000000000000001; };
+		B10000010000000000000002 /* FeedItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000020000000000000002; };
+		B10000010000000000000003 /* UserProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000020000000000000003; };
+		B10000010000000000000004 /* UserList.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000020000000000000004; };
+		B10000010000000000000005 /* WeeklyRecap.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000020000000000000005; };
+		B10000010000000000000006 /* NotificationPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000020000000000000006; };
+		B10000010000000000000007 /* PresentationHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000020000000000000007; };
+		B10000010000000000000008 /* SeedData.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000020000000000000008; };
+		C10000010000000000000001 /* FeedViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10000020000000000000001; };
+		C10000010000000000000002 /* LogViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10000020000000000000002; };
+		C10000010000000000000003 /* SearchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10000020000000000000003; };
+		C10000010000000000000004 /* ListsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10000020000000000000004; };
+		C10000010000000000000005 /* ProfileViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10000020000000000000005; };
+		D10000010000000000000001 /* StarRating.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10000020000000000000001; };
+		D10000010000000000000002 /* AlbumArtwork.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10000020000000000000002; };
+		D10000010000000000000003 /* AvatarCircle.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10000020000000000000003; };
+		D10000010000000000000004 /* PillSearchBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10000020000000000000004; };
+		D10000010000000000000005 /* SyncBanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10000020000000000000005; };
+		D10000010000000000000006 /* EmptyState.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10000020000000000000006; };
+		D10000010000000000000007 /* TimelineEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10000020000000000000007; };
+		D10000010000000000000008 /* GlassIconButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10000020000000000000008; };
+		D10000010000000000000009 /* ScreenHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10000020000000000000009; };
+		D10000010000000000000010 /* SectionHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10000020000000000000010; };
+		D10000010000000000000011 /* StatPill.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10000020000000000000011; };
+		D10000010000000000000012 /* ActionChip.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10000020000000000000012; };
+		D10000010000000000000013 /* MosaicCover.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10000020000000000000013; };
+		D10000010000000000000014 /* TrendChartRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10000020000000000000014; };
+		D10000010000000000000015 /* AppBackdrop.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10000020000000000000015; };
+		D10000010000000000000016 /* SSButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10000020000000000000016; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		A10000020000000000000001 /* SoundScoreApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundScoreApp.swift; sourceTree = "<group>"; };
+		A10000020000000000000002 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		A10000020000000000000003 /* SSColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SSColors.swift; sourceTree = "<group>"; };
+		A10000020000000000000004 /* SSTypography.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SSTypography.swift; sourceTree = "<group>"; };
+		A10000020000000000000005 /* Tab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tab.swift; sourceTree = "<group>"; };
+		A10000020000000000000006 /* FloatingTabBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloatingTabBar.swift; sourceTree = "<group>"; };
+		A10000020000000000000007 /* GlassCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlassCard.swift; sourceTree = "<group>"; };
+		A10000020000000000000008 /* FeedScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedScreen.swift; sourceTree = "<group>"; };
+		A10000020000000000000009 /* LogScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogScreen.swift; sourceTree = "<group>"; };
+		A10000020000000000000010 /* SearchScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchScreen.swift; sourceTree = "<group>"; };
+		A10000020000000000000011 /* ListsScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListsScreen.swift; sourceTree = "<group>"; };
+		A10000020000000000000012 /* ProfileScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileScreen.swift; sourceTree = "<group>"; };
+		A10000030000000000000001 /* SoundScore.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SoundScore.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		B10000020000000000000001 /* Album.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Album.swift; sourceTree = "<group>"; };
+		B10000020000000000000002 /* FeedItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedItem.swift; sourceTree = "<group>"; };
+		B10000020000000000000003 /* UserProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProfile.swift; sourceTree = "<group>"; };
+		B10000020000000000000004 /* UserList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserList.swift; sourceTree = "<group>"; };
+		B10000020000000000000005 /* WeeklyRecap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeeklyRecap.swift; sourceTree = "<group>"; };
+		B10000020000000000000006 /* NotificationPreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationPreferences.swift; sourceTree = "<group>"; };
+		B10000020000000000000007 /* PresentationHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresentationHelpers.swift; sourceTree = "<group>"; };
+		B10000020000000000000008 /* SeedData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeedData.swift; sourceTree = "<group>"; };
+		C10000020000000000000001 /* FeedViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedViewModel.swift; sourceTree = "<group>"; };
+		C10000020000000000000002 /* LogViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogViewModel.swift; sourceTree = "<group>"; };
+		C10000020000000000000003 /* SearchViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchViewModel.swift; sourceTree = "<group>"; };
+		C10000020000000000000004 /* ListsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListsViewModel.swift; sourceTree = "<group>"; };
+		C10000020000000000000005 /* ProfileViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewModel.swift; sourceTree = "<group>"; };
+		D10000020000000000000001 /* StarRating.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StarRating.swift; sourceTree = "<group>"; };
+		D10000020000000000000002 /* AlbumArtwork.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumArtwork.swift; sourceTree = "<group>"; };
+		D10000020000000000000003 /* AvatarCircle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AvatarCircle.swift; sourceTree = "<group>"; };
+		D10000020000000000000004 /* PillSearchBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PillSearchBar.swift; sourceTree = "<group>"; };
+		D10000020000000000000005 /* SyncBanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncBanner.swift; sourceTree = "<group>"; };
+		D10000020000000000000006 /* EmptyState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyState.swift; sourceTree = "<group>"; };
+		D10000020000000000000007 /* TimelineEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineEntry.swift; sourceTree = "<group>"; };
+		D10000020000000000000008 /* GlassIconButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlassIconButton.swift; sourceTree = "<group>"; };
+		D10000020000000000000009 /* ScreenHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenHeader.swift; sourceTree = "<group>"; };
+		D10000020000000000000010 /* SectionHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SectionHeader.swift; sourceTree = "<group>"; };
+		D10000020000000000000011 /* StatPill.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatPill.swift; sourceTree = "<group>"; };
+		D10000020000000000000012 /* ActionChip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionChip.swift; sourceTree = "<group>"; };
+		D10000020000000000000013 /* MosaicCover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MosaicCover.swift; sourceTree = "<group>"; };
+		D10000020000000000000014 /* TrendChartRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrendChartRow.swift; sourceTree = "<group>"; };
+		D10000020000000000000015 /* AppBackdrop.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppBackdrop.swift; sourceTree = "<group>"; };
+		D10000020000000000000016 /* SSButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SSButton.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		A10000040000000000000001 = {
+			isa = PBXGroup;
+			children = (
+				A10000040000000000000002 /* SoundScore */,
+				A10000040000000000000006 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		A10000040000000000000002 /* SoundScore */ = {
+			isa = PBXGroup;
+			children = (
+				A10000020000000000000001 /* SoundScoreApp.swift */,
+				A10000020000000000000002 /* ContentView.swift */,
+				A10000040000000000000003 /* Theme */,
+				A10000040000000000000004 /* Components */,
+				A10000040000000000000005 /* Screens */,
+				A10000040000000000000007 /* Models */,
+				A10000040000000000000008 /* ViewModels */,
+			);
+			path = SoundScore;
+			sourceTree = "<group>";
+		};
+		A10000040000000000000003 /* Theme */ = {
+			isa = PBXGroup;
+			children = (
+				A10000020000000000000003 /* SSColors.swift */,
+				A10000020000000000000004 /* SSTypography.swift */,
+			);
+			path = Theme;
+			sourceTree = "<group>";
+		};
+		A10000040000000000000004 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				A10000020000000000000005 /* Tab.swift */,
+				A10000020000000000000006 /* FloatingTabBar.swift */,
+				A10000020000000000000007 /* GlassCard.swift */,
+				D10000020000000000000001 /* StarRating.swift */,
+				D10000020000000000000002 /* AlbumArtwork.swift */,
+				D10000020000000000000003 /* AvatarCircle.swift */,
+				D10000020000000000000004 /* PillSearchBar.swift */,
+				D10000020000000000000005 /* SyncBanner.swift */,
+				D10000020000000000000006 /* EmptyState.swift */,
+				D10000020000000000000007 /* TimelineEntry.swift */,
+				D10000020000000000000008 /* GlassIconButton.swift */,
+				D10000020000000000000009 /* ScreenHeader.swift */,
+				D10000020000000000000010 /* SectionHeader.swift */,
+				D10000020000000000000011 /* StatPill.swift */,
+				D10000020000000000000012 /* ActionChip.swift */,
+				D10000020000000000000013 /* MosaicCover.swift */,
+				D10000020000000000000014 /* TrendChartRow.swift */,
+				D10000020000000000000015 /* AppBackdrop.swift */,
+				D10000020000000000000016 /* SSButton.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		A10000040000000000000005 /* Screens */ = {
+			isa = PBXGroup;
+			children = (
+				A10000020000000000000008 /* FeedScreen.swift */,
+				A10000020000000000000009 /* LogScreen.swift */,
+				A10000020000000000000010 /* SearchScreen.swift */,
+				A10000020000000000000011 /* ListsScreen.swift */,
+				A10000020000000000000012 /* ProfileScreen.swift */,
+			);
+			path = Screens;
+			sourceTree = "<group>";
+		};
+		A10000040000000000000006 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				A10000030000000000000001 /* SoundScore.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		A10000040000000000000007 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				B10000020000000000000001 /* Album.swift */,
+				B10000020000000000000002 /* FeedItem.swift */,
+				B10000020000000000000003 /* UserProfile.swift */,
+				B10000020000000000000004 /* UserList.swift */,
+				B10000020000000000000005 /* WeeklyRecap.swift */,
+				B10000020000000000000006 /* NotificationPreferences.swift */,
+				B10000020000000000000007 /* PresentationHelpers.swift */,
+				B10000020000000000000008 /* SeedData.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		A10000040000000000000008 /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				C10000020000000000000001 /* FeedViewModel.swift */,
+				C10000020000000000000002 /* LogViewModel.swift */,
+				C10000020000000000000003 /* SearchViewModel.swift */,
+				C10000020000000000000004 /* ListsViewModel.swift */,
+				C10000020000000000000005 /* ProfileViewModel.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		A10000050000000000000001 /* SoundScore */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A10000070000000000000001 /* Build configuration list for PBXNativeTarget "SoundScore" */;
+			buildPhases = (
+				A10000060000000000000001 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SoundScore;
+			productName = SoundScore;
+			productReference = A10000030000000000000001 /* SoundScore.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		A10000080000000000000001 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1500;
+				LastUpgradeCheck = 1500;
+			};
+			buildConfigurationList = A10000070000000000000002 /* Build configuration list for PBXProject "SoundScore" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = A10000040000000000000001;
+			productRefGroup = A10000040000000000000006 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				A10000050000000000000001 /* SoundScore */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		A10000060000000000000001 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A10000010000000000000001 /* SoundScoreApp.swift in Sources */,
+				A10000010000000000000002 /* ContentView.swift in Sources */,
+				A10000010000000000000003 /* SSColors.swift in Sources */,
+				A10000010000000000000004 /* SSTypography.swift in Sources */,
+				A10000010000000000000005 /* Tab.swift in Sources */,
+				A10000010000000000000006 /* FloatingTabBar.swift in Sources */,
+				A10000010000000000000007 /* GlassCard.swift in Sources */,
+				A10000010000000000000008 /* FeedScreen.swift in Sources */,
+				A10000010000000000000009 /* LogScreen.swift in Sources */,
+				A10000010000000000000010 /* SearchScreen.swift in Sources */,
+				A10000010000000000000011 /* ListsScreen.swift in Sources */,
+				A10000010000000000000012 /* ProfileScreen.swift in Sources */,
+				B10000010000000000000001 /* Album.swift in Sources */,
+				B10000010000000000000002 /* FeedItem.swift in Sources */,
+				B10000010000000000000003 /* UserProfile.swift in Sources */,
+				B10000010000000000000004 /* UserList.swift in Sources */,
+				B10000010000000000000005 /* WeeklyRecap.swift in Sources */,
+				B10000010000000000000006 /* NotificationPreferences.swift in Sources */,
+				B10000010000000000000007 /* PresentationHelpers.swift in Sources */,
+				B10000010000000000000008 /* SeedData.swift in Sources */,
+				C10000010000000000000001 /* FeedViewModel.swift in Sources */,
+				C10000010000000000000002 /* LogViewModel.swift in Sources */,
+				C10000010000000000000003 /* SearchViewModel.swift in Sources */,
+				C10000010000000000000004 /* ListsViewModel.swift in Sources */,
+				C10000010000000000000005 /* ProfileViewModel.swift in Sources */,
+				D10000010000000000000001 /* StarRating.swift in Sources */,
+				D10000010000000000000002 /* AlbumArtwork.swift in Sources */,
+				D10000010000000000000003 /* AvatarCircle.swift in Sources */,
+				D10000010000000000000004 /* PillSearchBar.swift in Sources */,
+				D10000010000000000000005 /* SyncBanner.swift in Sources */,
+				D10000010000000000000006 /* EmptyState.swift in Sources */,
+				D10000010000000000000007 /* TimelineEntry.swift in Sources */,
+				D10000010000000000000008 /* GlassIconButton.swift in Sources */,
+				D10000010000000000000009 /* ScreenHeader.swift in Sources */,
+				D10000010000000000000010 /* SectionHeader.swift in Sources */,
+				D10000010000000000000011 /* StatPill.swift in Sources */,
+				D10000010000000000000012 /* ActionChip.swift in Sources */,
+				D10000010000000000000013 /* MosaicCover.swift in Sources */,
+				D10000010000000000000014 /* TrendChartRow.swift in Sources */,
+				D10000010000000000000015 /* AppBackdrop.swift in Sources */,
+				D10000010000000000000016 /* SSButton.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		A10000090000000000000001 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.soundscore.app;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		A10000090000000000000002 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.soundscore.app;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		A10000090000000000000003 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		A10000090000000000000004 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_OPTIMIZATION_LEVEL = s;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		A10000070000000000000001 /* Build configuration list for PBXNativeTarget "SoundScore" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A10000090000000000000001 /* Debug */,
+				A10000090000000000000002 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A10000070000000000000002 /* Build configuration list for PBXProject "SoundScore" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A10000090000000000000003 /* Debug */,
+				A10000090000000000000004 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = A10000080000000000000001 /* Project object */;
+}
