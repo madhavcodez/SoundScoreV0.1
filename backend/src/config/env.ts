@@ -21,4 +21,8 @@ export const env = {
   auth: {
     saltRounds: toNumber(process.env.AUTH_SALT_ROUNDS, 10),
   },
+  spotify: {
+    clientId: process.env.SPOTIFY_CLIENT_ID ?? "",
+    clientSecret: process.env.SPOTIFY_CLIENT_SECRET ?? "",
+  },
 };
