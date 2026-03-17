@@ -1,30 +1,32 @@
 import Foundation
+import Combine
 
 class ListsViewModel: ObservableObject {
     @Published var lists: [UserList]
     @Published var showcases: [ListShowcase]
     @Published var syncMessage: String?
 
-    private let albums: [Album]
-
     init() {
-        self.albums = SeedData.albums
-        self.lists = SeedData.initialLists
-        self.showcases = resolveListShowcases(SeedData.initialLists, SeedData.albums)
-        self.syncMessage = nil
+        let repo = SoundScoreRepository.shared
+        self.lists = repo.lists
+        self.showcases = resolveListShowcases(repo.lists, repo.albums)
+        self.syncMessage = repo.syncMessage
+
+        repo.$lists
+            .receive(on: RunLoop.main)
+            .assign(to: &$lists)
+
+        Publishers.CombineLatest(repo.$lists, repo.$albums)
+            .receive(on: RunLoop.main)
+            .map { resolveListShowcases($0, $1) }
+            .assign(to: &$showcases)
+
+        repo.$syncMessage
+            .receive(on: RunLoop.main)
+            .assign(to: &$syncMessage)
     }
 
     func createList(title: String) {
-        guard !title.trimmingCharacters(in: .whitespaces).isEmpty else { return }
-        let newList = UserList(
-            id: "l_\(UUID().uuidString.prefix(8))",
-            title: title,
-            note: nil,
-            albumIds: [],
-            curatorHandle: "@madhav",
-            saves: 0
-        )
-        lists.append(newList)
-        showcases = resolveListShowcases(lists, albums)
+        SoundScoreRepository.shared.createList(title: title)
     }
 }
