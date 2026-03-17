@@ -1,4 +1,5 @@
 import Foundation
+import Combine
 
 class FeedViewModel: ObservableObject {
     @Published var items: [FeedItem]
@@ -6,14 +7,26 @@ class FeedViewModel: ObservableObject {
     @Published var syncMessage: String?
 
     init() {
-        self.items = SeedData.feedItems
-        self.trendingAlbums = buildTrendingAlbums(SeedData.albums)
-        self.syncMessage = nil
+        let repo = SoundScoreRepository.shared
+        self.items = repo.feedItems
+        self.trendingAlbums = buildTrendingAlbums(repo.albums)
+        self.syncMessage = repo.syncMessage
+
+        repo.$feedItems
+            .receive(on: RunLoop.main)
+            .assign(to: &$items)
+
+        repo.$albums
+            .receive(on: RunLoop.main)
+            .map { buildTrendingAlbums($0) }
+            .assign(to: &$trendingAlbums)
+
+        repo.$syncMessage
+            .receive(on: RunLoop.main)
+            .assign(to: &$syncMessage)
     }
 
     func toggleLike(_ id: String) {
-        guard let index = items.firstIndex(where: { $0.id == id }) else { return }
-        items[index].isLiked.toggle()
-        items[index].likes += items[index].isLiked ? 1 : -1
+        SoundScoreRepository.shared.toggleLike(feedItemId: id)
     }
 }
