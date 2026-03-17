@@ -5,6 +5,7 @@ import {
   UpdateReviewRequestSchema,
 } from "@soundscore/contracts";
 import type { Db } from "../db/client";
+import { logAuditEvent } from "../lib/audit";
 import { conflict, notFound } from "../lib/errors";
 import { withIdempotency } from "../lib/idempotency";
 import {
@@ -152,6 +153,14 @@ export const registerOpinionRoutes = (app: FastifyInstance, db: Db) => {
         },
       );
 
+      logAuditEvent(db, {
+        userId,
+        type: "rating.create",
+        details: { albumId: payload.albumId, value: payload.value },
+        ipAddress: request.ip,
+        userAgent: request.headers["user-agent"],
+      }).catch(() => {});
+
       const rating = ratingResult.rows[0];
       return {
         id: rating.id,
@@ -236,6 +245,14 @@ export const registerOpinionRoutes = (app: FastifyInstance, db: Db) => {
         },
       );
 
+      logAuditEvent(db, {
+        userId,
+        type: "review.create",
+        details: { albumId: payload.albumId, reviewId },
+        ipAddress: request.ip,
+        userAgent: request.headers["user-agent"],
+      }).catch(() => {});
+
       const review = reviewResult.rows[0];
       return {
         id: review.id,
@@ -298,6 +315,14 @@ export const registerOpinionRoutes = (app: FastifyInstance, db: Db) => {
         `,
         [reviewId, payload.body],
       );
+
+      logAuditEvent(db, {
+        userId,
+        type: "review.update",
+        details: { reviewId, revision: updated.rows[0].revision },
+        ipAddress: request.ip,
+        userAgent: request.headers["user-agent"],
+      }).catch(() => {});
 
       const row = updated.rows[0];
       return {
