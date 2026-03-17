@@ -4,6 +4,7 @@ struct ListsScreen: View {
     @StateObject private var viewModel = ListsViewModel()
     @State private var showCreateSheet = false
     @State private var draftTitle = ""
+    var onSelectAlbum: (Album) -> Void = { _ in }
 
     var body: some View {
         ScrollView {
@@ -27,7 +28,7 @@ struct ListsScreen: View {
                     ScrollView(.horizontal, showsIndicators: false) {
                         LazyHStack(spacing: 12) {
                             ForEach(Array(viewModel.showcases.dropFirst())) { showcase in
-                                CompactListCard(showcase: showcase)
+                                CompactListCard(showcase: showcase, onSelectAlbum: onSelectAlbum)
                             }
                         }
                         .padding(.trailing, 8)
@@ -116,9 +117,15 @@ private struct FeaturedListHero: View {
 
 private struct CompactListCard: View {
     let showcase: ListShowcase
+    var onSelectAlbum: (Album) -> Void = { _ in }
 
     var body: some View {
-        GlassCard(cornerRadius: 20, borderColor: SSColors.feedItemBorder, contentPadding: EdgeInsets(top: 10, leading: 10, bottom: 10, trailing: 10), onTap: {}) {
+        GlassCard(cornerRadius: 20, borderColor: SSColors.feedItemBorder, contentPadding: EdgeInsets(top: 10, leading: 10, bottom: 10, trailing: 10), onTap: {
+            if let firstAlbum = showcase.coverAlbums.first {
+                UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                onSelectAlbum(firstAlbum)
+            }
+        }) {
             VStack(alignment: .leading, spacing: 10) {
                 MosaicCover(albums: showcase.coverAlbums, cornerRadius: 14)
                 Text(showcase.list.title)

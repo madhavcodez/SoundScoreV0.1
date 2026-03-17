@@ -2,6 +2,9 @@ import SwiftUI
 
 struct ProfileScreen: View {
     @StateObject private var viewModel = ProfileViewModel()
+    var onSelectAlbum: (Album) -> Void = { _ in }
+    var onOpenSettings: () -> Void = {}
+    @State private var appeared = false
 
     var body: some View {
         if let profile = viewModel.profile {
@@ -45,13 +48,16 @@ struct ProfileScreen: View {
                         Spacer()
                         GlassIconButton(icon: "arrow.down.circle", label: "Export")
                         Spacer()
-                        GlassIconButton(icon: "gearshape", label: "Settings")
+                        GlassIconButton(icon: "gearshape", label: "Settings", action: {
+                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                            onOpenSettings()
+                        })
                         Spacer()
                     }
 
                     if !viewModel.favoriteAlbums.isEmpty {
                         SectionHeader(eyebrow: "Favorites", title: "Pinned to your identity")
-                        FavoriteGrid(albums: viewModel.favoriteAlbums)
+                        FavoriteGrid(albums: viewModel.favoriteAlbums, onSelectAlbum: onSelectAlbum, appeared: appeared)
                     }
 
                     SectionHeader(eyebrow: "Taste DNA", title: "Genres on repeat")
@@ -78,6 +84,7 @@ struct ProfileScreen: View {
                 .padding(.top, 16)
                 .padding(.bottom, 120)
             }
+            .onAppear { appeared = true }
         } else {
             Text("Loading profile...")
                 .foregroundColor(SSColors.textSecondary)
@@ -105,15 +112,21 @@ private struct ProfileCount: View {
 
 private struct FavoriteGrid: View {
     let albums: [Album]
+    var onSelectAlbum: (Album) -> Void = { _ in }
+    var appeared: Bool = false
 
     var body: some View {
         let rows = stride(from: 0, to: albums.count, by: 3).map { i in
             Array(albums[i..<min(i + 3, albums.count)])
         }
-        ForEach(Array(rows.enumerated()), id: \.offset) { _, row in
+        ForEach(Array(rows.enumerated()), id: \.offset) { rowIndex, row in
             HStack(spacing: 10) {
-                ForEach(row) { album in
-                    GlassCard(cornerRadius: 18, borderColor: SSColors.feedItemBorder, contentPadding: EdgeInsets(top: 6, leading: 6, bottom: 6, trailing: 6), onTap: {}) {
+                ForEach(Array(row.enumerated()), id: \.element.id) { colIndex, album in
+                    let flatIndex = rowIndex * 3 + colIndex
+                    GlassCard(cornerRadius: 18, borderColor: SSColors.feedItemBorder, contentPadding: EdgeInsets(top: 6, leading: 6, bottom: 6, trailing: 6), onTap: {
+                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                        onSelectAlbum(album)
+                    }) {
                         VStack(spacing: 6) {
                             AlbumArtwork(artworkUrl: album.artworkUrl, colors: album.artColors, cornerRadius: 14)
                                 .frame(height: 100)
@@ -125,6 +138,9 @@ private struct FavoriteGrid: View {
                         }
                     }
                     .frame(maxWidth: .infinity)
+                    .opacity(appeared ? 1 : 0)
+                    .offset(y: appeared ? 0 : 16)
+                    .animation(.easeOut(duration: 0.3).delay(Double(flatIndex) * 0.06), value: appeared)
                 }
                 ForEach(0..<(3 - row.count), id: \.self) { _ in
                     Spacer().frame(maxWidth: .infinity)
