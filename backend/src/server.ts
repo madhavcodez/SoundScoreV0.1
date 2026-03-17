@@ -10,6 +10,7 @@ import { registerListRoutes } from "./modules/lists";
 import { registerTrustRoutes } from "./modules/trust";
 import { registerRecapRoutes } from "./modules/recaps";
 import { registerPushRoutes } from "./modules/push";
+import { registerProviderRoutes } from "./modules/providers";
 import { createDb, type Db } from "./db/client";
 import { runMigrations } from "./db/runMigrations";
 
@@ -75,6 +76,7 @@ export const buildServer = async () => {
   registerTrustRoutes(app, db);
   registerPushRoutes(app, db);
   registerRecapRoutes(app, db);
+  registerProviderRoutes(app, db);
 
   app.addHook("onRequest", (request, _reply, done) => {
     // Attach start timestamp for latency logging.
