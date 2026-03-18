@@ -8,6 +8,7 @@ class SearchViewModel: ObservableObject {
     @Published var chartEntries: [ChartEntry]
     @Published var syncMessage: String?
     @Published var isSearching: Bool = false
+    @Published var errorMessage: String?
 
     private var cancellables = Set<AnyCancellable>()
 
@@ -16,6 +17,7 @@ class SearchViewModel: ObservableObject {
         self.browseGenres = buildBrowseGenres()
         self.chartEntries = buildChartEntries(repo.albums)
         self.syncMessage = repo.syncMessage
+        self.errorMessage = repo.errorMessage
 
         $query
             .debounce(for: .milliseconds(300), scheduler: RunLoop.main)
@@ -32,6 +34,10 @@ class SearchViewModel: ObservableObject {
         repo.$syncMessage
             .receive(on: RunLoop.main)
             .assign(to: &$syncMessage)
+
+        repo.$errorMessage
+            .receive(on: RunLoop.main)
+            .assign(to: &$errorMessage)
     }
 
     func updateQuery(_ text: String) {
