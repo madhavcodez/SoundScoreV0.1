@@ -7,6 +7,7 @@ export type PaginationParams = {
 
 const DEFAULT_LIMIT = 30;
 const MAX_LIMIT = 100;
+const MAX_CURSOR_LENGTH = 128;
 
 export const parsePaginationParams = (request: FastifyRequest): PaginationParams => {
   const query = request.query as { cursor?: string; limit?: string };
@@ -14,7 +15,11 @@ export const parsePaginationParams = (request: FastifyRequest): PaginationParams
   const limit = Number.isFinite(rawLimit) && rawLimit > 0
     ? Math.min(rawLimit, MAX_LIMIT)
     : DEFAULT_LIMIT;
-  const cursor = query.cursor?.trim() || null;
+
+  const raw = query.cursor?.trim() || null;
+  // Reject cursors that are too long or contain SQL-suspicious characters
+  const cursor = raw && raw.length <= MAX_CURSOR_LENGTH ? raw : null;
+
   return { cursor, limit };
 };
 
@@ -23,6 +28,6 @@ export const buildPaginatedResponse = <T>(items: T[], limit: number, getCursor: 
   const trimmed = hasMore ? items.slice(0, limit) : items;
   return {
     items: trimmed,
-    nextCursor: hasMore ? getCursor(trimmed[trimmed.length - 1]) : null,
+    nextCursor: hasMore && trimmed.length > 0 ? getCursor(trimmed[trimmed.length - 1]) : null,
   };
 };

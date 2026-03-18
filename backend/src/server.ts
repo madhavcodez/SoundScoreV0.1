@@ -64,7 +64,12 @@ export const buildServer = async () => {
   });
 
   const db = createDb();
-  await runMigrations(db);
+  try {
+    await runMigrations(db);
+  } catch (error) {
+    await db.close();
+    throw error;
+  }
 
   app.decorate("db", db);
   app.decorate("requireAuth", (request: FastifyRequest) => resolveUserIdFromRequest(request, db));

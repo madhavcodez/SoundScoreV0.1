@@ -20,14 +20,14 @@ CREATE INDEX IF NOT EXISTS idx_notification_events_user ON notification_events(u
 -- Full-text search support for albums
 ALTER TABLE albums ADD COLUMN IF NOT EXISTS search_vector tsvector;
 
-UPDATE albums SET search_vector = to_tsvector('english', title || ' ' || artist) WHERE search_vector IS NULL;
+UPDATE albums SET search_vector = to_tsvector('english', COALESCE(title, '') || ' ' || COALESCE(artist, '')) WHERE search_vector IS NULL;
 
 CREATE INDEX IF NOT EXISTS idx_albums_search ON albums USING GIN (search_vector);
 
 -- Trigger to keep search_vector updated on insert/update
 CREATE OR REPLACE FUNCTION albums_search_vector_update() RETURNS trigger AS $$
 BEGIN
-  NEW.search_vector := to_tsvector('english', NEW.title || ' ' || NEW.artist);
+  NEW.search_vector := to_tsvector('english', COALESCE(NEW.title, '') || ' ' || COALESCE(NEW.artist, ''));
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
