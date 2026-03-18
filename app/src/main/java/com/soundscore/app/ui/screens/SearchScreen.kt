@@ -145,17 +145,6 @@ fun SearchScreenContent(
             }
 
         } else {
-            item {
-                SectionHeader(
-                    eyebrow = "Results",
-                    title = "${uiState.results.size} matches",
-                )
-            }
-
-            items(uiState.results, key = { it.id }) { album ->
-                SearchResultCard(album = album)
-            }
-
             if (uiState.results.isEmpty()) {
                 item {
                     EmptyState(
@@ -163,6 +152,17 @@ fun SearchScreenContent(
                         subtitle = "Try a different search term or check your spelling.",
                         icon = Icons.Outlined.SearchOff,
                     )
+                }
+            } else {
+                item {
+                    SectionHeader(
+                        eyebrow = "Results",
+                        title = "${uiState.results.size} matches",
+                    )
+                }
+
+                items(uiState.results, key = { it.id }) { album ->
+                    SearchResultCard(album = album)
                 }
             }
         }
