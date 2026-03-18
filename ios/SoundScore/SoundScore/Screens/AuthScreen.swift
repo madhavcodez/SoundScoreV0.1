@@ -121,6 +121,7 @@ struct AuthScreen: View {
                         email: email, password: password
                     )
                 }
+                await MainActor.run { isLoading = false }
                 Task { await SoundScoreRepository.shared.refresh() }
             } catch {
                 await MainActor.run {
