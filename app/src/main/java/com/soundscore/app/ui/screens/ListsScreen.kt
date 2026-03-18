@@ -95,11 +95,14 @@ fun ListsScreen(
                 BlueButton(
                     text = "Create",
                     onClick = {
-                        listsViewModel.createList(draftTitle)
-                        draftTitle = ""
-                        showCreateSheet = false
+                        if (draftTitle.isNotBlank()) {
+                            listsViewModel.createList(draftTitle)
+                            draftTitle = ""
+                            showCreateSheet = false
+                        }
                     },
                     modifier = Modifier.fillMaxWidth(),
+                    enabled = draftTitle.isNotBlank(),
                 )
                 Spacer(Modifier.height(24.dp))
             }
