@@ -10,7 +10,7 @@ struct AvatarCircle: View {
             Circle()
                 .fill(LinearGradient(colors: gradientColors, startPoint: .topLeading, endPoint: .bottomTrailing))
             Circle()
-                .stroke(Color.white.opacity(0.12), lineWidth: 1.5)
+                .stroke(SSColors.glassBorder, lineWidth: 1.5)
             Text(initials.uppercased())
                 .font(.system(size: size * 0.35, weight: .bold, design: .rounded))
                 .foregroundColor(.white)

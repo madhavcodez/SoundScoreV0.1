@@ -58,6 +58,7 @@
 		F10000010000000000000002 /* SettingsScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = F10000020000000000000002; };
 		F10000010000000000000003 /* ReviewSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = F10000020000000000000003; };
 		F10000010000000000000004 /* SkeletonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F10000020000000000000004; };
+		F1000001000000000000000X /* ThemeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1000002000000000000000X; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -113,6 +114,7 @@
 		F10000020000000000000002 /* SettingsScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsScreen.swift; sourceTree = "<group>"; };
 		F10000020000000000000003 /* ReviewSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewSheet.swift; sourceTree = "<group>"; };
 		F10000020000000000000004 /* SkeletonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkeletonView.swift; sourceTree = "<group>"; };
+		F1000002000000000000000X /* ThemeManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -144,6 +146,7 @@
 			children = (
 				A10000020000000000000003 /* SSColors.swift */,
 				A10000020000000000000004 /* SSTypography.swift */,
+				F1000002000000000000000X /* ThemeManager.swift */,
 			);
 			path = Theme;
 			sourceTree = "<group>";
@@ -340,6 +343,7 @@
 				F10000010000000000000002 /* SettingsScreen.swift in Sources */,
 				F10000010000000000000003 /* ReviewSheet.swift in Sources */,
 				F10000010000000000000004 /* SkeletonView.swift in Sources */,
+				F1000001000000000000000X /* ThemeManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

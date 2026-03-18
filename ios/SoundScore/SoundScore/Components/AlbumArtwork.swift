@@ -30,7 +30,7 @@ struct AlbumArtwork: View {
                 }
 
                 LinearGradient(
-                    colors: [Color.black.opacity(0.05), Color.black.opacity(0.22)],
+                    colors: [SSColors.overlayLight, SSColors.overlayOnImage],
                     startPoint: .top, endPoint: .bottom
                 )
             }

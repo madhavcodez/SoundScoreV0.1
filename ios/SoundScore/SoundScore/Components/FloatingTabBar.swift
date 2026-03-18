@@ -18,12 +18,12 @@ struct FloatingTabBar: View {
                             .font(.system(size: selectedTab == tab ? 24 : 20))
                             .foregroundColor(
                                 selectedTab == tab
-                                    ? SSColors.accentGreen
+                                    ? ThemeManager.shared.primary
                                     : SSColors.chromeDim
                             )
 
                         Circle()
-                            .fill(SSColors.accentGreen)
+                            .fill(ThemeManager.shared.primary)
                             .frame(width: 4, height: 4)
                             .opacity(selectedTab == tab ? 1 : 0)
                     }
@@ -33,10 +33,10 @@ struct FloatingTabBar: View {
         }
         .frame(height: 64)
         .background(
-            RoundedRectangle(cornerRadius: 28)
+            RoundedRectangle(cornerRadius: 24)
                 .fill(.ultraThinMaterial)
                 .overlay(
-                    RoundedRectangle(cornerRadius: 28)
+                    RoundedRectangle(cornerRadius: 24)
                         .stroke(SSColors.glassBorder, lineWidth: 0.5)
                 )
         )

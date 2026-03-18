@@ -14,16 +14,16 @@ struct ActionChip: View {
                 Text(text)
                     .font(SSTypography.labelSmall)
             }
-            .foregroundColor(active ? SSColors.accentGreen : SSColors.chromeDim)
+            .foregroundColor(active ? ThemeManager.shared.primary : SSColors.chromeDim)
             .padding(.horizontal, 10)
             .padding(.vertical, 6)
             .background(
                 Capsule()
-                    .fill(active ? SSColors.accentGreenDim : SSColors.glassBg)
+                    .fill(active ? ThemeManager.shared.primaryDim : SSColors.glassBg)
             )
             .overlay(
                 Capsule()
-                    .stroke(active ? SSColors.accentGreen.opacity(0.3) : SSColors.feedItemBorder, lineWidth: 0.5)
+                    .stroke(active ? ThemeManager.shared.primary.opacity(0.3) : SSColors.feedItemBorder, lineWidth: 0.5)
             )
         }
         .buttonStyle(.plain)

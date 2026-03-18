@@ -7,13 +7,17 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
@@ -22,84 +26,79 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.soundscore.app.ui.theme.GlassBg
 import com.soundscore.app.ui.theme.GlassBorder
+import com.soundscore.app.ui.theme.GlassHighlight
 
-/**
- * Liquid glass card with Apple-like dynamic movement and haptic-style scaling.
- *
- * @param tintColor    Optional color that "bleeds" through the glass.
- * @param cornerRadius Corner rounding. Default 16dp.
- * @param borderColor  Border color. Default GlassBorder (9% white).
- */
 @Composable
 fun GlassCard(
     modifier: Modifier = Modifier,
     tintColor: Color? = null,
-    cornerRadius: Dp = 16.dp,
+    cornerRadius: Dp = 20.dp,
     borderColor: Color = GlassBorder,
+    contentPadding: PaddingValues = PaddingValues(horizontal = 14.dp, vertical = 14.dp),
+    fillMaxWidth: Boolean = true,
+    frosted: Boolean = false,
     onClick: (() -> Unit)? = null,
     content: @Composable BoxScope.() -> Unit,
 ) {
     var isPressed by remember { mutableStateOf(false) }
-    
-    // Smooth spring animation for the "liquid" scale effect
     val scale by animateFloatAsState(
-        targetValue = if (isPressed) 0.96f else 1f,
-        animationSpec = spring(dampingRatio = 0.7f, stiffness = 400f),
-        label = "scale"
+        targetValue = if (isPressed) 0.97f else 1f,
+        animationSpec = spring(dampingRatio = 0.65f, stiffness = 500f),
+        label = "glassScale"
     )
 
     val shape = RoundedCornerShape(cornerRadius)
 
-    val bgModifier = if (tintColor != null) {
-        Modifier.background(
-            brush = Brush.linearGradient(
-                colors = listOf(
-                    tintColor.copy(alpha = 0.18f),
-                    GlassBg.copy(alpha = 0.4f),
-                    tintColor.copy(alpha = 0.05f),
-                )
-            ),
-            shape = shape,
+    val bgBrush = if (tintColor != null) {
+        Brush.linearGradient(
+            colors = listOf(
+                tintColor.copy(alpha = 0.14f),
+                GlassBg.copy(alpha = 0.60f),
+                tintColor.copy(alpha = 0.04f),
+            )
         )
     } else {
-        Modifier.background(
-            brush = Brush.verticalGradient(
-                colors = listOf(
-                    Color.White.copy(alpha = 0.08f),
-                    GlassBg,
-                )
-            ),
-            shape = shape
+        Brush.verticalGradient(
+            colors = listOf(
+                GlassHighlight.copy(alpha = if (frosted) 0.28f else 0.20f),
+                GlassBg,
+            )
         )
+    }
+
+    val interactionModifier = if (onClick != null) {
+        Modifier.pointerInput(onClick) {
+            detectTapGestures(
+                onPress = {
+                    isPressed = true
+                    tryAwaitRelease()
+                    isPressed = false
+                },
+                onTap = { onClick() },
+            )
+        }
+    } else {
+        Modifier
     }
 
     Box(
         modifier = modifier
-            .fillMaxWidth()
+            .then(if (fillMaxWidth) Modifier.fillMaxWidth() else Modifier)
             .graphicsLayer {
                 this.scaleX = scale
                 this.scaleY = scale
             }
             .clip(shape)
-            .then(bgModifier)
+            .background(brush = bgBrush, shape = shape)
             .border(
-                width = 0.5.dp, 
+                width = 0.5.dp,
                 brush = Brush.verticalGradient(
-                    listOf(Color.White.copy(alpha = 0.15f), borderColor)
-                ), 
-                shape = shape
+                    listOf(Color.White.copy(alpha = 0.14f), borderColor)
+                ),
+                shape = shape,
             )
-            .pointerInput(Unit) {
-                detectTapGestures(
-                    onPress = {
-                        isPressed = true
-                        tryAwaitRelease()
-                        isPressed = false
-                    },
-                    onTap = { onClick?.invoke() }
-                )
-            }
-            .padding(12.dp),
+            .then(interactionModifier)
+            .padding(contentPadding),
         content = content,
     )
 }

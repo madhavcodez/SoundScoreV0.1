@@ -5,7 +5,7 @@ import {
   RefreshRequestSchema,
   SignUpRequestSchema,
 } from "@soundscore/contracts";
-import { compare, hash } from "bcryptjs";
+import bcrypt from "bcryptjs";
 import type { Db } from "../db/client";
 import { logAuditEvent } from "../lib/audit";
 import { conflict, unauthorized } from "../lib/errors";
@@ -62,7 +62,7 @@ export const registerAuthRoutes = (app: FastifyInstance, db: Db) => {
     const accessToken = uid("atk");
     const refreshToken = uid("rtk");
     const now = nowIso();
-    const passwordHash = await hash(payload.password, env.auth.saltRounds);
+    const passwordHash = await bcrypt.hash(payload.password, env.auth.saltRounds);
 
     await db.query(
       `
@@ -131,7 +131,7 @@ export const registerAuthRoutes = (app: FastifyInstance, db: Db) => {
     }
 
     const user = userResult.rows[0];
-    const matches = await compare(payload.password, user.password_hash);
+    const matches = await bcrypt.compare(payload.password, user.password_hash);
     if (!matches) {
       throw unauthorized("Invalid credentials");
     }

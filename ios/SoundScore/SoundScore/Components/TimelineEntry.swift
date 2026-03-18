@@ -16,7 +16,7 @@ struct TimelineEntry<Content: View>: View {
             VStack(spacing: 4) {
                 Text(dateLabel)
                     .font(SSTypography.labelMedium)
-                    .foregroundColor(SSColors.accentGreen)
+                    .foregroundColor(ThemeManager.shared.primary)
                 Text(timeLabel)
                     .font(SSTypography.labelSmall)
                     .foregroundColor(SSColors.chromeDim)

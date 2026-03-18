@@ -13,7 +13,7 @@ struct PillSearchBar: View {
             TextField("", text: $query, prompt: Text(placeholder).foregroundColor(SSColors.chromeDim))
                 .font(SSTypography.bodyLarge)
                 .foregroundColor(SSColors.chromeLight)
-                .tint(SSColors.accentGreen)
+                .tint(ThemeManager.shared.primary)
 
             if !query.isEmpty {
                 Button { query = "" } label: {
@@ -30,11 +30,11 @@ struct PillSearchBar: View {
         .padding(.horizontal, 16)
         .padding(.vertical, 12)
         .background(
-            RoundedRectangle(cornerRadius: 28)
+            RoundedRectangle(cornerRadius: 24)
                 .fill(SSColors.glassFrosted)
         )
         .overlay(
-            RoundedRectangle(cornerRadius: 28)
+            RoundedRectangle(cornerRadius: 24)
                 .stroke(SSColors.glassBorder, lineWidth: 0.5)
         )
     }

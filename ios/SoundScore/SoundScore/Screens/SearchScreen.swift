@@ -9,6 +9,10 @@ struct SearchScreen: View {
             LazyVStack(alignment: .leading, spacing: 16) {
                 SyncBanner(message: viewModel.syncMessage)
 
+                if let error = viewModel.errorMessage {
+                    ErrorBanner(message: error)
+                }
+
                 ScreenHeader(title: "Discover", subtitle: "Browse by mood, genre, or find the record in your head.")
 
                 PillSearchBar(query: $viewModel.query)

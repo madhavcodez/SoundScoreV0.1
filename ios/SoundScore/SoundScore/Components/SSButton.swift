@@ -12,7 +12,7 @@ struct SSButton: View {
                 .padding(.horizontal, 24)
                 .padding(.vertical, 12)
                 .frame(maxWidth: .infinity)
-                .background(SSColors.accentGreen)
+                .background(ThemeManager.shared.primary)
                 .clipShape(RoundedRectangle(cornerRadius: 20))
         }
         .buttonStyle(.plain)

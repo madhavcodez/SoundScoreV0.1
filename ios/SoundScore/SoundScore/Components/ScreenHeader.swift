@@ -21,10 +21,10 @@ struct ScreenHeader: View {
                 Button(action: onAction) {
                     Text(actionLabel)
                         .font(SSTypography.labelLarge)
-                        .foregroundColor(SSColors.accentGreen)
+                        .foregroundColor(ThemeManager.shared.primary)
                         .padding(.horizontal, 16)
                         .padding(.vertical, 8)
-                        .background(SSColors.accentGreenDim)
+                        .background(ThemeManager.shared.primaryDim)
                         .clipShape(Capsule())
                 }
                 .buttonStyle(.plain)

@@ -12,11 +12,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.soundscore.app.ui.theme.*
+import com.soundscore.app.ui.theme.AccentGreen
+import com.soundscore.app.ui.theme.DarkBase
+import com.soundscore.app.ui.theme.GlassBg
+import com.soundscore.app.ui.theme.GlassBorder
+import com.soundscore.app.ui.theme.TextPrimary
 
-/**
- * Primary CTA — Electric Blue with glow shadow.
- */
 @Composable
 fun BlueButton(
     text: String,
@@ -26,24 +27,21 @@ fun BlueButton(
     Button(
         onClick = onClick,
         modifier = modifier,
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(20.dp),
         colors = ButtonDefaults.buttonColors(
-            containerColor = ElectricBlue,
+            containerColor = AccentGreen,
             contentColor = DarkBase,
         ),
-        contentPadding = PaddingValues(horizontal = 20.dp, vertical = 12.dp),
+        contentPadding = PaddingValues(horizontal = 24.dp, vertical = 14.dp),
     ) {
         Text(
             text = text,
-            fontWeight = FontWeight.SemiBold,
-            fontSize = 13.sp,
+            fontWeight = FontWeight.Bold,
+            fontSize = 14.sp,
         )
     }
 }
 
-/**
- * Ghost / secondary button — dark glass with chrome border.
- */
 @Composable
 fun GhostButton(
     text: String,
@@ -53,18 +51,18 @@ fun GhostButton(
     OutlinedButton(
         onClick = onClick,
         modifier = modifier,
-        shape = RoundedCornerShape(10.dp),
-        border = BorderStroke(1.dp, GlassBorder),
+        shape = RoundedCornerShape(20.dp),
+        border = BorderStroke(0.5.dp, GlassBorder),
         colors = ButtonDefaults.outlinedButtonColors(
-            containerColor = GlassBg,
-            contentColor = ChromeMedium,
+            containerColor = GlassBg.copy(alpha = 0.6f),
+            contentColor = TextPrimary,
         ),
-        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 10.dp),
+        contentPadding = PaddingValues(horizontal = 20.dp, vertical = 12.dp),
     ) {
         Text(
             text = text,
             fontWeight = FontWeight.Medium,
-            fontSize = 12.sp,
+            fontSize = 13.sp,
         )
     }
 }
