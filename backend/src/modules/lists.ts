@@ -6,6 +6,7 @@ import { notFound } from "../lib/errors";
 import { withIdempotency } from "../lib/idempotency";
 import { invalidateFeedCacheForUserAndFollowers, queueFollowerNotifications } from "../lib/notifications";
 import { nowIso, uid } from "../lib/util";
+import { stripHtml } from "../lib/sanitize";
 
 const updateUserListCount = async (db: Db, userId: string) => {
   await db.query(
@@ -26,7 +27,7 @@ const updateUserListCount = async (db: Db, userId: string) => {
 };
 
 export const registerListRoutes = (app: FastifyInstance, db: Db) => {
-  app.post("/v1/lists", async (request) => {
+  app.post("/v1/lists", async (request, reply) => {
     const userId = await app.requireAuth(request);
     const payload = CreateListRequestSchema.parse(request.body);
 
@@ -39,7 +40,7 @@ export const registerListRoutes = (app: FastifyInstance, db: Db) => {
           INSERT INTO lists(id, owner_id, title, note, created_at, updated_at)
           VALUES ($1, $2, $3, $4, $5, $5)
         `,
-        [listId, userId, payload.title, payload.note ?? null, now],
+        [listId, userId, stripHtml(payload.title), payload.note ? stripHtml(payload.note) : null, now],
       );
 
       await updateUserListCount(db, userId);
@@ -77,7 +78,7 @@ export const registerListRoutes = (app: FastifyInstance, db: Db) => {
         userAgent: request.headers["user-agent"],
       }).catch(() => {});
 
-      return {
+      return reply.status(201).send({
         id: listId,
         ownerId: userId,
         title: payload.title,
@@ -85,11 +86,11 @@ export const registerListRoutes = (app: FastifyInstance, db: Db) => {
         items: [],
         createdAt: now,
         updatedAt: now,
-      };
+      });
     });
   });
 
-  app.post("/v1/lists/:id/items", async (request) => {
+  app.post("/v1/lists/:id/items", async (request, reply) => {
     const userId = await app.requireAuth(request);
     const listId = (request.params as { id: string }).id;
     const payload = AddListItemRequestSchema.parse(request.body);
@@ -165,7 +166,7 @@ export const registerListRoutes = (app: FastifyInstance, db: Db) => {
         [listId],
       );
 
-      return {
+      return reply.status(201).send({
         id: response.rows[0].id,
         ownerId: response.rows[0].owner_id,
         title: response.rows[0].title,
@@ -177,7 +178,7 @@ export const registerListRoutes = (app: FastifyInstance, db: Db) => {
         })),
         createdAt: response.rows[0].created_at,
         updatedAt: response.rows[0].updated_at,
-      };
+      });
     });
   });
 
