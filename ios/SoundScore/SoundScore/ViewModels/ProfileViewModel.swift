@@ -10,6 +10,7 @@ class ProfileViewModel: ObservableObject {
     @Published var syncMessage: String?
     @Published var isLoading: Bool
     @Published var recentActivity: [FeedItem]
+    @Published var errorMessage: String?
     @Published var showExportSuccess = false
     @Published var showDeleteConfirm = false
 
@@ -22,6 +23,7 @@ class ProfileViewModel: ObservableObject {
         self.latestRecap = repo.latestRecap
         self.syncMessage = repo.syncMessage
         self.isLoading = repo.isLoading
+        self.errorMessage = repo.errorMessage
         self.recentActivity = Array(repo.feedItems.prefix(3))
 
         repo.$profile
@@ -50,6 +52,10 @@ class ProfileViewModel: ObservableObject {
         repo.$isLoading
             .receive(on: RunLoop.main)
             .assign(to: &$isLoading)
+
+        repo.$errorMessage
+            .receive(on: RunLoop.main)
+            .assign(to: &$errorMessage)
 
         repo.$feedItems
             .receive(on: RunLoop.main)

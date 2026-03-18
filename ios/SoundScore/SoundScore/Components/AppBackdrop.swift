@@ -9,13 +9,13 @@ struct AppBackdrop: View {
             )
 
             RadialGradient(
-                colors: [SSColors.accentGreen.opacity(0.12), Color.clear],
+                colors: [ThemeManager.shared.current.backdropGlow, Color.clear],
                 center: .topLeading,
                 startRadius: 0, endRadius: 400
             )
 
             RadialGradient(
-                colors: [SSColors.accentViolet.opacity(0.06), Color.clear],
+                colors: [ThemeManager.shared.current.backdropSecondaryGlow, Color.clear],
                 center: .bottomTrailing,
                 startRadius: 0, endRadius: 300
             )

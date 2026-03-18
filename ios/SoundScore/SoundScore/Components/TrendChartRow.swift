@@ -8,11 +8,11 @@ struct TrendChartRow: View {
             HStack(spacing: 12) {
                 ZStack {
                     Circle()
-                        .fill(SSColors.accentGreenDim)
+                        .fill(ThemeManager.shared.primaryDim)
                         .frame(width: 32, height: 32)
                     Text("\(entry.rank)")
                         .font(SSTypography.labelLarge)
-                        .foregroundColor(SSColors.accentGreen)
+                        .foregroundColor(ThemeManager.shared.primary)
                 }
 
                 AlbumArtwork(
@@ -43,7 +43,7 @@ struct TrendChartRow: View {
                         .font(SSTypography.labelSmall)
                         .fontWeight(.bold)
                 }
-                .foregroundColor(SSColors.accentGreen)
+                .foregroundColor(ThemeManager.shared.primary)
             }
         }
     }

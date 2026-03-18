@@ -15,7 +15,7 @@ struct SectionHeader: View {
                 if let trailing {
                     Text(trailing)
                         .font(SSTypography.labelSmall)
-                        .foregroundColor(SSColors.accentGreen)
+                        .foregroundColor(ThemeManager.shared.primary)
                 }
             }
             Text(title)

@@ -4,7 +4,7 @@ struct StatPill: View {
     let value: String
     let label: String
     var highlight: Bool = false
-    var accentColor: Color = SSColors.accentGreen
+    var accentColor: Color = ThemeManager.shared.primary
 
     var body: some View {
         VStack(spacing: 2) {

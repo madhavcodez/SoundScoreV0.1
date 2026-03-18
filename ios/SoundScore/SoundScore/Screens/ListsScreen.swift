@@ -11,6 +11,10 @@ struct ListsScreen: View {
             LazyVStack(alignment: .leading, spacing: 16) {
                 SyncBanner(message: viewModel.syncMessage)
 
+                if let error = viewModel.errorMessage {
+                    ErrorBanner(message: error)
+                }
+
                 ScreenHeader(
                     title: "Lists",
                     subtitle: "Curated collections worth sharing.",
