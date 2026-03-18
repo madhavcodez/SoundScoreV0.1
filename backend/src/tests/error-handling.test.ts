@@ -11,6 +11,8 @@ const setup = async (): Promise<boolean> => {
     await app.db.query("SELECT 1");
     return true;
   } catch {
+    if (app) await app.close().catch(() => {});
+    app = undefined;
     return false;
   }
 };
@@ -42,7 +44,7 @@ test("Error handling", async (t) => {
         handle: `e_${suffix}`,
       },
     });
-    assert.ok(res.statusCode >= 200 && res.statusCode <= 201);
+    assert.equal(res.statusCode, 201);
     const body = JSON.parse(res.payload);
     accessToken = body.accessToken;
     userId = body.userId;
@@ -107,7 +109,7 @@ test("Error handling", async (t) => {
       payload: { albumId: "alb_1", value: 3.5 },
     });
 
-    assert.equal(res1.statusCode, 200);
+    assert.equal(res1.statusCode, 201);
 
     // Second rating on same album with different key → upsert (idempotent at DB level)
     const res2 = await app!.inject({
@@ -120,7 +122,7 @@ test("Error handling", async (t) => {
       payload: { albumId: "alb_1", value: 4.0 },
     });
 
-    assert.equal(res2.statusCode, 200);
+    assert.equal(res2.statusCode, 201);
     const body2 = JSON.parse(res2.payload);
     assert.equal(body2.value, 4.0);
   });
@@ -131,7 +133,7 @@ test("Error handling", async (t) => {
       url: "/v1/search?q=' OR 1=1; DROP TABLE users; --",
     });
 
-    assert.ok(res.statusCode >= 200 && res.statusCode <= 201);
+    assert.equal(res.statusCode, 200);
     const body = JSON.parse(res.payload);
     assert.ok(Array.isArray(body.items));
   });
@@ -149,7 +151,7 @@ test("Error handling", async (t) => {
       payload: { albumId: "alb_2", body: xssPayload },
     });
 
-    assert.ok(res.statusCode >= 200 && res.statusCode <= 201);
+    assert.equal(res.statusCode, 201);
     const body = JSON.parse(res.payload);
     // HTML tags are stripped by server-side sanitization
     assert.equal(body.body, 'alert("xss")');

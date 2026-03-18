@@ -11,6 +11,8 @@ const setup = async (): Promise<boolean> => {
     await app.db.query("SELECT 1");
     return true;
   } catch {
+    if (app) await app.close().catch(() => {});
+    app = undefined;
     return false;
   }
 };

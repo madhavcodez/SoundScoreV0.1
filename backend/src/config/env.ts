@@ -3,11 +3,14 @@ import { z } from "zod";
 
 dotenv.config();
 
+const DEV_DATABASE_URL = "postgresql://soundscore:soundscore@localhost:5432/soundscore";
+const DEV_REDIS_URL = "redis://localhost:6379";
+
 const EnvSchema = z.object({
   PORT: z.coerce.number().default(8080),
   HOST: z.string().default("0.0.0.0"),
-  DATABASE_URL: z.string().min(1, "DATABASE_URL is required"),
-  REDIS_URL: z.string().min(1, "REDIS_URL is required"),
+  DATABASE_URL: z.string().min(1).default(DEV_DATABASE_URL),
+  REDIS_URL: z.string().min(1).default(DEV_REDIS_URL),
   AUTH_SALT_ROUNDS: z.coerce.number().default(10),
   SPOTIFY_CLIENT_ID: z.string().optional().default(""),
   SPOTIFY_CLIENT_SECRET: z.string().optional().default(""),
@@ -27,6 +30,18 @@ if (!parsed.success) {
 }
 
 const validated = parsed.data;
+
+// In production, require explicit DATABASE_URL and REDIS_URL (no dev defaults)
+if (validated.NODE_ENV === "production") {
+  if (!process.env.DATABASE_URL) {
+    console.error("DATABASE_URL must be explicitly set in production");
+    process.exit(1);
+  }
+  if (!process.env.REDIS_URL) {
+    console.error("REDIS_URL must be explicitly set in production");
+    process.exit(1);
+  }
+}
 
 if (!validated.SPOTIFY_CLIENT_ID || !validated.SPOTIFY_CLIENT_SECRET) {
   console.warn("Warning: SPOTIFY_CLIENT_ID / SPOTIFY_CLIENT_SECRET not set — provider features will be unavailable");
