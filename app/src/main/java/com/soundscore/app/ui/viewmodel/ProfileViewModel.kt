@@ -54,7 +54,7 @@ class ProfileViewModel : ViewModel() {
             repository.refresh()
             repository.registerDeviceToken(
                 platform = "android",
-                token = "emulator-debug-token", // TODO: Replace with real FCM token from Firebase Messaging
+                token = "emulator-debug-token", // KNOWN: Replace with FirebaseMessaging.getInstance().token once FCM is integrated
             )
             repository.loadLatestRecap()
         }
