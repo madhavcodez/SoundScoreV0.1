@@ -23,14 +23,18 @@ fun BlueButton(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
 ) {
     Button(
         onClick = onClick,
         modifier = modifier,
+        enabled = enabled,
         shape = RoundedCornerShape(20.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = AccentGreen,
             contentColor = DarkBase,
+            disabledContainerColor = AccentGreen.copy(alpha = 0.38f),
+            disabledContentColor = DarkBase.copy(alpha = 0.5f),
         ),
         contentPadding = PaddingValues(horizontal = 24.dp, vertical = 14.dp),
     ) {
