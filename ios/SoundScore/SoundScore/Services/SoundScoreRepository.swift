@@ -141,7 +141,7 @@ class SoundScoreRepository: ObservableObject {
         ))
         guard let index = feedItems.firstIndex(where: { $0.id == feedItemId }) else { return }
         feedItems[index].isLiked.toggle()
-        feedItems[index].likes += feedItems[index].isLiked ? 1 : -1
+        feedItems[index].likes = max(0, feedItems[index].likes + (feedItems[index].isLiked ? 1 : -1))
         Task { await syncOutbox() }
     }
 
