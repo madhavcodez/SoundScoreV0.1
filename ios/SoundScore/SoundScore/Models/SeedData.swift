@@ -27,39 +27,57 @@ enum SeedData {
         ),
         Album(
             id: "alb_4", title: "Brat", artist: "Charli XCX", year: 2024,
-            artColors: AlbumColors.rose, artworkUrl: nil, avgRating: 4.0, logCount: 3200
+            artColors: AlbumColors.rose,
+            artworkUrl: "https://i.scdn.co/image/ab67616d0000b273f88b43d15fd14e9525338b59",
+            avgRating: 4.0, logCount: 3200
         ),
         Album(
             id: "alb_5", title: "Manning Fireside", artist: "Mk.gee", year: 2024,
-            artColors: AlbumColors.lagoon, artworkUrl: nil, avgRating: 3.9, logCount: 620
+            artColors: AlbumColors.lagoon,
+            artworkUrl: "https://i.scdn.co/image/ab67616d0000b2732a8e8b10d2ada6d5a9a459a8",
+            avgRating: 3.9, logCount: 620
         ),
         Album(
             id: "alb_6", title: "The Great Impersonator", artist: "Halsey", year: 2024,
-            artColors: AlbumColors.ember, artworkUrl: nil, avgRating: 3.5, logCount: 430
+            artColors: AlbumColors.ember,
+            artworkUrl: "https://i.scdn.co/image/ab67616d0000b2732e53476c915af358ba2aac02",
+            avgRating: 3.5, logCount: 430
         ),
         Album(
             id: "alb_7", title: "HIT ME HARD AND SOFT", artist: "Billie Eilish", year: 2024,
-            artColors: AlbumColors.midnight, artworkUrl: nil, avgRating: 4.2, logCount: 1650
+            artColors: AlbumColors.midnight,
+            artworkUrl: "https://i.scdn.co/image/ab67616d0000b27371d62ea7ea8a5be92d3c1f62",
+            avgRating: 4.2, logCount: 1650
         ),
         Album(
             id: "alb_8", title: "The Tortured Poets Department", artist: "Taylor Swift", year: 2024,
-            artColors: AlbumColors.slate, artworkUrl: nil, avgRating: 3.7, logCount: 2800
+            artColors: AlbumColors.slate,
+            artworkUrl: "https://i.scdn.co/image/ab67616d0000b2738ecc33f195df6aa257c39eaa",
+            avgRating: 3.7, logCount: 2800
         ),
         Album(
             id: "alb_9", title: "Cowboy Carter", artist: "Beyoncé", year: 2024,
-            artColors: AlbumColors.amber, artworkUrl: nil, avgRating: 4.4, logCount: 3100
+            artColors: AlbumColors.amber,
+            artworkUrl: "https://i.scdn.co/image/ab67616d0000b273208e593c3565dae1295b5a26",
+            avgRating: 4.4, logCount: 3100
         ),
         Album(
             id: "alb_10", title: "Romance", artist: "Fontaines D.C.", year: 2024,
-            artColors: AlbumColors.forest, artworkUrl: nil, avgRating: 4.0, logCount: 780
+            artColors: AlbumColors.forest,
+            artworkUrl: "https://i.scdn.co/image/ab67616d0000b273f69e28716be1331924f25f2e",
+            avgRating: 4.0, logCount: 780
         ),
         Album(
             id: "alb_11", title: "Lives Outgrown", artist: "Beth Gibbons", year: 2024,
-            artColors: AlbumColors.orchid, artworkUrl: nil, avgRating: 4.1, logCount: 520
+            artColors: AlbumColors.orchid,
+            artworkUrl: "https://i.scdn.co/image/ab67616d0000b27316997b4a53ae6b42a4b803be",
+            avgRating: 4.1, logCount: 520
         ),
         Album(
             id: "alb_12", title: "Forever", artist: "Skrillex", year: 2024,
-            artColors: AlbumColors.lagoon, artworkUrl: nil, avgRating: 3.6, logCount: 890
+            artColors: AlbumColors.lagoon,
+            artworkUrl: "https://i.scdn.co/image/ab67616d0000b2732a7e34a68952017d900c6bb8",
+            avgRating: 3.6, logCount: 890
         ),
     ]
 
@@ -148,6 +166,26 @@ enum SeedData {
         UserList(id: "l5", title: "Headphone Albums Only",
                  note: "Albums that demand isolation and full attention.",
                  albumIds: ["alb_5", "alb_11", "alb_7", "alb_6"], curatorHandle: "@madhav", saves: 112),
+    ]
+
+    static let sampleTracks: [String: [Track]] = [
+        "alb_1": [
+            Track(id: "t1_1", albumId: "alb_1", title: "St. Chroma", trackNumber: 1, durationMs: 218_000, spotifyId: nil),
+            Track(id: "t1_2", albumId: "alb_1", title: "Rah Tah Tah", trackNumber: 2, durationMs: 156_000, spotifyId: nil),
+            Track(id: "t1_3", albumId: "alb_1", title: "Noid", trackNumber: 3, durationMs: 203_000, spotifyId: nil),
+            Track(id: "t1_4", albumId: "alb_1", title: "Darling, I", trackNumber: 4, durationMs: 247_000, spotifyId: nil),
+        ],
+        "alb_2": [
+            Track(id: "t2_1", albumId: "alb_2", title: "wacced out murals", trackNumber: 1, durationMs: 325_000, spotifyId: nil),
+            Track(id: "t2_2", albumId: "alb_2", title: "squabble up", trackNumber: 2, durationMs: 152_000, spotifyId: nil),
+            Track(id: "t2_3", albumId: "alb_2", title: "luther", trackNumber: 3, durationMs: 268_000, spotifyId: nil),
+            Track(id: "t2_4", albumId: "alb_2", title: "tv off", trackNumber: 4, durationMs: 276_000, spotifyId: nil),
+        ],
+        "alb_3": [
+            Track(id: "t3_1", albumId: "alb_3", title: "Taste", trackNumber: 1, durationMs: 177_000, spotifyId: nil),
+            Track(id: "t3_2", albumId: "alb_3", title: "Please Please Please", trackNumber: 2, durationMs: 186_000, spotifyId: nil),
+            Track(id: "t3_3", albumId: "alb_3", title: "Espresso", trackNumber: 3, durationMs: 175_000, spotifyId: nil),
+        ],
     ]
 
     static let defaultNotificationPreferences = NotificationPreferences()

@@ -28,7 +28,13 @@ export const AuthResponseSchema = z.object({
 
 export const CreateRatingRequestSchema = z.object({
   albumId: z.string().max(100),
-  value: z.number().min(0).max(5),
+  value: z.number().min(0).max(6),
+});
+
+export const CreateTrackRatingRequestSchema = z.object({
+  trackId: z.string().max(100),
+  albumId: z.string().max(100),
+  value: z.number().min(0).max(6),
 });
 
 export const CreateReviewRequestSchema = z.object({

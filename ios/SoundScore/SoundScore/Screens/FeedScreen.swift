@@ -31,12 +31,26 @@ struct FeedScreen: View {
 
                         ScrollView(.horizontal, showsIndicators: false) {
                             LazyHStack(spacing: 14) {
-                                ForEach(viewModel.trendingAlbums) { album in
-                                    TrendingHeroCard(album: album)
+                                ForEach(Array(viewModel.trendingAlbums.enumerated()), id: \.element.id) { index, album in
+                                    TrendingHeroCard(album: album, rank: index + 1)
                                         .onTapGesture {
                                             UIImpactFeedbackGenerator(style: .light).impactOccurred()
                                             onSelectAlbum(album)
                                         }
+                                }
+                            }
+                            .padding(.trailing, 8)
+                        }
+                    }
+
+                    // Collections section (lists in feed)
+                    if !viewModel.featuredLists.isEmpty {
+                        SectionHeader(eyebrow: "Curated", title: "Collections")
+
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            LazyHStack(spacing: 12) {
+                                ForEach(viewModel.featuredLists.prefix(4)) { showcase in
+                                    CompactListCard(showcase: showcase, onSelectAlbum: onSelectAlbum)
                                 }
                             }
                             .padding(.trailing, 8)
@@ -104,16 +118,23 @@ struct ErrorBanner: View {
     }
 }
 
+// MARK: - Trending Card (redesigned with rank badge, glow, border)
+
 private struct TrendingHeroCard: View {
     let album: Album
+    let rank: Int
+
+    private var dominantColor: Color {
+        album.artColors.first ?? ThemeManager.shared.primary
+    }
 
     var body: some View {
         ZStack(alignment: .bottomLeading) {
             AlbumArtwork(artworkUrl: album.artworkUrl, colors: album.artColors, cornerRadius: 24)
 
             LinearGradient(
-                colors: [.clear, SSColors.overlayDark],
-                startPoint: .init(x: 0.5, y: 0.35),
+                colors: [.clear, .clear, SSColors.overlayDark.opacity(0.6), SSColors.overlayDark],
+                startPoint: .init(x: 0.5, y: 0.0),
                 endPoint: .bottom
             )
             .clipShape(RoundedRectangle(cornerRadius: 24))
@@ -137,13 +158,31 @@ private struct TrendingHeroCard: View {
                 }
             }
             .padding(14)
+
+            // Rank badge
+            VStack {
+                HStack {
+                    Text("#\(rank)")
+                        .font(SSTypography.labelSmall)
+                        .fontWeight(.black)
+                        .foregroundColor(SSColors.chromeLight)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(dominantColor.opacity(0.85))
+                        .clipShape(Capsule())
+                        .padding(10)
+                    Spacer()
+                }
+                Spacer()
+            }
         }
-        .frame(width: 200, height: 260)
+        .frame(width: 220, height: 280)
         .clipShape(RoundedRectangle(cornerRadius: 24))
         .overlay(
             RoundedRectangle(cornerRadius: 24)
-                .stroke(SSColors.feedItemBorder, lineWidth: 0.5)
+                .stroke(dominantColor.opacity(0.4), lineWidth: 1)
         )
+        .shadow(color: dominantColor.opacity(0.3), radius: 12, y: 4)
     }
 }
 
@@ -186,7 +225,7 @@ private struct FeedActivityCard: View {
                             .font(SSTypography.titleLarge)
                             .fontWeight(.semibold)
                             .foregroundColor(SSColors.chromeLight)
-                        Text("\(item.album.artist) · \(item.album.year)")
+                        Text("\(item.album.artist) · \(String(item.album.year))")
                             .font(SSTypography.bodySmall)
                             .foregroundColor(SSColors.textSecondary)
                         StarRating(rating: item.rating, starSize: 14)
@@ -213,7 +252,6 @@ private struct FeedActivityCard: View {
 }
 
 private func avatarColors(_ username: String) -> [Color] {
-    // Generate deterministic colors from username hash instead of hardcoding
     let hash = abs(username.hashValue)
     let palettes: [[Color]] = [
         AlbumColors.forest, AlbumColors.rose, AlbumColors.orchid,

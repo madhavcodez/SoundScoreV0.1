@@ -61,6 +61,17 @@
 		F10000010000000000000003 /* ReviewSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = F10000020000000000000003; };
 		F10000010000000000000004 /* SkeletonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F10000020000000000000004; };
 		F1000001000000000000000X /* ThemeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1000002000000000000000X; };
+		N10000010000000000000001 /* Track.swift in Sources */ = {isa = PBXBuildFile; fileRef = N10000020000000000000001; };
+		N10000010000000000000002 /* SplashScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = N10000020000000000000002; };
+		N10000010000000000000003 /* AIBuddyScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = N10000020000000000000003; };
+		N10000010000000000000004 /* CadenceCharacter.swift in Sources */ = {isa = PBXBuildFile; fileRef = N10000020000000000000004; };
+		N10000010000000000000005 /* ListCards.swift in Sources */ = {isa = PBXBuildFile; fileRef = N10000020000000000000005; };
+		N10000010000000000000006 /* AIBuddyService.swift in Sources */ = {isa = PBXBuildFile; fileRef = N10000020000000000000006; };
+		N10000010000000000000008 /* AlbumDetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = N10000020000000000000008; };
+		P10000010000000000000001 /* SongRatingSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = P10000020000000000000001; };
+		Q10000010000000000000001 /* CadenceActionCards.swift in Sources */ = {isa = PBXBuildFile; fileRef = Q10000020000000000000001; };
+		P10000010000000000000002 /* AlbumRatingSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = P10000020000000000000002; };
+		N10000010000000000000009 /* AIBuddyViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = N10000020000000000000009; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -120,6 +131,17 @@
 		F10000020000000000000003 /* ReviewSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewSheet.swift; sourceTree = "<group>"; };
 		F10000020000000000000004 /* SkeletonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkeletonView.swift; sourceTree = "<group>"; };
 		F1000002000000000000000X /* ThemeManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeManager.swift; sourceTree = "<group>"; };
+		N10000020000000000000001 /* Track.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Track.swift; sourceTree = "<group>"; };
+		N10000020000000000000002 /* SplashScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashScreen.swift; sourceTree = "<group>"; };
+		N10000020000000000000003 /* AIBuddyScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIBuddyScreen.swift; sourceTree = "<group>"; };
+		N10000020000000000000004 /* CadenceCharacter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CadenceCharacter.swift; sourceTree = "<group>"; };
+		N10000020000000000000005 /* ListCards.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListCards.swift; sourceTree = "<group>"; };
+		N10000020000000000000006 /* AIBuddyService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIBuddyService.swift; sourceTree = "<group>"; };
+		N10000020000000000000008 /* AlbumDetailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumDetailViewModel.swift; sourceTree = "<group>"; };
+		P10000020000000000000001 /* SongRatingSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SongRatingSheet.swift; sourceTree = "<group>"; };
+		Q10000020000000000000001 /* CadenceActionCards.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CadenceActionCards.swift; sourceTree = "<group>"; };
+		P10000020000000000000002 /* AlbumRatingSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumRatingSheet.swift; sourceTree = "<group>"; };
+		N10000020000000000000009 /* AIBuddyViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIBuddyViewModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -181,6 +203,11 @@
 				D10000020000000000000016 /* SSButton.swift */,
 				F10000020000000000000003 /* ReviewSheet.swift */,
 				F10000020000000000000004 /* SkeletonView.swift */,
+				N10000020000000000000004 /* CadenceCharacter.swift */,
+				N10000020000000000000005 /* ListCards.swift */,
+				P10000020000000000000001 /* SongRatingSheet.swift */,
+				P10000020000000000000002 /* AlbumRatingSheet.swift */,
+				Q10000020000000000000001 /* CadenceActionCards.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -196,6 +223,8 @@
 				A10000020000000000000013 /* AuthScreen.swift */,
 				F10000020000000000000001 /* AlbumDetailScreen.swift */,
 				F10000020000000000000002 /* SettingsScreen.swift */,
+				N10000020000000000000002 /* SplashScreen.swift */,
+				N10000020000000000000003 /* AIBuddyScreen.swift */,
 			);
 			path = Screens;
 			sourceTree = "<group>";
@@ -219,6 +248,7 @@
 				B10000020000000000000006 /* NotificationPreferences.swift */,
 				B10000020000000000000007 /* PresentationHelpers.swift */,
 				B10000020000000000000008 /* SeedData.swift */,
+				N10000020000000000000001 /* Track.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -231,6 +261,8 @@
 				C10000020000000000000003 /* SearchViewModel.swift */,
 				C10000020000000000000004 /* ListsViewModel.swift */,
 				C10000020000000000000005 /* ProfileViewModel.swift */,
+				N10000020000000000000008 /* AlbumDetailViewModel.swift */,
+				N10000020000000000000009 /* AIBuddyViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -244,6 +276,7 @@
 				E10000020000000000000004 /* OutboxStore.swift */,
 				E10000020000000000000005 /* SoundScoreRepository.swift */,
 				E10000020000000000000006 /* SpotifyService.swift */,
+				N10000020000000000000006 /* AIBuddyService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -362,6 +395,17 @@
 				F10000010000000000000003 /* ReviewSheet.swift in Sources */,
 				F10000010000000000000004 /* SkeletonView.swift in Sources */,
 				F1000001000000000000000X /* ThemeManager.swift in Sources */,
+				N10000010000000000000001 /* Track.swift in Sources */,
+				N10000010000000000000002 /* SplashScreen.swift in Sources */,
+				N10000010000000000000003 /* AIBuddyScreen.swift in Sources */,
+				N10000010000000000000004 /* CadenceCharacter.swift in Sources */,
+				N10000010000000000000005 /* ListCards.swift in Sources */,
+				N10000010000000000000006 /* AIBuddyService.swift in Sources */,
+				N10000010000000000000008 /* AlbumDetailViewModel.swift in Sources */,
+				N10000010000000000000009 /* AIBuddyViewModel.swift in Sources */,
+				P10000010000000000000001 /* SongRatingSheet.swift in Sources */,
+				P10000010000000000000002 /* AlbumRatingSheet.swift in Sources */,
+				Q10000010000000000000001 /* CadenceActionCards.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

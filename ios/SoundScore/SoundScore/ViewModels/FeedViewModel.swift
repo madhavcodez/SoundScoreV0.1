@@ -4,6 +4,7 @@ import Combine
 class FeedViewModel: ObservableObject {
     @Published var items: [FeedItem]
     @Published var trendingAlbums: [Album]
+    @Published var featuredLists: [ListShowcase]
     @Published var syncMessage: String?
     @Published var isLoading: Bool
     @Published var errorMessage: String?
@@ -12,6 +13,7 @@ class FeedViewModel: ObservableObject {
         let repo = SoundScoreRepository.shared
         self.items = repo.feedItems
         self.trendingAlbums = buildTrendingAlbums(repo.albums)
+        self.featuredLists = resolveListShowcases(repo.lists, repo.albums)
         self.syncMessage = repo.syncMessage
         self.isLoading = repo.isLoading
         self.errorMessage = repo.errorMessage
@@ -24,6 +26,11 @@ class FeedViewModel: ObservableObject {
             .receive(on: RunLoop.main)
             .map { buildTrendingAlbums($0) }
             .assign(to: &$trendingAlbums)
+
+        Publishers.CombineLatest(repo.$lists, repo.$albums)
+            .receive(on: RunLoop.main)
+            .map { resolveListShowcases($0, $1) }
+            .assign(to: &$featuredLists)
 
         repo.$syncMessage
             .receive(on: RunLoop.main)

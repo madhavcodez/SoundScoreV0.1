@@ -5,26 +5,31 @@ class ProfileViewModel: ObservableObject {
     @Published var profile: UserProfile?
     @Published var metrics: [ProfileMetric]
     @Published var favoriteAlbums: [Album]
+    @Published var genres: [String]
     @Published var notificationPreferences: NotificationPreferences
-    @Published var latestRecap: WeeklyRecap?
+    @Published var recap: WeeklyRecap?
+    @Published var recentActivity: [RecentLogEntry]
     @Published var syncMessage: String?
     @Published var isLoading: Bool
-    @Published var recentActivity: [FeedItem]
     @Published var errorMessage: String?
     @Published var showExportSuccess = false
     @Published var showDeleteConfirm = false
+
+    var handle: String { profile?.handle ?? "@user" }
+    var bio: String { profile?.bio ?? "" }
 
     init() {
         let repo = SoundScoreRepository.shared
         self.profile = repo.profile
         self.metrics = buildProfileMetrics(repo.profile)
         self.favoriteAlbums = buildFavoriteAlbums(repo.profile)
+        self.genres = repo.profile.genres
         self.notificationPreferences = SeedData.defaultNotificationPreferences
-        self.latestRecap = repo.latestRecap
+        self.recap = repo.latestRecap
         self.syncMessage = repo.syncMessage
         self.isLoading = repo.isLoading
         self.errorMessage = repo.errorMessage
-        self.recentActivity = Array(repo.feedItems.prefix(3))
+        self.recentActivity = buildRecentLogs(repo.albums, repo.ratings)
 
         repo.$profile
             .receive(on: RunLoop.main)
@@ -41,9 +46,19 @@ class ProfileViewModel: ObservableObject {
             .map { buildFavoriteAlbums($0) }
             .assign(to: &$favoriteAlbums)
 
+        repo.$profile
+            .receive(on: RunLoop.main)
+            .map { $0.genres }
+            .assign(to: &$genres)
+
         repo.$latestRecap
             .receive(on: RunLoop.main)
-            .assign(to: &$latestRecap)
+            .assign(to: &$recap)
+
+        Publishers.CombineLatest(repo.$albums, repo.$ratings)
+            .receive(on: RunLoop.main)
+            .map { buildRecentLogs($0, $1) }
+            .assign(to: &$recentActivity)
 
         repo.$syncMessage
             .receive(on: RunLoop.main)
@@ -56,11 +71,6 @@ class ProfileViewModel: ObservableObject {
         repo.$errorMessage
             .receive(on: RunLoop.main)
             .assign(to: &$errorMessage)
-
-        repo.$feedItems
-            .receive(on: RunLoop.main)
-            .map { Array($0.prefix(3)) }
-            .assign(to: &$recentActivity)
     }
 
     func shareProfileText() -> String {

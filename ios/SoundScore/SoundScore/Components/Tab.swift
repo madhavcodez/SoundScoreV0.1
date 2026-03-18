@@ -4,7 +4,7 @@ enum Tab: String, CaseIterable {
     case feed
     case log
     case search
-    case lists
+    case aiBuddy
     case profile
 
     var label: String {
@@ -12,7 +12,7 @@ enum Tab: String, CaseIterable {
         case .feed: "Feed"
         case .log: "Diary"
         case .search: "Discover"
-        case .lists: "Lists"
+        case .aiBuddy: "Cadence"
         case .profile: "Profile"
         }
     }
@@ -22,7 +22,7 @@ enum Tab: String, CaseIterable {
         case .feed: "rectangle.stack"
         case .log: "book"
         case .search: "magnifyingglass"
-        case .lists: "list.bullet.rectangle"
+        case .aiBuddy: "sparkles"
         case .profile: "person.circle"
         }
     }
@@ -32,7 +32,7 @@ enum Tab: String, CaseIterable {
         case .feed: "rectangle.stack.fill"
         case .log: "book.fill"
         case .search: "magnifyingglass"
-        case .lists: "list.bullet.rectangle.fill"
+        case .aiBuddy: "sparkles"
         case .profile: "person.circle.fill"
         }
     }

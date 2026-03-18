@@ -7,10 +7,17 @@ struct ContentView: View {
     @State private var selectedTab: Tab = .feed
     @State private var selectedAlbum: Album?
     @State private var showSettings = false
+    @State private var showSplash = true
 
     var body: some View {
         Group {
-            if authManager.isAuthenticated {
+            if showSplash {
+                SplashScreen {
+                    withAnimation(.easeInOut(duration: 0.3)) {
+                        showSplash = false
+                    }
+                }
+            } else if authManager.isAuthenticated {
                 NavigationStack {
                     ZStack(alignment: .bottom) {
                         AppBackdrop()
@@ -58,8 +65,8 @@ struct TabContent: View {
             LogScreen(onSelectAlbum: onSelectAlbum)
         case .search:
             SearchScreen(onSelectAlbum: onSelectAlbum)
-        case .lists:
-            ListsScreen(onSelectAlbum: onSelectAlbum)
+        case .aiBuddy:
+            AIBuddyScreen()
         case .profile:
             ProfileScreen(onSelectAlbum: onSelectAlbum, onOpenSettings: onOpenSettings)
         }

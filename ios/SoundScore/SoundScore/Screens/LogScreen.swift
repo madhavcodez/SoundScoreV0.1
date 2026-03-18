@@ -19,27 +19,11 @@ struct LogScreen: View {
 
                     ScreenHeader(title: "Diary", subtitle: "Your listening journal. Rate, log, repeat.")
 
-                    if viewModel.isLoading && viewModel.quickLogAlbums.isEmpty {
-                        SkeletonView()
-                            .frame(height: 80)
-                            .clipShape(RoundedRectangle(cornerRadius: 22))
-                    } else {
-                        GlassCard(cornerRadius: 22, borderColor: SSColors.feedItemBorder, frosted: true) {
-                            HStack {
-                                ForEach(Array(viewModel.summaryStats.enumerated()), id: \.offset) { _, stat in
-                                    VStack(spacing: 2) {
-                                        Text(stat.value)
-                                            .font(SSTypography.headlineMedium)
-                                            .foregroundColor(stat.label == "This week" ? ThemeManager.shared.primary : SSColors.chromeLight)
-                                            .fontWeight(.black)
-                                        Text(stat.label.uppercased())
-                                            .font(SSTypography.labelSmall)
-                                            .foregroundColor(SSColors.textTertiary)
-                                    }
-                                    .frame(maxWidth: .infinity)
-                                }
-                            }
-                        }
+                    if !viewModel.summaryStats.isEmpty {
+                        Text(viewModel.summaryStats.map { "\($0.value) \($0.label.lowercased())" }.joined(separator: " · "))
+                            .font(SSTypography.bodyMedium)
+                            .foregroundColor(SSColors.textSecondary)
+                            .padding(.horizontal, 4)
                     }
 
                     SectionHeader(eyebrow: "Quick rate", title: "Tap to rate")

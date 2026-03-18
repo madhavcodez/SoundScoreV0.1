@@ -67,6 +67,38 @@ actor SpotifyService {
         return first.artworkUrl
     }
 
+    /// Fetch tracks for a Spotify album
+    func fetchAlbumTracks(spotifyAlbumId: String) async -> [SpotifyTrackResult] {
+        do {
+            let token = try await ensureToken()
+
+            guard let url = URL(string: "https://api.spotify.com/v1/albums/\(spotifyAlbumId)/tracks?limit=50") else { return [] }
+
+            var request = URLRequest(url: url)
+            request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+
+            let (data, response) = try await URLSession.shared.data(for: request)
+            guard let http = response as? HTTPURLResponse, http.statusCode == 200 else {
+                return []
+            }
+
+            let decoded = try JSONDecoder().decode(SpotifyTracksResponse.self, from: data)
+            return decoded.items.enumerated().map { index, item in
+                SpotifyTrackResult(
+                    title: item.name,
+                    trackNumber: item.trackNumber ?? (index + 1),
+                    durationMs: item.durationMs,
+                    spotifyId: item.id
+                )
+            }
+        } catch {
+            #if DEBUG
+            print("[Spotify] Tracks error: \(error)")
+            #endif
+            return []
+        }
+    }
+
     // MARK: - Auth (Client Credentials)
 
     private func ensureToken() async throws -> String {
@@ -106,6 +138,13 @@ struct SpotifyAlbumResult {
     let artworkUrl: String
     let spotifyId: String
     let year: Int
+}
+
+struct SpotifyTrackResult {
+    let title: String
+    let trackNumber: Int
+    let durationMs: Int
+    let spotifyId: String
 }
 
 enum SpotifyError: Error {
@@ -155,4 +194,23 @@ private struct SpotifyImage: Decodable {
     let url: String
     let height: Int?
     let width: Int?
+}
+
+// MARK: - Spotify Tracks Response Types
+
+private struct SpotifyTracksResponse: Decodable {
+    let items: [SpotifyTrackItem]
+}
+
+private struct SpotifyTrackItem: Decodable {
+    let id: String
+    let name: String
+    let trackNumber: Int?
+    let durationMs: Int
+
+    enum CodingKeys: String, CodingKey {
+        case id, name
+        case trackNumber = "track_number"
+        case durationMs = "duration_ms"
+    }
 }

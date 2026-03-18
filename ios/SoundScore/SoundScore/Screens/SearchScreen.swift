@@ -205,7 +205,7 @@ private struct SearchResultCard: View {
                         .font(SSTypography.titleMedium)
                         .fontWeight(.semibold)
                         .foregroundColor(SSColors.chromeLight)
-                    Text("\(album.artist) · \(album.year)")
+                    Text("\(album.artist) · \(String(album.year))")
                         .font(SSTypography.bodySmall)
                         .foregroundColor(SSColors.textSecondary)
                 }

@@ -7,303 +7,368 @@ struct ProfileScreen: View {
     @State private var appeared = false
 
     var body: some View {
-        if let profile = viewModel.profile {
-            ScrollView {
-                LazyVStack(alignment: .leading, spacing: 18) {
-                    SyncBanner(message: viewModel.syncMessage)
+        ScrollView {
+            LazyVStack(alignment: .leading, spacing: 16) {
+                SyncBanner(message: viewModel.syncMessage)
 
-                    if let error = viewModel.errorMessage {
-                        ErrorBanner(message: error)
-                    }
+                if let error = viewModel.errorMessage {
+                    ErrorBanner(message: error)
+                }
 
-                    GlassCard(cornerRadius: 24, borderColor: SSColors.feedItemBorder, frosted: true) {
-                        VStack(spacing: 12) {
-                            AvatarCircle(
-                                initials: String(profile.handle.dropFirst().prefix(2)),
-                                gradientColors: [ThemeManager.shared.primary, SSColors.accentViolet],
-                                size: 80
-                            )
-                            Text(profile.handle)
-                                .font(SSTypography.headlineMedium)
-                                .foregroundColor(SSColors.chromeLight)
-                                .fontWeight(.bold)
-                            Text(profile.bio)
-                                .font(SSTypography.bodyMedium)
-                                .foregroundColor(SSColors.textSecondary)
-                                .multilineTextAlignment(.center)
-                            HStack(spacing: 24) {
-                                ProfileCount(value: "\(profile.followingCount)", label: "Following")
-                                ProfileCount(value: "\(profile.followersCount)", label: "Followers")
+                heroBanner
+                statsRow
+                actionBar
+
+                if !viewModel.favoriteAlbums.isEmpty {
+                    favoritesSection
+                }
+
+                if !viewModel.genres.isEmpty {
+                    tasteDNASection
+                }
+
+                if let recap = viewModel.recap {
+                    recapCard(recap)
+                }
+
+                if !viewModel.recentActivity.isEmpty {
+                    recentActivitySection
+                }
+            }
+            .padding(.bottom, 120)
+        }
+        .refreshable { await SoundScoreRepository.shared.refresh() }
+        .onAppear { appeared = true }
+    }
+
+    // MARK: - Hero Banner
+
+    private var heroBanner: some View {
+        ZStack(alignment: .bottom) {
+            ZStack {
+                let artworks = viewModel.favoriteAlbums.prefix(4)
+                if !artworks.isEmpty {
+                    GeometryReader { geo in
+                        let size = geo.size
+                        ZStack {
+                            ForEach(Array(artworks.enumerated()), id: \.element.id) { index, album in
+                                AlbumArtwork(artworkUrl: album.artworkUrl, colors: album.artColors, cornerRadius: 0)
+                                    .frame(width: size.width / 2, height: 140)
+                                    .offset(
+                                        x: index % 2 == 0 ? -size.width / 4 : size.width / 4,
+                                        y: index < 2 ? -70 : 70
+                                    )
                             }
                         }
-                        .frame(maxWidth: .infinity)
+                        .frame(width: size.width, height: size.height)
+                        .blur(radius: 30)
                     }
-
-                    HStack(spacing: 10) {
-                        StatPill(value: "\(profile.albumsCount)", label: "Albums", highlight: true)
-                        StatPill(value: "\(profile.reviewCount)", label: "Reviews")
-                        StatPill(value: "\(profile.listCount)", label: "Lists")
-                        StatPill(value: String(format: "%.1f", profile.avgRating), label: "Avg", highlight: true, accentColor: SSColors.accentAmber)
-                    }
-
-                    HStack {
-                        Spacer()
-                        ShareLink(item: viewModel.shareProfileText()) {
-                            VStack(spacing: 4) {
-                                ZStack {
-                                    Circle()
-                                        .fill(SSColors.glassBg)
-                                        .frame(width: 44, height: 44)
-                                    Circle()
-                                        .stroke(SSColors.glassBorder, lineWidth: 0.5)
-                                        .frame(width: 44, height: 44)
-                                    Image(systemName: "square.and.arrow.up")
-                                        .font(.system(size: 16))
-                                        .foregroundColor(ThemeManager.shared.primary)
-                                }
-                                Text("Share")
-                                    .font(SSTypography.labelSmall)
-                                    .foregroundColor(SSColors.textTertiary)
-                            }
-                        }
-                        Spacer()
-                        GlassIconButton(icon: "arrow.down.circle", label: "Export", action: {
-                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                            viewModel.showExportSuccess = true
-                        })
-                        Spacer()
-                        GlassIconButton(icon: "gearshape", label: "Settings", action: {
-                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                            onOpenSettings()
-                        })
-                        Spacer()
-                    }
-
-                    if !viewModel.favoriteAlbums.isEmpty {
-                        SectionHeader(eyebrow: "Favorites", title: "Pinned to your identity")
-                        FavoriteGrid(albums: viewModel.favoriteAlbums, onSelectAlbum: onSelectAlbum, appeared: appeared)
-                    }
-
-                    SectionHeader(eyebrow: "Taste DNA", title: "Genres on repeat")
-                    TasteTags(tags: profile.genres)
-
-                    if let recap = viewModel.latestRecap {
-                        SectionHeader(eyebrow: "Weekly recap", title: "Your week in music")
-                        RecapCard(recap: recap, shareText: viewModel.shareProfileText())
-                    }
-
-                    if !viewModel.recentActivity.isEmpty {
-                        SectionHeader(eyebrow: "Activity", title: "Recent ratings")
-                        ForEach(viewModel.recentActivity) { item in
-                            GlassCard(cornerRadius: 16, borderColor: SSColors.feedItemBorder,
-                                      contentPadding: EdgeInsets(top: 10, leading: 12, bottom: 10, trailing: 12)) {
-                                HStack(spacing: 10) {
-                                    AlbumArtwork(artworkUrl: item.album.artworkUrl, colors: item.album.artColors, cornerRadius: 12)
-                                        .frame(width: 44, height: 44)
-                                        .onTapGesture { onSelectAlbum(item.album) }
-                                    VStack(alignment: .leading, spacing: 2) {
-                                        Text(item.album.title)
-                                            .font(SSTypography.titleMedium)
-                                            .foregroundColor(SSColors.chromeLight)
-                                            .fontWeight(.semibold)
-                                        Text(item.action)
-                                            .font(SSTypography.bodySmall)
-                                            .foregroundColor(SSColors.textSecondary)
-                                    }
-                                    Spacer()
-                                    Text(item.timeAgo)
-                                        .font(SSTypography.labelSmall)
-                                        .foregroundColor(SSColors.textTertiary)
-                                }
-                            }
-                        }
-                    } else {
-                        EmptyState(
-                            title: "Recent activity",
-                            subtitle: "Your latest ratings and reviews will appear here.",
-                            icon: "clock.arrow.circlepath"
-                        )
-                    }
+                } else {
+                    ThemeManager.shared.primary.opacity(0.15)
                 }
-                .padding(.horizontal, 20)
-                .padding(.top, 16)
-                .padding(.bottom, 120)
+
+                LinearGradient(
+                    colors: [SSColors.overlayMedium, SSColors.overlayDark],
+                    startPoint: .top, endPoint: .bottom
+                )
             }
-            .refreshable { await SoundScoreRepository.shared.refresh() }
-            .onAppear { appeared = true }
-            .alert("Export Queued", isPresented: $viewModel.showExportSuccess) {
-                Button("OK", role: .cancel) {}
-            } message: {
-                Text("Your data export has been queued. You'll receive a download link when it's ready.")
+            .frame(height: 280)
+
+            VStack(spacing: 10) {
+                ZStack {
+                    Circle()
+                        .fill(ThemeManager.shared.primary.opacity(0.2))
+                        .frame(width: 106, height: 106)
+                        .blur(radius: 12)
+
+                    AvatarCircle(
+                        initials: String(viewModel.handle.dropFirst().prefix(2)),
+                        gradientColors: [ThemeManager.shared.primary, SSColors.accentViolet],
+                        size: 96
+                    )
+                    .overlay(
+                        Circle()
+                            .stroke(ThemeManager.shared.primary, lineWidth: 3)
+                            .frame(width: 96, height: 96)
+                    )
+                    .shadow(color: ThemeManager.shared.primary.opacity(0.4), radius: 12, y: 4)
+                }
+
+                Text(viewModel.handle)
+                    .font(SSTypography.displayMedium)
+                    .foregroundColor(SSColors.chromeLight)
+                    .fontWeight(.bold)
+
+                Text(viewModel.bio)
+                    .font(SSTypography.bodyMedium)
+                    .foregroundColor(SSColors.textSecondary)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 32)
             }
-        } else {
-            VStack(spacing: 12) {
-                SkeletonView()
-                    .frame(width: 80, height: 80)
-                    .clipShape(Circle())
-                SkeletonView()
-                    .frame(width: 120, height: 20)
-                    .clipShape(RoundedRectangle(cornerRadius: 8))
-                SkeletonView()
-                    .frame(width: 200, height: 14)
-                    .clipShape(RoundedRectangle(cornerRadius: 6))
-            }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .padding(.bottom, 20)
         }
     }
-}
 
-private struct ProfileCount: View {
-    let value: String
-    let label: String
+    // MARK: - Stats
 
-    var body: some View {
-        VStack(spacing: 1) {
-            Text(value)
-                .font(SSTypography.titleLarge)
-                .foregroundColor(SSColors.chromeLight)
-                .fontWeight(.bold)
-            Text(label)
-                .font(SSTypography.labelSmall)
-                .foregroundColor(SSColors.textTertiary)
-        }
-    }
-}
-
-private struct FavoriteGrid: View {
-    let albums: [Album]
-    var onSelectAlbum: (Album) -> Void = { _ in }
-    var appeared: Bool = false
-
-    var body: some View {
-        let rows = stride(from: 0, to: albums.count, by: 3).map { i in
-            Array(albums[i..<min(i + 3, albums.count)])
-        }
-        ForEach(Array(rows.enumerated()), id: \.offset) { rowIndex, row in
-            HStack(spacing: 10) {
-                ForEach(Array(row.enumerated()), id: \.element.id) { colIndex, album in
-                    let flatIndex = rowIndex * 3 + colIndex
-                    GlassCard(cornerRadius: 18, borderColor: SSColors.feedItemBorder, contentPadding: EdgeInsets(top: 6, leading: 6, bottom: 6, trailing: 6), onTap: {
-                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                        onSelectAlbum(album)
-                    }) {
-                        VStack(spacing: 6) {
-                            AlbumArtwork(artworkUrl: album.artworkUrl, colors: album.artColors, cornerRadius: 14)
-                                .frame(height: 100)
-                            Text(album.title)
-                                .font(SSTypography.titleMedium)
-                                .fontWeight(.medium)
-                                .foregroundColor(SSColors.chromeLight)
-                                .lineLimit(1)
-                        }
-                    }
-                    .frame(maxWidth: .infinity)
-                    .opacity(appeared ? 1 : 0)
-                    .offset(y: appeared ? 0 : 16)
-                    .animation(.easeOut(duration: 0.3).delay(Double(flatIndex) * 0.06), value: appeared)
-                }
-                ForEach(0..<(3 - row.count), id: \.self) { _ in
-                    Spacer().frame(maxWidth: .infinity)
-                }
-            }
-        }
-    }
-}
-
-private struct TasteTags: View {
-    let tags: [String]
-
-    var body: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 8) {
-                ForEach(Array(tags.enumerated()), id: \.offset) { index, tag in
-                    let tagColors: [Color] = {
-                        switch index % 4 {
-                        case 0: return AlbumColors.orchid
-                        case 1: return AlbumColors.lagoon
-                        case 2: return AlbumColors.ember
-                        default: return AlbumColors.rose
-                        }
-                    }()
-                    Text(tag)
-                        .font(SSTypography.labelMedium)
-                        .fontWeight(.medium)
-                        .foregroundColor(SSColors.chromeLight)
-                        .padding(.horizontal, 14)
-                        .padding(.vertical, 8)
-                        .background(
-                            LinearGradient(
-                                colors: [tagColors.first!.opacity(0.4), tagColors.last!.opacity(0.15)],
-                                startPoint: .leading, endPoint: .trailing
-                            )
-                        )
-                        .clipShape(Capsule())
-                        .overlay(
-                            Capsule()
-                                .stroke(tagColors.last!.opacity(0.3), lineWidth: 0.5)
-                        )
-                }
-            }
-        }
-    }
-}
-
-private struct RecapCard: View {
-    let recap: WeeklyRecap
-    let shareText: String
-
-    var body: some View {
-        GlassCard(tintColor: ThemeManager.shared.primary, cornerRadius: 22, borderColor: ThemeManager.shared.primary.opacity(0.2)) {
-            VStack(alignment: .leading, spacing: 10) {
-                HStack {
-                    VStack(alignment: .leading) {
-                        Text("\(recap.totalLogs)")
+    private var statsRow: some View {
+        HStack(spacing: 10) {
+            ForEach(viewModel.metrics) { metric in
+                GlassCard(cornerRadius: 16, borderColor: SSColors.feedItemBorder,
+                          contentPadding: EdgeInsets(top: 12, leading: 8, bottom: 12, trailing: 8)) {
+                    VStack(spacing: 4) {
+                        Text(metric.value)
                             .font(SSTypography.headlineMedium)
-                            .foregroundColor(ThemeManager.shared.primary)
+                            .foregroundColor(metric.label == "Albums" ? ThemeManager.shared.primary : SSColors.chromeLight)
                             .fontWeight(.black)
-                        Text("ALBUMS LOGGED")
+                        Text(metric.label.uppercased())
                             .font(SSTypography.labelSmall)
                             .foregroundColor(SSColors.textTertiary)
                     }
+                    .frame(maxWidth: .infinity)
+                }
+            }
+        }
+        .padding(.horizontal, 20)
+    }
+
+    // MARK: - Actions
+
+    private var actionBar: some View {
+        GlassCard(cornerRadius: 18, borderColor: SSColors.feedItemBorder,
+                  contentPadding: EdgeInsets(top: 10, leading: 14, bottom: 10, trailing: 14)) {
+            HStack(spacing: 12) {
+                Button {} label: {
+                    Text("Edit Profile")
+                        .font(SSTypography.labelLarge)
+                        .foregroundColor(SSColors.chromeLight)
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 8)
+                        .background(ThemeManager.shared.primary.opacity(0.25))
+                        .clipShape(Capsule())
+                }
+                .buttonStyle(.plain)
+
+                Spacer()
+
+                ShareLink(item: viewModel.shareProfileText()) {
+                    Image(systemName: "square.and.arrow.up")
+                        .font(.system(size: 16))
+                        .foregroundColor(SSColors.chromeMedium)
+                        .frame(width: 36, height: 36)
+                        .background(SSColors.glassBg)
+                        .clipShape(Circle())
+                }
+
+                Button { onOpenSettings() } label: {
+                    Image(systemName: "gearshape")
+                        .font(.system(size: 16))
+                        .foregroundColor(SSColors.chromeMedium)
+                        .frame(width: 36, height: 36)
+                        .background(SSColors.glassBg)
+                        .clipShape(Circle())
+                }
+                .buttonStyle(.plain)
+            }
+        }
+        .padding(.horizontal, 20)
+    }
+
+    // MARK: - Favorites
+
+    private var favoritesSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            SectionHeader(eyebrow: "Top picks", title: "Favorites", trailing: "See All")
+                .padding(.horizontal, 20)
+
+            ScrollView(.horizontal, showsIndicators: false) {
+                LazyHStack(spacing: 12) {
+                    ForEach(Array(viewModel.favoriteAlbums.enumerated()), id: \.element.id) { index, album in
+                        Button {
+                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                            onSelectAlbum(album)
+                        } label: {
+                            ZStack(alignment: .bottom) {
+                                AlbumArtwork(artworkUrl: album.artworkUrl, colors: album.artColors, cornerRadius: 18)
+
+                                LinearGradient(
+                                    colors: [.clear, SSColors.overlayDark],
+                                    startPoint: .init(x: 0.5, y: 0.4), endPoint: .bottom
+                                )
+                                .clipShape(RoundedRectangle(cornerRadius: 18))
+
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text(album.title)
+                                        .font(SSTypography.titleMedium)
+                                        .foregroundColor(SSColors.chromeLight)
+                                        .fontWeight(.bold)
+                                        .lineLimit(1)
+                                    Text(album.artist)
+                                        .font(SSTypography.labelSmall)
+                                        .foregroundColor(SSColors.textSecondary)
+                                        .lineLimit(1)
+                                }
+                                .padding(10)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                            }
+                            .frame(width: 140, height: 180)
+                            .clipShape(RoundedRectangle(cornerRadius: 18))
+                            .overlay(RoundedRectangle(cornerRadius: 18).stroke(SSColors.feedItemBorder, lineWidth: 0.5))
+                        }
+                        .buttonStyle(.plain)
+                        .opacity(appeared ? 1 : 0)
+                        .offset(y: appeared ? 0 : 20)
+                        .animation(.spring(response: 0.5, dampingFraction: 0.7).delay(Double(index) * 0.08), value: appeared)
+                    }
+                }
+                .padding(.horizontal, 20)
+            }
+        }
+    }
+
+    // MARK: - Taste DNA
+
+    private var tasteDNASection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            SectionHeader(eyebrow: "Your vibe", title: "Taste DNA")
+                .padding(.horizontal, 20)
+
+            ScrollView(.horizontal, showsIndicators: false) {
+                LazyHStack(spacing: 10) {
+                    let palettes: [[Color]] = [
+                        AlbumColors.forest, AlbumColors.orchid, AlbumColors.lagoon,
+                        AlbumColors.ember, AlbumColors.rose, AlbumColors.midnight,
+                    ]
+                    ForEach(Array(viewModel.genres.enumerated()), id: \.offset) { index, genre in
+                        Text(genre)
+                            .font(SSTypography.labelLarge)
+                            .fontWeight(.bold)
+                            .foregroundColor(.white)
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 14)
+                            .frame(height: 56)
+                            .background(
+                                LinearGradient(
+                                    colors: palettes[index % palettes.count],
+                                    startPoint: .topLeading, endPoint: .bottomTrailing
+                                )
+                            )
+                            .clipShape(RoundedRectangle(cornerRadius: 14))
+                            .overlay(RoundedRectangle(cornerRadius: 14).stroke(Color.white.opacity(0.15), lineWidth: 0.5))
+                    }
+                }
+                .padding(.horizontal, 20)
+            }
+        }
+    }
+
+    // MARK: - Recap
+
+    private func recapCard(_ recap: WeeklyRecap) -> some View {
+        GlassCard(tintColor: ThemeManager.shared.primary, cornerRadius: 22, borderColor: ThemeManager.shared.primary.opacity(0.2)) {
+            VStack(spacing: 12) {
+                HStack {
+                    Image(systemName: "chart.bar.fill")
+                        .foregroundColor(ThemeManager.shared.primary)
+                    Text("Weekly Recap")
+                        .font(SSTypography.headlineSmall)
+                        .foregroundColor(SSColors.chromeLight)
+                        .fontWeight(.bold)
                     Spacer()
-                    VStack(alignment: .trailing) {
+                }
+
+                HStack {
+                    VStack(spacing: 2) {
+                        Text("\(recap.totalLogs)")
+                            .font(SSTypography.headlineMedium)
+                            .foregroundColor(SSColors.chromeLight)
+                            .fontWeight(.black)
+                        Text("LOGS")
+                            .font(SSTypography.labelSmall)
+                            .foregroundColor(SSColors.textTertiary)
+                    }
+                    .frame(maxWidth: .infinity)
+
+                    VStack(spacing: 2) {
                         Text(String(format: "%.1f", recap.averageRating))
                             .font(SSTypography.headlineMedium)
                             .foregroundColor(SSColors.accentAmber)
                             .fontWeight(.black)
-                        Text("AVG RATING")
+                        Text("AVG")
                             .font(SSTypography.labelSmall)
                             .foregroundColor(SSColors.textTertiary)
                     }
+                    .frame(maxWidth: .infinity)
                 }
-                Text(recap.shareText)
-                    .font(SSTypography.bodyMedium)
-                    .foregroundColor(SSColors.textSecondary)
-                HStack(spacing: 10) {
-                    SSButton(text: "View Recap") {
-                        // Deep link to recap view
-                        if let url = URL(string: recap.deepLink) {
-                            UIApplication.shared.open(url)
+
+                ShareLink(item: recap.shareText) {
+                    HStack {
+                        Image(systemName: "square.and.arrow.up")
+                            .font(.system(size: 13))
+                        Text("Share Recap")
+                            .font(SSTypography.labelMedium)
+                    }
+                    .foregroundColor(ThemeManager.shared.primary)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 8)
+                    .background(ThemeManager.shared.primary.opacity(0.15))
+                    .clipShape(Capsule())
+                }
+            }
+        }
+        .padding(.horizontal, 20)
+    }
+
+    // MARK: - Recent Activity
+
+    private var recentActivitySection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            SectionHeader(eyebrow: "Recent", title: "Activity")
+                .padding(.horizontal, 20)
+
+            ForEach(viewModel.recentActivity) { entry in
+                HStack(spacing: 0) {
+                    RoundedRectangle(cornerRadius: 1)
+                        .fill(LinearGradient(colors: entry.album.artColors, startPoint: .top, endPoint: .bottom))
+                        .frame(width: 3)
+                        .padding(.vertical, 4)
+
+                    HStack(spacing: 10) {
+                        AlbumArtwork(artworkUrl: entry.album.artworkUrl, colors: entry.album.artColors, cornerRadius: 12)
+                            .frame(width: 56, height: 56)
+                            .onTapGesture {
+                                UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                onSelectAlbum(entry.album)
+                            }
+
+                        VStack(alignment: .leading, spacing: 3) {
+                            Text(entry.album.title)
+                                .font(SSTypography.titleMedium)
+                                .foregroundColor(SSColors.chromeLight)
+                                .fontWeight(.semibold)
+                                .lineLimit(1)
+                            Text(entry.album.artist)
+                                .font(SSTypography.bodySmall)
+                                .foregroundColor(SSColors.textSecondary)
+                                .lineLimit(1)
+                        }
+
+                        Spacer()
+
+                        VStack(alignment: .trailing, spacing: 3) {
+                            StarRating(rating: entry.rating, starSize: 10)
+                            Text(entry.dateLabel)
+                                .font(SSTypography.labelSmall)
+                                .foregroundColor(SSColors.textTertiary)
                         }
                     }
-                    ShareLink(item: recap.shareText) {
-                        HStack(spacing: 6) {
-                            Image(systemName: "square.and.arrow.up")
-                                .font(.system(size: 14))
-                            Text("Share")
-                                .font(SSTypography.labelMedium)
-                        }
-                        .foregroundColor(ThemeManager.shared.primary)
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 10)
-                        .background(SSColors.glassBg)
-                        .clipShape(RoundedRectangle(cornerRadius: 16))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 16)
-                                .stroke(SSColors.glassBorder, lineWidth: 0.5)
-                        )
-                    }
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 8)
                 }
+                .background(SSColors.glassBg)
+                .clipShape(RoundedRectangle(cornerRadius: 14))
+                .overlay(RoundedRectangle(cornerRadius: 14).stroke(SSColors.feedItemBorder, lineWidth: 0.5))
+                .padding(.horizontal, 20)
             }
         }
     }
