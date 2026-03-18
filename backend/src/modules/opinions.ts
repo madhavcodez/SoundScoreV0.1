@@ -13,6 +13,8 @@ import {
   queueFollowerNotifications,
 } from "../lib/notifications";
 import { nowIso, uid } from "../lib/util";
+import { parsePaginationParams, buildPaginatedResponse } from "../lib/pagination";
+import { stripHtml } from "../lib/sanitize";
 
 const updateUserAndAlbumAggregates = async (db: Db, userId: string, albumId: string) => {
   await db.query(
@@ -54,6 +56,13 @@ const updateUserAndAlbumAggregates = async (db: Db, userId: string, albumId: str
 export const registerOpinionRoutes = (app: FastifyInstance, db: Db) => {
   app.get("/v1/log/recently-played", async (request) => {
     const userId = await app.requireAuth(request);
+    const { cursor, limit } = parsePaginationParams(request);
+
+    const cursorClause = cursor ? "AND played_at < $3" : "";
+    const params: unknown[] = [userId, limit + 1];
+    if (cursor) {
+      params.push(cursor);
+    }
 
     const recentlyPlayed = await db.query<{
       id: string;
@@ -66,27 +75,26 @@ export const registerOpinionRoutes = (app: FastifyInstance, db: Db) => {
       `
         SELECT id, user_id, album_id, played_at, source, source_ref
         FROM listening_events
-        WHERE user_id = $1
+        WHERE user_id = $1 ${cursorClause}
         ORDER BY played_at DESC
-        LIMIT 30
+        LIMIT $2
       `,
-      [userId],
+      params,
     );
 
-    return {
-      items: recentlyPlayed.rows.map((row) => ({
-        id: row.id,
-        userId: row.user_id,
-        albumId: row.album_id,
-        playedAt: row.played_at,
-        source: row.source,
-        sourceRef: row.source_ref,
-      })),
-      nextCursor: null,
-    };
+    const mapped = recentlyPlayed.rows.map((row) => ({
+      id: row.id,
+      userId: row.user_id,
+      albumId: row.album_id,
+      playedAt: row.played_at,
+      source: row.source,
+      sourceRef: row.source_ref,
+    }));
+
+    return buildPaginatedResponse(mapped, limit, (item) => item.playedAt);
   });
 
-  app.post("/v1/ratings", async (request) => {
+  app.post("/v1/ratings", async (request, reply) => {
     const userId = await app.requireAuth(request);
     const payload = CreateRatingRequestSchema.parse(request.body);
 
@@ -162,18 +170,18 @@ export const registerOpinionRoutes = (app: FastifyInstance, db: Db) => {
       }).catch(() => {});
 
       const rating = ratingResult.rows[0];
-      return {
+      return reply.status(201).send({
         id: rating.id,
         userId: rating.user_id,
         albumId: rating.album_id,
         value: Number(rating.value),
         createdAt: rating.created_at,
         updatedAt: rating.updated_at,
-      };
+      });
     });
   });
 
-  app.post("/v1/reviews", async (request) => {
+  app.post("/v1/reviews", async (request, reply) => {
     const userId = await app.requireAuth(request);
     const payload = CreateReviewRequestSchema.parse(request.body);
 
@@ -200,7 +208,7 @@ export const registerOpinionRoutes = (app: FastifyInstance, db: Db) => {
           VALUES ($1, $2, $3, $4, 0, $5, $5)
           RETURNING id, user_id, album_id, body, revision, created_at, updated_at
         `,
-        [reviewId, userId, payload.albumId, payload.body, now],
+        [reviewId, userId, payload.albumId, stripHtml(payload.body), now],
       );
 
       const activityId = uid("act");
@@ -254,7 +262,7 @@ export const registerOpinionRoutes = (app: FastifyInstance, db: Db) => {
       }).catch(() => {});
 
       const review = reviewResult.rows[0];
-      return {
+      return reply.status(201).send({
         id: review.id,
         userId: review.user_id,
         albumId: review.album_id,
@@ -262,7 +270,7 @@ export const registerOpinionRoutes = (app: FastifyInstance, db: Db) => {
         revision: review.revision,
         createdAt: review.created_at,
         updatedAt: review.updated_at,
-      };
+      });
     });
   });
 
@@ -313,7 +321,7 @@ export const registerOpinionRoutes = (app: FastifyInstance, db: Db) => {
           WHERE id = $1
           RETURNING id, user_id, album_id, body, revision, created_at, updated_at
         `,
-        [reviewId, payload.body],
+        [reviewId, stripHtml(payload.body)],
       );
 
       logAuditEvent(db, {

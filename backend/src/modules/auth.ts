@@ -48,7 +48,7 @@ const writeProfileCache = async (db: Db, userId: string) => {
 };
 
 export const registerAuthRoutes = (app: FastifyInstance, db: Db) => {
-  app.post("/v1/auth/signup", async (request) => {
+  app.post("/v1/auth/signup", async (request, reply) => {
     const payload = SignUpRequestSchema.parse(request.body);
     const existing = await db.query<{ id: string }>(
       "SELECT id FROM users WHERE email = $1",
@@ -82,8 +82,8 @@ export const registerAuthRoutes = (app: FastifyInstance, db: Db) => {
 
     await db.query(
       `
-        INSERT INTO sessions(access_token, user_id, created_at)
-        VALUES($1, $2, $3)
+        INSERT INTO sessions(access_token, user_id, created_at, expires_at)
+        VALUES($1, $2, $3, NOW() + INTERVAL '24 hours')
       `,
       [accessToken, userId, now],
     );
@@ -107,12 +107,12 @@ export const registerAuthRoutes = (app: FastifyInstance, db: Db) => {
       userAgent: request.headers["user-agent"],
     }).catch(() => {});
 
-    return buildAuthResponse(
+    return reply.status(201).send(buildAuthResponse(
       accessToken,
       refreshToken,
       userId,
       payload.handle.startsWith("@") ? payload.handle : `@${payload.handle}`,
-    );
+    ));
   });
 
   app.post("/v1/auth/login", async (request) => {
@@ -145,9 +145,12 @@ export const registerAuthRoutes = (app: FastifyInstance, db: Db) => {
       [user.id, refreshToken],
     );
     await db.query(
-      "INSERT INTO sessions(access_token, user_id, created_at) VALUES($1, $2, $3)",
+      "INSERT INTO sessions(access_token, user_id, created_at, expires_at) VALUES($1, $2, $3, NOW() + INTERVAL '24 hours')",
       [accessToken, user.id, now],
     );
+
+    // Clean up expired sessions for this user
+    await db.query("DELETE FROM sessions WHERE user_id = $1 AND expires_at < NOW()", [user.id]);
 
     logAuditEvent(db, {
       userId: user.id,
@@ -180,9 +183,12 @@ export const registerAuthRoutes = (app: FastifyInstance, db: Db) => {
       [user.id, nextRefreshToken],
     );
     await db.query(
-      "INSERT INTO sessions(access_token, user_id, created_at) VALUES($1, $2, $3)",
+      "INSERT INTO sessions(access_token, user_id, created_at, expires_at) VALUES($1, $2, $3, NOW() + INTERVAL '24 hours')",
       [accessToken, user.id, now],
     );
+
+    // Clean up expired sessions for this user
+    await db.query("DELETE FROM sessions WHERE user_id = $1 AND expires_at < NOW()", [user.id]);
 
     return buildAuthResponse(accessToken, nextRefreshToken, user.id, user.handle);
   });
