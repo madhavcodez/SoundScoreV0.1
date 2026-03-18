@@ -12,6 +12,10 @@ struct ProfileScreen: View {
                 LazyVStack(alignment: .leading, spacing: 18) {
                     SyncBanner(message: viewModel.syncMessage)
 
+                    if let error = viewModel.errorMessage {
+                        ErrorBanner(message: error)
+                    }
+
                     GlassCard(cornerRadius: 24, borderColor: SSColors.feedItemBorder, frosted: true) {
                         VStack(spacing: 12) {
                             AvatarCircle(
