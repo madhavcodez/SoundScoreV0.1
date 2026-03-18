@@ -11,6 +11,8 @@ const setup = async (): Promise<boolean> => {
     await app.db.query("SELECT 1");
     return true;
   } catch {
+    if (app) await app.close().catch(() => {});
+    app = undefined;
     return false;
   }
 };
@@ -47,7 +49,7 @@ test("Integration: full user journey", async (t) => {
       payload: { email, password, handle },
     });
 
-    assert.equal(res.statusCode, 200);
+    assert.equal(res.statusCode, 201);
     const body = JSON.parse(res.payload);
     assert.ok(body.accessToken);
     assert.ok(body.refreshToken);
@@ -109,7 +111,7 @@ test("Integration: full user journey", async (t) => {
       payload: { albumId, value: 4.5 },
     });
 
-    assert.equal(res.statusCode, 200);
+    assert.equal(res.statusCode, 201);
     const body = JSON.parse(res.payload);
     assert.equal(body.albumId, albumId);
     assert.equal(body.value, 4.5);
@@ -144,7 +146,7 @@ test("Integration: full user journey", async (t) => {
       payload: { albumId, body: "An incredible sonic journey." },
     });
 
-    assert.equal(res.statusCode, 200);
+    assert.equal(res.statusCode, 201);
     const body = JSON.parse(res.payload);
     assert.equal(body.albumId, albumId);
     assert.equal(body.body, "An incredible sonic journey.");
@@ -185,7 +187,7 @@ test("Integration: full user journey", async (t) => {
       payload: { title: "Best of 2024", note: "Top picks" },
     });
 
-    assert.equal(res.statusCode, 200);
+    assert.equal(res.statusCode, 201);
     const body = JSON.parse(res.payload);
     assert.equal(body.title, "Best of 2024");
     assert.equal(body.ownerId, userId);
@@ -205,7 +207,7 @@ test("Integration: full user journey", async (t) => {
       payload: { albumId, note: "Must listen" },
     });
 
-    assert.equal(res.statusCode, 200);
+    assert.equal(res.statusCode, 201);
     const body = JSON.parse(res.payload);
     assert.equal(body.items.length, 1);
     assert.equal(body.items[0].albumId, albumId);
@@ -243,7 +245,7 @@ test("Integration: full user journey", async (t) => {
       payload: { reaction: "fire" },
     });
 
-    assert.equal(res.statusCode, 200);
+    assert.equal(res.statusCode, 201);
     const body = JSON.parse(res.payload);
     assert.equal(body.activityId, activityId);
     assert.ok(body.reactions >= 1);

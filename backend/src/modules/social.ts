@@ -4,11 +4,12 @@ import type { Db } from "../db/client";
 import { notFound } from "../lib/errors";
 import { withIdempotency } from "../lib/idempotency";
 import { invalidateFeedCacheForUserAndFollowers, queueNotification } from "../lib/notifications";
+import { parsePaginationParams, buildPaginatedResponse } from "../lib/pagination";
 
 const FEED_CACHE_TTL_SECONDS = 90;
 
 export const registerSocialRoutes = (app: FastifyInstance, db: Db) => {
-  app.post("/v1/follow/:userId", async (request) => {
+  app.post("/v1/follow/:userId", async (request, reply) => {
     const actorId = await app.requireAuth(request);
     const targetUserId = (request.params as { userId: string }).userId;
 
@@ -28,7 +29,7 @@ export const registerSocialRoutes = (app: FastifyInstance, db: Db) => {
       );
 
       await db.redis.del(`feed:${actorId}:page1`);
-      return { followingUserId: targetUserId, following: true };
+      return reply.status(201).send({ followingUserId: targetUserId, following: true });
     });
   });
 
@@ -52,10 +53,15 @@ export const registerSocialRoutes = (app: FastifyInstance, db: Db) => {
 
   app.get("/v1/feed", async (request) => {
     const actorId = await app.requireAuth(request);
-    const cacheKey = `feed:${actorId}:page1`;
-    const cached = await db.redis.get(cacheKey);
-    if (cached) {
-      return JSON.parse(cached) as unknown;
+    const { cursor, limit } = parsePaginationParams(request);
+
+    // Only use cache for the first page (no cursor)
+    if (!cursor) {
+      const cacheKey = `feed:${actorId}:page1`;
+      const cached = await db.redis.get(cacheKey);
+      if (cached) {
+        return JSON.parse(cached) as unknown;
+      }
     }
 
     const follows = await db.query<{ followee_id: string }>(
@@ -64,6 +70,13 @@ export const registerSocialRoutes = (app: FastifyInstance, db: Db) => {
     );
 
     const actorIds = [actorId, ...follows.rows.map((row) => row.followee_id)];
+
+    const cursorClause = cursor ? "AND created_at < $3" : "";
+    const params: unknown[] = [actorIds, limit + 1];
+    if (cursor) {
+      params.push(cursor);
+    }
+
     const feed = await db.query<{
       id: string;
       actor_id: string;
@@ -78,35 +91,37 @@ export const registerSocialRoutes = (app: FastifyInstance, db: Db) => {
       `
         SELECT id, actor_id, type, object_type, object_id, created_at, payload, reactions, comments
         FROM activity_events
-        WHERE actor_id = ANY($1::text[])
+        WHERE actor_id = ANY($1::text[]) ${cursorClause}
         ORDER BY created_at DESC
-        LIMIT 40
+        LIMIT $2
       `,
-      [actorIds],
+      params,
     );
 
-    const response = {
-      items: feed.rows.map((row) => ({
-        id: row.id,
-        actorId: row.actor_id,
-        type: row.type,
-        object: {
-          type: row.object_type,
-          id: row.object_id,
-        },
-        createdAt: row.created_at,
-        payload: row.payload,
-        reactions: row.reactions,
-        comments: row.comments,
-      })),
-      nextCursor: null,
-    };
+    const mapped = feed.rows.map((row) => ({
+      id: row.id,
+      actorId: row.actor_id,
+      type: row.type,
+      object: {
+        type: row.object_type,
+        id: row.object_id,
+      },
+      createdAt: row.created_at,
+      payload: row.payload,
+      reactions: row.reactions,
+      comments: row.comments,
+    }));
 
-    await db.redis.setex(cacheKey, FEED_CACHE_TTL_SECONDS, JSON.stringify(response));
+    const response = buildPaginatedResponse(mapped, limit, (item) => item.createdAt);
+
+    // Cache first page only
+    if (!cursor) {
+      await db.redis.setex(`feed:${actorId}:page1`, FEED_CACHE_TTL_SECONDS, JSON.stringify(response));
+    }
     return response;
   });
 
-  app.post("/v1/activity/:id/react", async (request) => {
+  app.post("/v1/activity/:id/react", async (request, reply) => {
     const actorId = await app.requireAuth(request);
     const activityId = (request.params as { id: string }).id;
     ReactActivityRequestSchema.parse(request.body);
@@ -151,11 +166,11 @@ export const registerSocialRoutes = (app: FastifyInstance, db: Db) => {
       }
 
       await invalidateFeedCacheForUserAndFollowers(db, ownerId);
-      return { activityId, reactions: event.rows[0].reactions };
+      return reply.status(201).send({ activityId, reactions: event.rows[0].reactions });
     });
   });
 
-  app.post("/v1/activity/:id/comment", async (request) => {
+  app.post("/v1/activity/:id/comment", async (request, reply) => {
     const actorId = await app.requireAuth(request);
     const activityId = (request.params as { id: string }).id;
     CommentActivityRequestSchema.parse(request.body);
@@ -200,7 +215,7 @@ export const registerSocialRoutes = (app: FastifyInstance, db: Db) => {
       }
 
       await invalidateFeedCacheForUserAndFollowers(db, ownerId);
-      return { activityId, comments: event.rows[0].comments };
+      return reply.status(201).send({ activityId, comments: event.rows[0].comments });
     });
   });
 };

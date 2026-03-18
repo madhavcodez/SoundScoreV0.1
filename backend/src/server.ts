@@ -1,6 +1,9 @@
 import Fastify, { type FastifyRequest } from "fastify";
 import cors from "@fastify/cors";
+import helmet from "@fastify/helmet";
 import rateLimit from "@fastify/rate-limit";
+import swagger from "@fastify/swagger";
+import swaggerUi from "@fastify/swagger-ui";
 import { ApiError, unauthorized } from "./lib/errors";
 import { applyRouteRateLimits } from "./lib/rate-limit";
 import { registerAuthRoutes } from "./modules/auth";
@@ -16,6 +19,8 @@ import { registerMappingRoutes } from "./modules/mapping";
 import { registerImportRoutes } from "./modules/import";
 import { createDb, type Db } from "./db/client";
 import { runMigrations } from "./db/runMigrations";
+import { env } from "./config/env";
+import { uid } from "./lib/util";
 
 declare module "fastify" {
   interface FastifyInstance {
@@ -32,7 +37,7 @@ const resolveUserIdFromRequest = async (request: FastifyRequest, db: Db): Promis
 
   const token = authHeader.replace("Bearer ", "").trim();
   const session = await db.query<{ user_id: string }>(
-    "SELECT user_id FROM sessions WHERE access_token = $1",
+    "SELECT user_id FROM sessions WHERE access_token = $1 AND expires_at > NOW()",
     [token],
   );
 
@@ -43,14 +48,65 @@ const resolveUserIdFromRequest = async (request: FastifyRequest, db: Db): Promis
 };
 
 export const buildServer = async () => {
-  const app = Fastify({ logger: true });
+  const app = Fastify({
+    logger: {
+      level: env.app.logLevel,
+      serializers: {
+        req: (req) => ({
+          method: req.method,
+          url: req.url,
+          remoteAddress: req.ip,
+        }),
+      },
+    },
+    requestIdHeader: "x-request-id",
+    genReqId: () => uid("req"),
+  });
+
   const db = createDb();
-  await runMigrations(db);
+  try {
+    await runMigrations(db);
+  } catch (error) {
+    await db.close();
+    throw error;
+  }
 
   app.decorate("db", db);
   app.decorate("requireAuth", (request: FastifyRequest) => resolveUserIdFromRequest(request, db));
 
-  app.register(cors, { origin: true });
+  // OpenAPI documentation
+  await app.register(swagger, {
+    openapi: {
+      info: {
+        title: "SoundScore API",
+        description: "Music logging & social discovery platform",
+        version: "0.1.0",
+      },
+      servers: [{ url: `http://localhost:${env.app.port}` }],
+      components: {
+        securitySchemes: {
+          bearerAuth: {
+            type: "http",
+            scheme: "bearer",
+          },
+        },
+      },
+    },
+  });
+  await app.register(swaggerUi, { routePrefix: "/docs" });
+
+  // Security headers (API-only, no CSP needed)
+  app.register(helmet, {
+    contentSecurityPolicy: false,
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+  });
+
+  // CORS with explicit origin allowlist
+  app.register(cors, {
+    origin: env.app.allowedOrigins,
+    credentials: true,
+  });
+
   app.register(rateLimit, {
     global: true,
     max: 100,
@@ -70,14 +126,23 @@ export const buildServer = async () => {
 
   applyRouteRateLimits(app);
 
-  app.get("/health", async () => ({
-    status: "ok",
-    service: "soundscore-backend",
-    checks: {
-      postgres: "up",
-      redis: db.redis.status,
-    },
-  }));
+  // Health check with actual DB/Redis connectivity probes
+  app.get("/health", async (_request, reply) => {
+    const pgStatus = await db.query("SELECT 1").then(() => "up" as const).catch(() => "down" as const);
+    const redisStatus = db.redis.status === "ready" ? "up" as const : "down" as const;
+    const allUp = pgStatus === "up" && redisStatus === "up";
+
+    const payload = {
+      status: allUp ? "ok" : "degraded",
+      service: "soundscore-backend",
+      checks: {
+        postgres: pgStatus,
+        redis: redisStatus,
+      },
+    };
+
+    return allUp ? payload : reply.status(503).send(payload);
+  });
 
   registerAuthRoutes(app, db);
   registerCatalogRoutes(app, db);
