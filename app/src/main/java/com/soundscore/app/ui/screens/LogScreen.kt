@@ -20,12 +20,18 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -48,6 +54,7 @@ import com.soundscore.app.ui.theme.AccentGreen
 import com.soundscore.app.ui.theme.AccentGreenDim
 import com.soundscore.app.ui.theme.ChromeLight
 import com.soundscore.app.ui.theme.DarkBase
+import com.soundscore.app.ui.theme.DarkElevated
 import com.soundscore.app.ui.theme.FeedItemBorder
 import com.soundscore.app.ui.theme.GlassBg
 import com.soundscore.app.ui.theme.GlassBorder
@@ -57,12 +64,42 @@ import com.soundscore.app.ui.viewmodel.LogUiState
 import com.soundscore.app.ui.viewmodel.LogViewModel
 import com.soundscore.app.ui.viewmodel.RecentLogEntry
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LogScreen(
     modifier: Modifier = Modifier,
     logViewModel: LogViewModel = viewModel(),
 ) {
     val uiState by logViewModel.uiState.collectAsStateWithLifecycle()
+    var showSearchSheet by remember { mutableStateOf(false) }
+
+    if (showSearchSheet) {
+        ModalBottomSheet(
+            onDismissRequest = { showSearchSheet = false },
+            sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+            containerColor = DarkElevated,
+            shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp, vertical = 16.dp),
+            ) {
+                Text(
+                    text = "Log an album",
+                    style = MaterialTheme.typography.headlineSmall,
+                    color = ChromeLight,
+                )
+                Spacer(Modifier.height(16.dp))
+                Text(
+                    text = "Album search coming soon. Use the Quick Rate cards below to log albums.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = TextSecondary,
+                )
+                Spacer(Modifier.height(24.dp))
+            }
+        }
+    }
 
     Box(modifier = modifier.fillMaxSize()) {
         LogScreenContent(
@@ -71,7 +108,7 @@ fun LogScreen(
         )
 
         FloatingActionButton(
-            onClick = { /* TODO: Open album search/log sheet */ },
+            onClick = { showSearchSheet = true },
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .padding(end = 20.dp, bottom = 24.dp),
