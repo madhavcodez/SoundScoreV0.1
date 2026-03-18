@@ -12,7 +12,9 @@ struct LogScreen: View {
                     SyncBanner(message: viewModel.syncMessage)
 
                     if let error = viewModel.errorMessage {
-                        ErrorBanner(message: error)
+                        ErrorBanner(message: error, onRetry: {
+                            Task { await SoundScoreRepository.shared.refresh() }
+                        })
                     }
 
                     ScreenHeader(title: "Diary", subtitle: "Your listening journal. Rate, log, repeat.")
