@@ -7,6 +7,7 @@ class SearchViewModel: ObservableObject {
     @Published var browseGenres: [BrowseGenre]
     @Published var chartEntries: [ChartEntry]
     @Published var syncMessage: String?
+    @Published var isSearching: Bool = false
 
     private var cancellables = Set<AnyCancellable>()
 
@@ -17,7 +18,7 @@ class SearchViewModel: ObservableObject {
         self.syncMessage = repo.syncMessage
 
         $query
-            .debounce(for: .milliseconds(200), scheduler: RunLoop.main)
+            .debounce(for: .milliseconds(300), scheduler: RunLoop.main)
             .sink { [weak self] q in
                 self?.performSearch(q)
             }
@@ -38,10 +39,14 @@ class SearchViewModel: ObservableObject {
     }
 
     private func performSearch(_ q: String) {
-        if q.trimmingCharacters(in: .whitespaces).isEmpty {
+        let trimmed = q.trimmingCharacters(in: .whitespaces)
+        if trimmed.isEmpty {
             results = []
+            isSearching = false
         } else {
-            results = SoundScoreRepository.shared.searchAlbums(query: q)
+            isSearching = true
+            results = SoundScoreRepository.shared.searchAlbums(query: trimmed)
+            isSearching = false
         }
     }
 }

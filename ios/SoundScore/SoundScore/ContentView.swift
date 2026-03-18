@@ -40,6 +40,7 @@ struct ContentView: View {
         }
         .environmentObject(authManager)
         .environmentObject(repository)
+        .environmentObject(ThemeManager.shared)
     }
 }
 

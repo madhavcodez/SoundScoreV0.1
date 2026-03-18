@@ -7,47 +7,59 @@ struct FeedScreen: View {
 
     var body: some View {
         ScrollView {
-            LazyVStack(alignment: .leading, spacing: 16) {
+            LazyVStack(alignment: .leading, spacing: 18) {
                 SyncBanner(message: viewModel.syncMessage)
+
+                if let error = viewModel.errorMessage {
+                    ErrorBanner(message: error, onRetry: { viewModel.refresh() })
+                }
 
                 ScreenHeader(
                     title: "Feed",
                     subtitle: "What your people are logging right now."
                 )
 
-                if !viewModel.trendingAlbums.isEmpty {
-                    SectionHeader(eyebrow: "Trending", title: "Hot this week")
-
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        LazyHStack(spacing: 14) {
-                            ForEach(viewModel.trendingAlbums) { album in
-                                TrendingHeroCard(album: album)
-                                    .onTapGesture {
-                                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                                        onSelectAlbum(album)
-                                    }
-                            }
-                        }
-                        .padding(.trailing, 8)
+                if viewModel.isLoading && viewModel.items.isEmpty {
+                    ForEach(0..<3, id: \.self) { _ in
+                        SkeletonView()
+                            .frame(height: 160)
+                            .clipShape(RoundedRectangle(cornerRadius: 22))
                     }
-                }
-
-                if viewModel.items.isEmpty {
-                    EmptyState(
-                        title: "Your feed is quiet",
-                        subtitle: "Follow friends to see their ratings, reviews, and lists here.",
-                        icon: "person.2"
-                    )
                 } else {
-                    SectionHeader(eyebrow: "Activity", title: "From your circle")
+                    if !viewModel.trendingAlbums.isEmpty {
+                        SectionHeader(eyebrow: "Trending", title: "Hot this week")
 
-                    ForEach(Array(viewModel.items.enumerated()), id: \.element.id) { index, item in
-                        FeedActivityCard(item: item, onSelectAlbum: onSelectAlbum) {
-                            viewModel.toggleLike(item.id)
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            LazyHStack(spacing: 14) {
+                                ForEach(viewModel.trendingAlbums) { album in
+                                    TrendingHeroCard(album: album)
+                                        .onTapGesture {
+                                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                            onSelectAlbum(album)
+                                        }
+                                }
+                            }
+                            .padding(.trailing, 8)
                         }
-                        .opacity(appeared ? 1 : 0)
-                        .offset(y: appeared ? 0 : 20)
-                        .animation(.easeOut(duration: 0.35).delay(Double(index) * 0.04), value: appeared)
+                    }
+
+                    if viewModel.items.isEmpty {
+                        EmptyState(
+                            title: "Your feed is quiet",
+                            subtitle: "Follow friends to see their ratings, reviews, and lists here.",
+                            icon: "person.2"
+                        )
+                    } else {
+                        SectionHeader(eyebrow: "Activity", title: "From your circle")
+
+                        ForEach(Array(viewModel.items.enumerated()), id: \.element.id) { index, item in
+                            FeedActivityCard(item: item, onSelectAlbum: onSelectAlbum) {
+                                viewModel.toggleLike(item.id)
+                            }
+                            .opacity(appeared ? 1 : 0)
+                            .offset(y: appeared ? 0 : 20)
+                            .animation(.easeOut(duration: 0.35).delay(Double(index) * 0.04), value: appeared)
+                        }
                     }
                 }
             }
@@ -55,7 +67,40 @@ struct FeedScreen: View {
             .padding(.top, 16)
             .padding(.bottom, 120)
         }
+        .refreshable { await SoundScoreRepository.shared.refresh() }
         .onAppear { appeared = true }
+    }
+}
+
+// MARK: - Error Banner
+
+struct ErrorBanner: View {
+    let message: String
+    var onRetry: (() -> Void)?
+
+    var body: some View {
+        GlassCard(tintColor: SSColors.accentCoral, cornerRadius: 16, borderColor: SSColors.accentCoral.opacity(0.3)) {
+            HStack(spacing: 10) {
+                Image(systemName: "wifi.exclamationmark")
+                    .font(.system(size: 14))
+                    .foregroundColor(SSColors.accentCoral)
+                Text(message)
+                    .font(SSTypography.bodySmall)
+                    .foregroundColor(SSColors.chromeLight)
+                Spacer()
+                if let onRetry {
+                    Button {
+                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                        onRetry()
+                    } label: {
+                        Text("Retry")
+                            .font(SSTypography.labelMedium)
+                            .fontWeight(.semibold)
+                            .foregroundColor(SSColors.accentCoral)
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -67,7 +112,7 @@ private struct TrendingHeroCard: View {
             AlbumArtwork(artworkUrl: album.artworkUrl, colors: album.artColors, cornerRadius: 24)
 
             LinearGradient(
-                colors: [.clear, .black.opacity(0.7)],
+                colors: [.clear, SSColors.overlayDark],
                 startPoint: .init(x: 0.5, y: 0.35),
                 endPoint: .bottom
             )
@@ -76,19 +121,19 @@ private struct TrendingHeroCard: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text(album.title)
                     .font(SSTypography.titleLarge)
-                    .foregroundColor(.white)
+                    .foregroundColor(SSColors.chromeLight)
                     .fontWeight(.bold)
                     .lineLimit(2)
                 Text(album.artist)
                     .font(SSTypography.bodySmall)
-                    .foregroundColor(.white.opacity(0.8))
+                    .foregroundColor(SSColors.textSecondary)
                 Spacer().frame(height: 6)
                 HStack {
                     StarRating(rating: album.avgRating, starSize: 12)
                     Spacer()
                     Text("\(album.logCount)")
                         .font(SSTypography.labelSmall)
-                        .foregroundColor(SSColors.accentGreen)
+                        .foregroundColor(ThemeManager.shared.primary)
                 }
             }
             .padding(14)
@@ -158,7 +203,9 @@ private struct FeedActivityCard: View {
                 HStack(spacing: 8) {
                     ActionChip(text: "\(item.likes)", icon: "heart", active: item.isLiked, onTap: onToggleLike)
                     ActionChip(text: "\(item.comments)", icon: "bubble.left")
-                    ActionChip(text: "Share", icon: "square.and.arrow.up")
+                    ShareLink(item: "\(item.username) rated \(item.album.title) by \(item.album.artist)") {
+                        ActionChip(text: "Share", icon: "square.and.arrow.up")
+                    }
                 }
             }
         }
@@ -166,15 +213,13 @@ private struct FeedActivityCard: View {
 }
 
 private func avatarColors(_ username: String) -> [Color] {
-    switch username {
-    case "rohan": return AlbumColors.forest
-    case "priya": return AlbumColors.rose
-    case "kai": return AlbumColors.orchid
-    case "zara": return AlbumColors.lagoon
-    case "alex": return AlbumColors.amber
-    case "jordan": return AlbumColors.midnight
-    case "mia": return AlbumColors.lime
-    case "sam": return AlbumColors.ember
-    default: return [SSColors.accentGreen, SSColors.accentCoral]
-    }
+    // Generate deterministic colors from username hash instead of hardcoding
+    let hash = abs(username.hashValue)
+    let palettes: [[Color]] = [
+        AlbumColors.forest, AlbumColors.rose, AlbumColors.orchid,
+        AlbumColors.lagoon, AlbumColors.amber, AlbumColors.midnight,
+        AlbumColors.lime, AlbumColors.ember, AlbumColors.coral,
+        AlbumColors.slate,
+    ]
+    return palettes[hash % palettes.count]
 }

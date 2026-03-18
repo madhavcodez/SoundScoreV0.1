@@ -12,9 +12,11 @@ class SoundScoreRepository: ObservableObject {
     @Published var lists: [UserList]
     @Published var latestRecap: WeeklyRecap?
     @Published var syncMessage: String?
+    @Published var isLoading: Bool = false
+    @Published var errorMessage: String?
 
     private let api = SoundScoreAPI()
-    private let outboxStore = InMemoryOutboxStore()
+    let outboxStore = InMemoryOutboxStore()
     private lazy var outboxEngine = OutboxSyncEngine(store: outboxStore)
 
     private init() {
@@ -31,6 +33,11 @@ class SoundScoreRepository: ObservableObject {
 
     func refresh() async {
         guard AuthManager.shared.isAuthenticated else { return }
+
+        await MainActor.run {
+            self.isLoading = true
+            self.errorMessage = nil
+        }
 
         do {
             let remoteAlbums = try await api.searchAlbums(query: "")
@@ -77,7 +84,14 @@ class SoundScoreRepository: ObservableObject {
         } catch {
             await MainActor.run {
                 self.syncMessage = "Offline mode: \(error.localizedDescription)"
+                self.errorMessage = "Could not reach SoundScore servers. Showing cached data."
+                self.isLoading = false
             }
+            return
+        }
+
+        await MainActor.run {
+            self.isLoading = false
         }
     }
 
@@ -131,6 +145,22 @@ class SoundScoreRepository: ObservableObject {
         Task { await syncOutbox() }
     }
 
+    func saveReview(albumId: String, reviewText: String, rating: Float) {
+        outboxStore.enqueue(OutboxOperation(
+            type: .createReview,
+            payload: [
+                "albumId": albumId,
+                "body": reviewText,
+                "rating": String(rating),
+            ]
+        ))
+        // Also persist the rating optimistically
+        if rating > 0 {
+            updateRating(albumId: albumId, rating: rating)
+        }
+        Task { await syncOutbox() }
+    }
+
     func createList(title: String) {
         let trimmed = title.trimmingCharacters(in: .whitespaces)
         guard !trimmed.isEmpty else { return }
@@ -160,6 +190,13 @@ class SoundScoreRepository: ObservableObject {
                 let rating = Float(op.payload["rating"] ?? "0") ?? 0
                 try await api.createRating(
                     albumId: albumId, value: rating,
+                    idempotencyKey: op.idempotencyKey.uuidString
+                )
+            case .createReview:
+                let albumId = op.payload["albumId"] ?? ""
+                let body = op.payload["body"] ?? ""
+                try await api.createReview(
+                    albumId: albumId, body: body,
                     idempotencyKey: op.idempotencyKey.uuidString
                 )
             case .toggleReaction:
@@ -223,7 +260,9 @@ class SoundScoreRepository: ObservableObject {
     }
 
     private func mapFeedItem(_ event: ActivityEventDto) -> FeedItem {
-        let album = albums.first ?? SeedData.albums[0]
+        let resolvedAlbum = albums.first { $0.id == event.activityObject.id }
+            ?? albums.first
+            ?? SeedData.albums[0]
         let action: String
         switch event.type {
         case "RATED_ALBUM": action = "rated"
@@ -234,9 +273,27 @@ class SoundScoreRepository: ObservableObject {
         }
         return FeedItem(
             id: event.id, username: event.actorId, action: action,
-            album: album, rating: 0, reviewSnippet: nil,
+            album: resolvedAlbum,
+            rating: resolvedAlbum.avgRating,
+            reviewSnippet: nil,
             likes: event.reactions, comments: event.comments,
-            timeAgo: String(event.createdAt.prefix(16)), isLiked: false
+            timeAgo: formatTimeAgo(event.createdAt), isLiked: false
         )
+    }
+
+    private func formatTimeAgo(_ isoDate: String) -> String {
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        guard let date = formatter.date(from: isoDate) else {
+            return String(isoDate.prefix(16))
+        }
+        let seconds = Int(Date().timeIntervalSince(date))
+        switch seconds {
+        case ..<60: return "now"
+        case ..<3600: return "\(seconds / 60)m"
+        case ..<86400: return "\(seconds / 3600)h"
+        case ..<604800: return "\(seconds / 86400)d"
+        default: return "\(seconds / 604800)w"
+        }
     }
 }

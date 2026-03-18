@@ -11,9 +11,10 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 data class LogUiState(
-    val albums: List<Album> = emptyList(),
+    val quickLogAlbums: List<Album> = emptyList(),
     val ratings: Map<String, Float> = emptyMap(),
-    val writeLaterQueue: List<Album> = emptyList(),
+    val summaryStats: List<LogSummaryStat> = emptyList(),
+    val recentLogs: List<RecentLogEntry> = emptyList(),
     val syncMessage: String? = null,
 )
 
@@ -26,9 +27,10 @@ class LogViewModel : ViewModel() {
         repository.syncMessage,
     ) { albums, ratings, syncMessage ->
         LogUiState(
-            albums = albums,
+            quickLogAlbums = buildTrendingAlbums(albums).take(6),
             ratings = ratings,
-            writeLaterQueue = albums.take(3),
+            summaryStats = buildLogSummaryStats(ratings),
+            recentLogs = buildRecentLogs(albums, ratings),
             syncMessage = syncMessage,
         )
     }.stateIn(

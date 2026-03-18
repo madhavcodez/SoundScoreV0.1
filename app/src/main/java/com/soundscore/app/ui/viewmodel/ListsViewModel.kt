@@ -12,6 +12,7 @@ import kotlinx.coroutines.launch
 
 data class ListsUiState(
     val lists: List<UserList> = emptyList(),
+    val showcases: List<ListShowcase> = emptyList(),
     val syncMessage: String? = null,
 )
 
@@ -20,9 +21,14 @@ class ListsViewModel : ViewModel() {
 
     val uiState: StateFlow<ListsUiState> = combine(
         repository.lists,
+        repository.albums,
         repository.syncMessage,
-    ) { lists, syncMessage ->
-        ListsUiState(lists = lists, syncMessage = syncMessage)
+    ) { lists, albums, syncMessage ->
+        ListsUiState(
+            lists = lists,
+            showcases = resolveListShowcases(lists, albums),
+            syncMessage = syncMessage,
+        )
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5_000),

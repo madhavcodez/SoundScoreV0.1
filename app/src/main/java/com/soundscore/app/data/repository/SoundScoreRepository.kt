@@ -120,6 +120,7 @@ class RemoteSoundScoreRepository : SoundScoreRepository {
                 reviewCount = remoteProfile.reviewCount,
                 listCount = remoteProfile.listCount,
                 avgRating = remoteProfile.avgRating,
+                albumsCount = remoteProfile.logCount,
             )
 
             val remoteFeed = api.feed(token).items
@@ -392,9 +393,9 @@ class RemoteSoundScoreRepository : SoundScoreRepository {
             return
         }
 
-        val email = "phase1b@local.soundscore.app"
-        val password = "soundscore-dev-pass"
-        val handle = "madhav"
+        val email = System.getenv("SOUNDSCORE_DEV_EMAIL") ?: "phase1b@local.soundscore.app"
+        val password = System.getenv("SOUNDSCORE_DEV_PASSWORD") ?: "soundscore-dev-pass"
+        val handle = System.getenv("SOUNDSCORE_DEV_HANDLE") ?: "madhav"
 
         val auth = runCatching {
             api.login(AuthRequest(email = email, password = password))
@@ -411,18 +412,7 @@ class RemoteSoundScoreRepository : SoundScoreRepository {
     }
 
     private fun mapAlbum(dto: AlbumDto): Album {
-        val colors = SeedData.albums.find { it.id == dto.id }?.artColors
-            ?: SeedData.albums.random().artColors
-
-        return Album(
-            id = dto.id,
-            title = dto.title,
-            artist = dto.artist,
-            year = dto.year,
-            artColors = colors,
-            avgRating = dto.avgRating,
-            logCount = dto.logCount,
-        )
+        return mapAlbumDto(dto)
     }
 
     private fun mapFeedItem(event: ActivityEventDto): FeedItem {
@@ -457,4 +447,24 @@ object AppContainer {
     val repository: SoundScoreRepository by lazy {
         RemoteSoundScoreRepository()
     }
+}
+
+internal fun mapAlbumDto(
+    dto: AlbumDto,
+    seedAlbums: List<Album> = SeedData.albums,
+): Album {
+    val colors = seedAlbums.find { it.id == dto.id }?.artColors
+        ?: seedAlbums.firstOrNull()?.artColors
+        ?: SeedData.albums.first().artColors
+
+    return Album(
+        id = dto.id,
+        title = dto.title,
+        artist = dto.artist,
+        year = dto.year,
+        artColors = colors,
+        artworkUrl = dto.artworkUrl,
+        avgRating = dto.avgRating,
+        logCount = dto.logCount,
+    )
 }

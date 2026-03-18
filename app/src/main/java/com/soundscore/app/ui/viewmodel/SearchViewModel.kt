@@ -15,6 +15,8 @@ import kotlinx.coroutines.launch
 data class SearchUiState(
     val query: String = "",
     val results: List<Album> = emptyList(),
+    val browseGenres: List<BrowseGenre> = emptyList(),
+    val chartEntries: List<ChartEntry> = emptyList(),
     val syncMessage: String? = null,
 )
 
@@ -27,12 +29,14 @@ class SearchViewModel : ViewModel() {
         repository.albums,
         repository.syncMessage,
     ) { text, albums, syncMessage ->
-        val results = if (text.isBlank()) {
-            albums
-        } else {
-            repository.searchAlbums(text)
-        }
-        SearchUiState(query = text, results = results, syncMessage = syncMessage)
+        val results = resolveSearchResults(text, albums, repository::searchAlbums)
+        SearchUiState(
+            query = text,
+            results = results,
+            browseGenres = buildBrowseGenres(),
+            chartEntries = buildChartEntries(albums),
+            syncMessage = syncMessage,
+        )
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5_000),
