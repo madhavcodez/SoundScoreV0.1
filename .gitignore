@@ -7,6 +7,9 @@ gh.pat
 # Backend runtime
 backend/dist/
 backend/.env
+
+# iOS secrets
+**/Secrets.swift
 packages/contracts/dist/
 
 # Android/Gradle local artifacts

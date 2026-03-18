@@ -4,7 +4,7 @@ struct FeedItem: Identifiable {
     let id: String
     let username: String
     let action: String
-    let album: Album
+    var album: Album
     let rating: Float
     var reviewSnippet: String?
     var likes: Int

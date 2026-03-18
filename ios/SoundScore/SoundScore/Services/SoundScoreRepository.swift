@@ -27,6 +27,30 @@ class SoundScoreRepository: ObservableObject {
         self.lists = SeedData.initialLists
         self.latestRecap = SeedData.initialRecap
         self.syncMessage = nil
+        Task { await enrichAlbumsWithArtwork() }
+    }
+
+    // MARK: - Spotify Artwork Enrichment
+
+    private func enrichAlbumsWithArtwork() async {
+        let albumsNeedingArt = albums.filter { $0.artworkUrl == nil }
+        guard !albumsNeedingArt.isEmpty else { return }
+
+        for album in albumsNeedingArt {
+            if let url = await SpotifyService.shared.artworkUrl(title: album.title, artist: album.artist) {
+                await MainActor.run {
+                    if let index = self.albums.firstIndex(where: { $0.id == album.id }) {
+                        self.albums[index].artworkUrl = url
+                    }
+                    // Also update artwork in feedItems that reference this album
+                    for i in self.feedItems.indices where self.feedItems[i].album.id == album.id {
+                        self.feedItems[i].album.artworkUrl = url
+                    }
+                }
+            }
+            // Spotify rate limit: 1 request per ~100ms is safe with client credentials
+            try? await Task.sleep(nanoseconds: 150_000_000)
+        }
     }
 
     // MARK: - Refresh from API
