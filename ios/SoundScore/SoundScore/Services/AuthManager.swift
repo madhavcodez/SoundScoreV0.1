@@ -4,8 +4,7 @@ import Combine
 class AuthManager: ObservableObject {
     static let shared = AuthManager()
 
-    /// Set to `true` to bypass login while backend is offline.
-    @Published var isAuthenticated: Bool = true
+    @Published var isAuthenticated: Bool = false
     @Published var currentHandle: String?
 
     private(set) var accessToken: String?

@@ -16,11 +16,15 @@ object ApiClient {
     }
 
     private val httpClient = OkHttpClient.Builder()
-        .addInterceptor(
-            HttpLoggingInterceptor().apply {
-                level = HttpLoggingInterceptor.Level.BODY
-            },
-        )
+        .apply {
+            if (com.soundscore.app.BuildConfig.DEBUG) {
+                addInterceptor(
+                    HttpLoggingInterceptor().apply {
+                        level = HttpLoggingInterceptor.Level.BODY
+                    },
+                )
+            }
+        }
         .build()
 
     fun create(baseUrl: String = DEFAULT_BASE_URL): SoundScoreApi {
