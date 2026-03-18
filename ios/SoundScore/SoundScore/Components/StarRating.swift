@@ -4,9 +4,9 @@ struct StarRating: View {
     let rating: Float
     var onRate: ((Float) -> Void)?
     var starSize: CGFloat = 14
-    var maxStars: Int = 5
+    var maxStars: Int = 6
 
-    @State private var animateScale: [Bool] = Array(repeating: false, count: 5)
+    @State private var animateScale: [Bool] = []
 
     var body: some View {
         HStack(spacing: starSize * 0.15) {
@@ -14,20 +14,32 @@ struct StarRating: View {
                 starImage(for: index)
                     .font(.system(size: starSize))
                     .foregroundColor(starColor(for: index))
-                    .scaleEffect(animateScale[index] ? 1.3 : 1.0)
-                    .animation(.spring(response: 0.25, dampingFraction: 0.5), value: animateScale[index])
+                    .scaleEffect(index < animateScale.count && animateScale[index] ? 1.3 : 1.0)
+                    .animation(.spring(response: 0.25, dampingFraction: 0.5), value: index < animateScale.count ? animateScale[index] : false)
                     .onTapGesture {
                         guard let onRate else { return }
                         let tapped = Float(index + 1)
                         let newRating: Float = (rating == tapped) ? tapped - 0.5 : tapped
                         UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                        animateScale[index] = true
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
-                            animateScale[index] = false
+                        if index < animateScale.count {
+                            animateScale[index] = true
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                                if index < animateScale.count {
+                                    animateScale[index] = false
+                                }
+                            }
                         }
                         onRate(newRating)
                     }
             }
+        }
+        .onAppear {
+            if animateScale.count != maxStars {
+                animateScale = Array(repeating: false, count: maxStars)
+            }
+        }
+        .onChange(of: maxStars) {
+            animateScale = Array(repeating: false, count: maxStars)
         }
     }
 

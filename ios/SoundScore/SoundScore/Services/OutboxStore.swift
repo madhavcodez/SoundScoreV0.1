@@ -5,6 +5,7 @@ import Combine
 
 enum OutboxOperationType: String {
     case rateAlbum
+    case rateTrack
     case createReview
     case toggleReaction
     case createList

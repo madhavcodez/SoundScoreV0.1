@@ -67,6 +67,22 @@ struct NotificationPreferenceDto: Codable {
     let quietHoursEnd: Int
 }
 
+struct TrackDto: Decodable {
+    let id: String
+    let albumId: String
+    let title: String
+    let trackNumber: Int
+    let durationMs: Int?
+    let spotifyId: String?
+}
+
+struct TrackRatingDto: Decodable {
+    let id: String
+    let trackId: String
+    let albumId: String
+    let value: Float
+}
+
 struct ListDetailDto: Decodable {
     let id: String
     let title: String
@@ -102,6 +118,27 @@ struct SoundScoreAPI {
 
     func getAlbum(id: String) async throws -> AlbumDto {
         try await client.get("/v1/albums/\(id)")
+    }
+
+    // MARK: Tracks
+
+    func getAlbumTracks(albumId: String) async throws -> [TrackDto] {
+        try await client.get("/v1/albums/\(albumId)/tracks")
+    }
+
+    func getAlbumTrackRatings(albumId: String) async throws -> [TrackRatingDto] {
+        try await client.get("/v1/albums/\(albumId)/track-ratings")
+    }
+
+    func createTrackRating(
+        trackId: String, albumId: String, value: Float, idempotencyKey: String
+    ) async throws {
+        struct Body: Encodable { let trackId: String; let albumId: String; let value: Float }
+        let data = try encoder.encode(Body(trackId: trackId, albumId: albumId, value: value))
+        try await client.postVoid(
+            "/v1/track-ratings", body: data,
+            headers: ["idempotency-key": idempotencyKey]
+        )
     }
 
     // MARK: Ratings

@@ -45,6 +45,17 @@ class AuthManager: ObservableObject {
         await applyAuth(response)
     }
 
+    @MainActor
+    func devLogin(handle: String) {
+        accessToken = "dev_token_\(UUID().uuidString)"
+        refreshTokenValue = "dev_refresh_\(UUID().uuidString)"
+        currentHandle = handle
+        isAuthenticated = true
+        UserDefaults.standard.set(accessToken, forKey: "ss_accessToken")
+        UserDefaults.standard.set(refreshTokenValue, forKey: "ss_refreshToken")
+        UserDefaults.standard.set(handle, forKey: "ss_handle")
+    }
+
     func refresh() async throws {
         guard let token = refreshTokenValue else { throw ApiError.unauthorized }
         let body = RefreshRequestBody(refreshToken: token)

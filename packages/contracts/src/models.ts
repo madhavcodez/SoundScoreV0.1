@@ -6,7 +6,7 @@ export const AlbumSchema = z.object({
   artist: z.string(),
   year: z.number().int(),
   artworkUrl: z.string().url().nullable(),
-  avgRating: z.number().min(0).max(5),
+  avgRating: z.number().min(0).max(6),
   logCount: z.number().int().nonnegative(),
 });
 
@@ -14,7 +14,26 @@ export const RatingSchema = z.object({
   id: z.string(),
   userId: z.string(),
   albumId: z.string(),
-  value: z.number().min(0).max(5),
+  value: z.number().min(0).max(6),
+  createdAt: z.string().datetime(),
+  updatedAt: z.string().datetime(),
+});
+
+export const TrackSchema = z.object({
+  id: z.string(),
+  albumId: z.string(),
+  title: z.string(),
+  trackNumber: z.number().int().positive(),
+  durationMs: z.number().int().nonnegative().nullable(),
+  spotifyId: z.string().nullable(),
+});
+
+export const TrackRatingSchema = z.object({
+  id: z.string(),
+  userId: z.string(),
+  trackId: z.string(),
+  albumId: z.string(),
+  value: z.number().min(0).max(6),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
 });
@@ -36,7 +55,7 @@ export const UserProfileSchema = z.object({
   logCount: z.number().int().nonnegative(),
   reviewCount: z.number().int().nonnegative(),
   listCount: z.number().int().nonnegative(),
-  avgRating: z.number().min(0).max(5),
+  avgRating: z.number().min(0).max(6),
 });
 
 export const ListSchema = z.object({
@@ -57,7 +76,7 @@ export const ListSchema = z.object({
 
 export const RecapAlbumSchema = z.object({
   albumId: z.string(),
-  rating: z.number().min(0).max(5),
+  rating: z.number().min(0).max(6),
 });
 
 export const WeeklyRecapSchema = z.object({
@@ -66,7 +85,7 @@ export const WeeklyRecapSchema = z.object({
   weekStart: z.string(),
   weekEnd: z.string(),
   totalLogs: z.number().int().nonnegative(),
-  averageRating: z.number().min(0).max(5),
+  averageRating: z.number().min(0).max(6),
   topAlbums: z.array(RecapAlbumSchema),
   shareText: z.string(),
   deepLink: z.string(),
@@ -93,6 +112,8 @@ export const DeviceTokenSchema = z.object({
 
 export type Album = z.infer<typeof AlbumSchema>;
 export type Rating = z.infer<typeof RatingSchema>;
+export type Track = z.infer<typeof TrackSchema>;
+export type TrackRating = z.infer<typeof TrackRatingSchema>;
 export type Review = z.infer<typeof ReviewSchema>;
 export type UserProfile = z.infer<typeof UserProfileSchema>;
 export type SoundScoreList = z.infer<typeof ListSchema>;

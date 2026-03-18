@@ -9,6 +9,8 @@ class SoundScoreRepository: ObservableObject {
     @Published var feedItems: [FeedItem]
     @Published var profile: UserProfile
     @Published var ratings: [String: Float]
+    @Published var tracksByAlbum: [String: [Track]]
+    @Published var trackRatings: [String: Float]
     @Published var lists: [UserList]
     @Published var latestRecap: WeeklyRecap?
     @Published var syncMessage: String?
@@ -24,6 +26,8 @@ class SoundScoreRepository: ObservableObject {
         self.feedItems = SeedData.feedItems
         self.profile = SeedData.myProfile
         self.ratings = SeedData.logInitialRatings
+        self.tracksByAlbum = SeedData.sampleTracks
+        self.trackRatings = [:]
         self.lists = SeedData.initialLists
         self.latestRecap = SeedData.initialRecap
         self.syncMessage = nil
@@ -131,6 +135,61 @@ class SoundScoreRepository: ObservableObject {
         }
     }
 
+    // MARK: - Track Operations
+
+    func fetchTracks(albumId: String) async {
+        // If we already have tracks from seed data, skip
+        if let existing = tracksByAlbum[albumId], !existing.isEmpty { return }
+
+        // Try API first
+        do {
+            let remoteTracks = try await api.getAlbumTracks(albumId: albumId)
+            let mapped = remoteTracks.map { dto in
+                Track(
+                    id: dto.id, albumId: dto.albumId, title: dto.title,
+                    trackNumber: dto.trackNumber, durationMs: dto.durationMs,
+                    spotifyId: dto.spotifyId
+                )
+            }
+            if !mapped.isEmpty {
+                await MainActor.run { self.tracksByAlbum[albumId] = mapped }
+                return
+            }
+        } catch {
+            // Fall through to Spotify
+        }
+
+        // Try Spotify if album has a known spotifyId
+        if let album = albums.first(where: { $0.id == albumId }) {
+            let results = await SpotifyService.shared.searchAlbums(query: "\(album.title) \(album.artist)", limit: 1)
+            if let spotifyAlbum = results.first {
+                let spotifyTracks = await SpotifyService.shared.fetchAlbumTracks(spotifyAlbumId: spotifyAlbum.spotifyId)
+                let mapped = spotifyTracks.map { st in
+                    Track(
+                        id: "st_\(albumId)_\(st.trackNumber)",
+                        albumId: albumId,
+                        title: st.title,
+                        trackNumber: st.trackNumber,
+                        durationMs: st.durationMs,
+                        spotifyId: st.spotifyId
+                    )
+                }
+                if !mapped.isEmpty {
+                    await MainActor.run { self.tracksByAlbum[albumId] = mapped }
+                }
+            }
+        }
+    }
+
+    func updateTrackRating(trackId: String, albumId: String, rating: Float) {
+        trackRatings[trackId] = rating
+        outboxStore.enqueue(OutboxOperation(
+            type: .rateTrack,
+            payload: ["trackId": trackId, "albumId": albumId, "rating": String(rating)]
+        ))
+        Task { await syncOutbox() }
+    }
+
     // MARK: - Mutations (optimistic + outbox)
 
     func updateRating(albumId: String, rating: Float) {
@@ -214,6 +273,14 @@ class SoundScoreRepository: ObservableObject {
                 let rating = Float(op.payload["rating"] ?? "0") ?? 0
                 try await api.createRating(
                     albumId: albumId, value: rating,
+                    idempotencyKey: op.idempotencyKey.uuidString
+                )
+            case .rateTrack:
+                let trackId = op.payload["trackId"] ?? ""
+                let albumId = op.payload["albumId"] ?? ""
+                let rating = Float(op.payload["rating"] ?? "0") ?? 0
+                try await api.createTrackRating(
+                    trackId: trackId, albumId: albumId, value: rating,
                     idempotencyKey: op.idempotencyKey.uuidString
                 )
             case .createReview:
