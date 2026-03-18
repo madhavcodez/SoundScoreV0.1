@@ -3,6 +3,7 @@ import SwiftUI
 struct LogScreen: View {
     @StateObject private var viewModel = LogViewModel()
     var onSelectAlbum: (Album) -> Void = { _ in }
+    @State private var showSearchSheet = false
 
     var body: some View {
         ZStack(alignment: .bottomTrailing) {
@@ -10,21 +11,31 @@ struct LogScreen: View {
                 LazyVStack(alignment: .leading, spacing: 16) {
                     SyncBanner(message: viewModel.syncMessage)
 
+                    if let error = viewModel.errorMessage {
+                        ErrorBanner(message: error)
+                    }
+
                     ScreenHeader(title: "Diary", subtitle: "Your listening journal. Rate, log, repeat.")
 
-                    GlassCard(cornerRadius: 22, borderColor: SSColors.feedItemBorder, frosted: true) {
-                        HStack {
-                            ForEach(Array(viewModel.summaryStats.enumerated()), id: \.offset) { _, stat in
-                                VStack(spacing: 2) {
-                                    Text(stat.value)
-                                        .font(SSTypography.headlineMedium)
-                                        .foregroundColor(stat.label == "This week" ? SSColors.accentGreen : SSColors.chromeLight)
-                                        .fontWeight(.black)
-                                    Text(stat.label.uppercased())
-                                        .font(SSTypography.labelSmall)
-                                        .foregroundColor(SSColors.textTertiary)
+                    if viewModel.isLoading && viewModel.quickLogAlbums.isEmpty {
+                        SkeletonView()
+                            .frame(height: 80)
+                            .clipShape(RoundedRectangle(cornerRadius: 22))
+                    } else {
+                        GlassCard(cornerRadius: 22, borderColor: SSColors.feedItemBorder, frosted: true) {
+                            HStack {
+                                ForEach(Array(viewModel.summaryStats.enumerated()), id: \.offset) { _, stat in
+                                    VStack(spacing: 2) {
+                                        Text(stat.value)
+                                            .font(SSTypography.headlineMedium)
+                                            .foregroundColor(stat.label == "This week" ? ThemeManager.shared.primary : SSColors.chromeLight)
+                                            .fontWeight(.black)
+                                        Text(stat.label.uppercased())
+                                            .font(SSTypography.labelSmall)
+                                            .foregroundColor(SSColors.textTertiary)
+                                    }
+                                    .frame(maxWidth: .infinity)
                                 }
-                                .frame(maxWidth: .infinity)
                             }
                         }
                     }
@@ -72,19 +83,92 @@ struct LogScreen: View {
                 .padding(.top, 16)
                 .padding(.bottom, 120)
             }
+            .refreshable { await SoundScoreRepository.shared.refresh() }
 
-            Button(action: {}) {
+            Button {
+                UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                showSearchSheet = true
+            } label: {
                 Image(systemName: "plus")
                     .font(.system(size: 22, weight: .bold))
                     .foregroundColor(SSColors.darkBase)
                     .frame(width: 56, height: 56)
-                    .background(SSColors.accentGreen)
+                    .background(ThemeManager.shared.primary)
                     .clipShape(Circle())
-                    .shadow(color: SSColors.accentGreen.opacity(0.3), radius: 10, y: 4)
+                    .shadow(color: ThemeManager.shared.primary.opacity(0.3), radius: 10, y: 4)
             }
             .padding(.trailing, 20)
             .padding(.bottom, 100)
         }
+        .sheet(isPresented: $showSearchSheet) {
+            QuickLogSearchSheet(onSelectAlbum: { album in
+                showSearchSheet = false
+                onSelectAlbum(album)
+            })
+            .presentationDetents([.large])
+            .presentationDragIndicator(.visible)
+            .presentationBackground(SSColors.darkElevated)
+        }
+    }
+}
+
+// MARK: - Quick Log Search Sheet
+
+private struct QuickLogSearchSheet: View {
+    @StateObject private var viewModel = SearchViewModel()
+    var onSelectAlbum: (Album) -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Log an album")
+                .font(SSTypography.headlineSmall)
+                .foregroundColor(SSColors.chromeLight)
+
+            PillSearchBar(query: $viewModel.query, placeholder: "Search albums to log...")
+
+            if viewModel.results.isEmpty && !viewModel.query.isEmpty {
+                EmptyState(
+                    title: "No matches",
+                    subtitle: "Try a different search term.",
+                    icon: "magnifyingglass"
+                )
+            } else {
+                ScrollView {
+                    LazyVStack(spacing: 8) {
+                        ForEach(viewModel.results) { album in
+                            Button {
+                                UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                onSelectAlbum(album)
+                            } label: {
+                                HStack(spacing: 12) {
+                                    AlbumArtwork(artworkUrl: album.artworkUrl, colors: album.artColors, cornerRadius: 12)
+                                        .frame(width: 48, height: 48)
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        Text(album.title)
+                                            .font(SSTypography.titleMedium)
+                                            .foregroundColor(SSColors.chromeLight)
+                                            .fontWeight(.semibold)
+                                        Text(album.artist)
+                                            .font(SSTypography.bodySmall)
+                                            .foregroundColor(SSColors.textSecondary)
+                                    }
+                                    Spacer()
+                                    Image(systemName: "chevron.right")
+                                        .font(.system(size: 12))
+                                        .foregroundColor(SSColors.chromeFaint)
+                                }
+                                .padding(.vertical, 4)
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    }
+                }
+            }
+
+            Spacer()
+        }
+        .padding(.horizontal, 24)
+        .padding(.top, 24)
     }
 }
 
@@ -95,7 +179,7 @@ private struct QuickRateCard: View {
     var onSelectAlbum: (Album) -> Void = { _ in }
 
     var body: some View {
-        GlassCard(cornerRadius: 20, borderColor: SSColors.feedItemBorder, contentPadding: EdgeInsets(top: 8, leading: 8, bottom: 8, trailing: 8)) {
+        GlassCard(cornerRadius: 20, borderColor: SSColors.feedItemBorder, contentPadding: EdgeInsets(top: 10, leading: 10, bottom: 10, trailing: 10)) {
             VStack(alignment: .leading, spacing: 8) {
                 ZStack(alignment: .topTrailing) {
                     AlbumArtwork(artworkUrl: album.artworkUrl, colors: album.artColors, cornerRadius: 14)
@@ -114,6 +198,7 @@ private struct QuickRateCard: View {
                             .background(SSColors.darkBase.opacity(0.7))
                             .clipShape(RoundedRectangle(cornerRadius: 10))
                             .padding(6)
+                            .transition(.scale.combined(with: .opacity))
                     }
                 }
                 Text(album.title)

@@ -6,7 +6,7 @@ enum SSColors {
     static let darkElevated = Color(hex: 0x111618)
 
     static let glassBg = Color.white.opacity(0.07)
-    static let glassBorder = Color.white.opacity(0.14)
+    static let glassBorder = Color.white.opacity(0.18)
     static let glassFrosted = Color.white.opacity(0.16)
     static let glassSheet = Color.white.opacity(0.10)
 
@@ -29,8 +29,19 @@ enum SSColors {
     static let accentCoralDim = Color(hex: 0xFF6B6B, alpha: 0.12)
     static let accentVioletDim = Color(hex: 0xB388FF, alpha: 0.12)
 
-    static let feedItemBorder = Color.white.opacity(0.08)
+    static let feedItemBorder = Color.white.opacity(0.12)
     static let glassHighlight = Color.white.opacity(0.19)
+
+    // Overlay semantics (for gradient scrims on images)
+    static let overlayDark = Color.black.opacity(0.7)
+    static let overlayMedium = Color.black.opacity(0.5)
+    static let overlayLight = Color.black.opacity(0.3)
+    static let overlayOnImage = Color.black.opacity(0.22)
+
+    // Glass elevation levels
+    static let glassLevel1 = Color.white.opacity(0.04)
+    static let glassLevel2 = Color.white.opacity(0.08)
+    static let glassLevel3 = Color.white.opacity(0.14)
 }
 
 enum AlbumColors {

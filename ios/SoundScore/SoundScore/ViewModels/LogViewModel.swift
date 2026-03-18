@@ -7,6 +7,8 @@ class LogViewModel: ObservableObject {
     @Published var summaryStats: [LogSummaryStat]
     @Published var recentLogs: [RecentLogEntry]
     @Published var syncMessage: String?
+    @Published var isLoading: Bool
+    @Published var errorMessage: String?
 
     init() {
         let repo = SoundScoreRepository.shared
@@ -15,6 +17,8 @@ class LogViewModel: ObservableObject {
         self.summaryStats = buildLogSummaryStats(repo.ratings)
         self.recentLogs = buildRecentLogs(repo.albums, repo.ratings)
         self.syncMessage = repo.syncMessage
+        self.isLoading = repo.isLoading
+        self.errorMessage = repo.errorMessage
 
         repo.$albums
             .receive(on: RunLoop.main)
@@ -37,6 +41,14 @@ class LogViewModel: ObservableObject {
         repo.$syncMessage
             .receive(on: RunLoop.main)
             .assign(to: &$syncMessage)
+
+        repo.$isLoading
+            .receive(on: RunLoop.main)
+            .assign(to: &$isLoading)
+
+        repo.$errorMessage
+            .receive(on: RunLoop.main)
+            .assign(to: &$errorMessage)
     }
 
     func updateRating(albumId: String, rating: Float) {

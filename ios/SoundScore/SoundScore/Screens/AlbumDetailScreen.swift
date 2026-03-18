@@ -37,6 +37,21 @@ struct AlbumDetailScreen: View {
                 }
                 .buttonStyle(.plain)
             }
+            ToolbarItem(placement: .navigationBarTrailing) {
+                ShareLink(item: "\(album.title) by \(album.artist) — rated on SoundScore") {
+                    ZStack {
+                        Circle()
+                            .fill(.ultraThinMaterial)
+                            .frame(width: 36, height: 36)
+                        Circle()
+                            .stroke(SSColors.glassBorder, lineWidth: 0.5)
+                            .frame(width: 36, height: 36)
+                        Image(systemName: "square.and.arrow.up")
+                            .font(.system(size: 14, weight: .semibold))
+                            .foregroundColor(SSColors.chromeLight)
+                    }
+                }
+            }
         }
         .sheet(isPresented: $showReviewSheet) {
             ReviewSheet(album: album, rating: $userRating)
@@ -44,39 +59,42 @@ struct AlbumDetailScreen: View {
                 .presentationDragIndicator(.visible)
                 .presentationBackground(SSColors.darkElevated)
         }
+        .onAppear {
+            userRating = SoundScoreRepository.shared.ratings[album.id] ?? 0
+        }
     }
 
     private var heroSection: some View {
         ZStack(alignment: .bottomLeading) {
-            AlbumArtwork(artworkUrl: album.artworkUrl, colors: album.artColors, cornerRadius: 28)
+            AlbumArtwork(artworkUrl: album.artworkUrl, colors: album.artColors, cornerRadius: 24)
                 .frame(height: 300)
                 .frame(maxWidth: .infinity)
 
             LinearGradient(
-                colors: [.clear, .black.opacity(0.8)],
+                colors: [.clear, SSColors.overlayDark],
                 startPoint: .init(x: 0.5, y: 0.3),
                 endPoint: .bottom
             )
-            .clipShape(RoundedRectangle(cornerRadius: 28))
+            .clipShape(RoundedRectangle(cornerRadius: 24))
 
             VStack(alignment: .leading, spacing: 4) {
                 Text(album.title)
                     .font(SSTypography.displayMedium)
-                    .foregroundColor(.white)
+                    .foregroundColor(SSColors.chromeLight)
                     .fontWeight(.bold)
                     .lineLimit(2)
                 Text(album.artist)
                     .font(SSTypography.bodyLarge)
-                    .foregroundColor(.white.opacity(0.85))
+                    .foregroundColor(SSColors.chromeLight)
                 Text("\(album.year)")
                     .font(SSTypography.bodySmall)
-                    .foregroundColor(.white.opacity(0.6))
+                    .foregroundColor(SSColors.chromeDim)
             }
             .padding(18)
         }
-        .clipShape(RoundedRectangle(cornerRadius: 28))
+        .clipShape(RoundedRectangle(cornerRadius: 24))
         .overlay(
-            RoundedRectangle(cornerRadius: 28)
+            RoundedRectangle(cornerRadius: 24)
                 .stroke(SSColors.feedItemBorder, lineWidth: 0.5)
         )
     }
@@ -94,7 +112,7 @@ struct AlbumDetailScreen: View {
             HStack(spacing: 4) {
                 Image(systemName: "waveform.path.ecg")
                     .font(.system(size: 14))
-                    .foregroundColor(SSColors.accentGreen)
+                    .foregroundColor(ThemeManager.shared.primary)
                 Text("\(album.logCount) logs")
                     .font(SSTypography.labelMedium)
                     .foregroundColor(SSColors.textSecondary)
@@ -104,7 +122,7 @@ struct AlbumDetailScreen: View {
     }
 
     private var rateReviewSection: some View {
-        GlassCard(tintColor: SSColors.accentGreen, cornerRadius: 22, borderColor: SSColors.accentGreen.opacity(0.2)) {
+        GlassCard(tintColor: ThemeManager.shared.primary, cornerRadius: 22, borderColor: ThemeManager.shared.primary.opacity(0.2)) {
             VStack(spacing: 14) {
                 Text("Rate & Review")
                     .font(SSTypography.headlineSmall)
@@ -120,6 +138,7 @@ struct AlbumDetailScreen: View {
                     StarRating(rating: userRating, onRate: { newRating in
                         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
                         userRating = newRating
+                        SoundScoreRepository.shared.updateRating(albumId: album.id, rating: newRating)
                     }, starSize: 22)
                 }
 
@@ -150,7 +169,7 @@ struct AlbumDetailScreen: View {
     }
 
     private var listsContainingAlbum: some View {
-        let matchingLists = SeedData.initialLists.filter { $0.albumIds.contains(album.id) }
+        let matchingLists = SoundScoreRepository.shared.lists.filter { $0.albumIds.contains(album.id) }
         return Group {
             if !matchingLists.isEmpty {
                 SectionHeader(eyebrow: "Your lists", title: "In your collections")
@@ -183,7 +202,7 @@ struct AlbumDetailScreen: View {
     }
 
     private var alsoByArtist: some View {
-        let otherAlbums = SeedData.albums.filter { $0.artist == album.artist && $0.id != album.id }
+        let otherAlbums = SoundScoreRepository.shared.albums.filter { $0.artist == album.artist && $0.id != album.id }
         return Group {
             SectionHeader(eyebrow: "More", title: "Also by \(album.artist)")
 

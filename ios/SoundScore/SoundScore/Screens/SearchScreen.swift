@@ -15,6 +15,14 @@ struct SearchScreen: View {
 
                 if viewModel.query.trimmingCharacters(in: .whitespaces).isEmpty {
                     browseContent
+                } else if viewModel.isSearching {
+                    HStack {
+                        Spacer()
+                        ProgressView()
+                            .tint(ThemeManager.shared.primary)
+                        Spacer()
+                    }
+                    .padding(.vertical, 32)
                 } else {
                     searchResults
                 }
@@ -23,6 +31,7 @@ struct SearchScreen: View {
             .padding(.top, 16)
             .padding(.bottom, 120)
         }
+        .refreshable { await SoundScoreRepository.shared.refresh() }
     }
 
     @ViewBuilder
@@ -52,7 +61,9 @@ struct SearchScreen: View {
         ForEach(Array(rows.enumerated()), id: \.offset) { _, row in
             HStack(spacing: 10) {
                 ForEach(row) { genre in
-                    GenreCard(genre: genre)
+                    GenreCard(genre: genre, onTap: {
+                        viewModel.query = genre.name
+                    })
                 }
                 if row.count == 1 { Spacer() }
             }
@@ -67,24 +78,26 @@ struct SearchScreen: View {
                     onSelectAlbum(entry.album)
                 }
         }
-
-        EmptyState(
-            title: "Friends are listening to...",
-            subtitle: "Connect with friends to see what they're playing right now.",
-            icon: "person.2"
-        )
     }
 
     @ViewBuilder
     private var searchResults: some View {
-        SectionHeader(eyebrow: "Results", title: "\(viewModel.results.count) matches")
+        if viewModel.results.isEmpty {
+            EmptyState(
+                title: "No results found",
+                subtitle: "Try a different search term or check your spelling.",
+                icon: "magnifyingglass"
+            )
+        } else {
+            SectionHeader(eyebrow: "Results", title: "\(viewModel.results.count) matches")
 
-        ForEach(viewModel.results) { album in
-            SearchResultCard(album: album)
-                .onTapGesture {
-                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                    onSelectAlbum(album)
-                }
+            ForEach(viewModel.results) { album in
+                SearchResultCard(album: album)
+                    .onTapGesture {
+                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                        onSelectAlbum(album)
+                    }
+            }
         }
     }
 }
@@ -98,7 +111,7 @@ private struct TrendingSearchCard: View {
             AlbumArtwork(artworkUrl: album.artworkUrl, colors: album.artColors, cornerRadius: 20)
 
             LinearGradient(
-                colors: [.clear, .black.opacity(0.65)],
+                colors: [.clear, SSColors.overlayDark],
                 startPoint: .init(x: 0.5, y: 0.3),
                 endPoint: .bottom
             )
@@ -107,12 +120,12 @@ private struct TrendingSearchCard: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text(album.title)
                     .font(SSTypography.titleMedium)
-                    .foregroundColor(.white)
+                    .foregroundColor(SSColors.chromeLight)
                     .fontWeight(.bold)
                     .lineLimit(1)
                 Text(album.artist)
                     .font(SSTypography.bodySmall)
-                    .foregroundColor(.white.opacity(0.7))
+                    .foregroundColor(SSColors.textSecondary)
                     .lineLimit(1)
             }
             .padding(10)
@@ -122,10 +135,10 @@ private struct TrendingSearchCard: View {
                     Text("#\(rank)")
                         .font(SSTypography.labelMedium)
                         .fontWeight(.black)
-                        .foregroundColor(.black)
+                        .foregroundColor(SSColors.darkBase)
                         .padding(.horizontal, 8)
                         .padding(.vertical, 4)
-                        .background(SSColors.accentGreen.opacity(0.9))
+                        .background(ThemeManager.shared.primary.opacity(0.9))
                         .clipShape(RoundedRectangle(cornerRadius: 10))
                         .padding(8)
                     Spacer()
@@ -144,27 +157,34 @@ private struct TrendingSearchCard: View {
 
 private struct GenreCard: View {
     let genre: BrowseGenre
+    var onTap: () -> Void = {}
 
     var body: some View {
-        GlassCard(tintColor: genre.colors.last, cornerRadius: 20, borderColor: SSColors.feedItemBorder) {
-            VStack(alignment: .leading, spacing: 0) {
-                RoundedRectangle(cornerRadius: 10)
-                    .fill(LinearGradient(colors: genre.colors, startPoint: .topLeading, endPoint: .bottomTrailing))
-                    .frame(width: 32, height: 32)
-                Spacer()
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(genre.name)
-                        .font(SSTypography.titleMedium)
-                        .fontWeight(.bold)
-                        .foregroundColor(SSColors.chromeLight)
-                    Text(genre.caption)
-                        .font(SSTypography.bodySmall)
-                        .foregroundColor(SSColors.textSecondary)
+        Button {
+            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+            onTap()
+        } label: {
+            GlassCard(tintColor: genre.colors.last, cornerRadius: 20, borderColor: SSColors.feedItemBorder) {
+                VStack(alignment: .leading, spacing: 0) {
+                    RoundedRectangle(cornerRadius: 10)
+                        .fill(LinearGradient(colors: genre.colors, startPoint: .topLeading, endPoint: .bottomTrailing))
+                        .frame(width: 32, height: 32)
+                    Spacer()
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(genre.name)
+                            .font(SSTypography.titleMedium)
+                            .fontWeight(.bold)
+                            .foregroundColor(SSColors.chromeLight)
+                        Text(genre.caption)
+                            .font(SSTypography.bodySmall)
+                            .foregroundColor(SSColors.textSecondary)
+                    }
                 }
             }
+            .frame(maxWidth: .infinity)
+            .frame(height: 120)
         }
-        .frame(maxWidth: .infinity)
-        .frame(height: 120)
+        .buttonStyle(.plain)
     }
 }
 

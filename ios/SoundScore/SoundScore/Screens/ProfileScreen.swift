@@ -9,14 +9,14 @@ struct ProfileScreen: View {
     var body: some View {
         if let profile = viewModel.profile {
             ScrollView {
-                LazyVStack(alignment: .leading, spacing: 16) {
+                LazyVStack(alignment: .leading, spacing: 18) {
                     SyncBanner(message: viewModel.syncMessage)
 
-                    GlassCard(cornerRadius: 26, borderColor: SSColors.feedItemBorder, frosted: true) {
+                    GlassCard(cornerRadius: 24, borderColor: SSColors.feedItemBorder, frosted: true) {
                         VStack(spacing: 12) {
                             AvatarCircle(
                                 initials: String(profile.handle.dropFirst().prefix(2)),
-                                gradientColors: [SSColors.accentGreen, SSColors.accentViolet],
+                                gradientColors: [ThemeManager.shared.primary, SSColors.accentViolet],
                                 size: 80
                             )
                             Text(profile.handle)
@@ -44,9 +44,29 @@ struct ProfileScreen: View {
 
                     HStack {
                         Spacer()
-                        GlassIconButton(icon: "square.and.arrow.up", label: "Share", tint: SSColors.accentGreen)
+                        ShareLink(item: viewModel.shareProfileText()) {
+                            VStack(spacing: 4) {
+                                ZStack {
+                                    Circle()
+                                        .fill(SSColors.glassBg)
+                                        .frame(width: 44, height: 44)
+                                    Circle()
+                                        .stroke(SSColors.glassBorder, lineWidth: 0.5)
+                                        .frame(width: 44, height: 44)
+                                    Image(systemName: "square.and.arrow.up")
+                                        .font(.system(size: 16))
+                                        .foregroundColor(ThemeManager.shared.primary)
+                                }
+                                Text("Share")
+                                    .font(SSTypography.labelSmall)
+                                    .foregroundColor(SSColors.textTertiary)
+                            }
+                        }
                         Spacer()
-                        GlassIconButton(icon: "arrow.down.circle", label: "Export")
+                        GlassIconButton(icon: "arrow.down.circle", label: "Export", action: {
+                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                            viewModel.showExportSuccess = true
+                        })
                         Spacer()
                         GlassIconButton(icon: "gearshape", label: "Settings", action: {
                             UIImpactFeedbackGenerator(style: .light).impactOccurred()
@@ -65,30 +85,66 @@ struct ProfileScreen: View {
 
                     if let recap = viewModel.latestRecap {
                         SectionHeader(eyebrow: "Weekly recap", title: "Your week in music")
-                        RecapCard(totalLogs: recap.totalLogs, avgRating: recap.averageRating, shareText: recap.shareText)
+                        RecapCard(recap: recap, shareText: viewModel.shareProfileText())
                     }
 
-                    EmptyState(
-                        title: "Recent activity",
-                        subtitle: "Your latest ratings and reviews will appear here.",
-                        icon: "clock.arrow.circlepath"
-                    )
-
-                    EmptyState(
-                        title: "Achievements",
-                        subtitle: "Badges and milestones — coming soon.",
-                        icon: "trophy"
-                    )
+                    if !viewModel.recentActivity.isEmpty {
+                        SectionHeader(eyebrow: "Activity", title: "Recent ratings")
+                        ForEach(viewModel.recentActivity) { item in
+                            GlassCard(cornerRadius: 16, borderColor: SSColors.feedItemBorder,
+                                      contentPadding: EdgeInsets(top: 10, leading: 12, bottom: 10, trailing: 12)) {
+                                HStack(spacing: 10) {
+                                    AlbumArtwork(artworkUrl: item.album.artworkUrl, colors: item.album.artColors, cornerRadius: 12)
+                                        .frame(width: 44, height: 44)
+                                        .onTapGesture { onSelectAlbum(item.album) }
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        Text(item.album.title)
+                                            .font(SSTypography.titleMedium)
+                                            .foregroundColor(SSColors.chromeLight)
+                                            .fontWeight(.semibold)
+                                        Text(item.action)
+                                            .font(SSTypography.bodySmall)
+                                            .foregroundColor(SSColors.textSecondary)
+                                    }
+                                    Spacer()
+                                    Text(item.timeAgo)
+                                        .font(SSTypography.labelSmall)
+                                        .foregroundColor(SSColors.textTertiary)
+                                }
+                            }
+                        }
+                    } else {
+                        EmptyState(
+                            title: "Recent activity",
+                            subtitle: "Your latest ratings and reviews will appear here.",
+                            icon: "clock.arrow.circlepath"
+                        )
+                    }
                 }
                 .padding(.horizontal, 20)
                 .padding(.top, 16)
                 .padding(.bottom, 120)
             }
+            .refreshable { await SoundScoreRepository.shared.refresh() }
             .onAppear { appeared = true }
+            .alert("Export Queued", isPresented: $viewModel.showExportSuccess) {
+                Button("OK", role: .cancel) {}
+            } message: {
+                Text("Your data export has been queued. You'll receive a download link when it's ready.")
+            }
         } else {
-            Text("Loading profile...")
-                .foregroundColor(SSColors.textSecondary)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            VStack(spacing: 12) {
+                SkeletonView()
+                    .frame(width: 80, height: 80)
+                    .clipShape(Circle())
+                SkeletonView()
+                    .frame(width: 120, height: 20)
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                SkeletonView()
+                    .frame(width: 200, height: 14)
+                    .clipShape(RoundedRectangle(cornerRadius: 6))
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
     }
 }
@@ -189,18 +245,17 @@ private struct TasteTags: View {
 }
 
 private struct RecapCard: View {
-    let totalLogs: Int
-    let avgRating: Float
+    let recap: WeeklyRecap
     let shareText: String
 
     var body: some View {
-        GlassCard(tintColor: SSColors.accentGreen, cornerRadius: 22, borderColor: SSColors.accentGreen.opacity(0.2)) {
+        GlassCard(tintColor: ThemeManager.shared.primary, cornerRadius: 22, borderColor: ThemeManager.shared.primary.opacity(0.2)) {
             VStack(alignment: .leading, spacing: 10) {
                 HStack {
                     VStack(alignment: .leading) {
-                        Text("\(totalLogs)")
+                        Text("\(recap.totalLogs)")
                             .font(SSTypography.headlineMedium)
-                            .foregroundColor(SSColors.accentGreen)
+                            .foregroundColor(ThemeManager.shared.primary)
                             .fontWeight(.black)
                         Text("ALBUMS LOGGED")
                             .font(SSTypography.labelSmall)
@@ -208,7 +263,7 @@ private struct RecapCard: View {
                     }
                     Spacer()
                     VStack(alignment: .trailing) {
-                        Text(String(format: "%.1f", avgRating))
+                        Text(String(format: "%.1f", recap.averageRating))
                             .font(SSTypography.headlineMedium)
                             .foregroundColor(SSColors.accentAmber)
                             .fontWeight(.black)
@@ -217,12 +272,33 @@ private struct RecapCard: View {
                             .foregroundColor(SSColors.textTertiary)
                     }
                 }
-                Text(shareText)
+                Text(recap.shareText)
                     .font(SSTypography.bodyMedium)
                     .foregroundColor(SSColors.textSecondary)
                 HStack(spacing: 10) {
-                    SSButton(text: "View Recap", action: {})
-                    GlassIconButton(icon: "square.and.arrow.up", label: "Share", tint: SSColors.accentGreen)
+                    SSButton(text: "View Recap") {
+                        // Deep link to recap view
+                        if let url = URL(string: recap.deepLink) {
+                            UIApplication.shared.open(url)
+                        }
+                    }
+                    ShareLink(item: recap.shareText) {
+                        HStack(spacing: 6) {
+                            Image(systemName: "square.and.arrow.up")
+                                .font(.system(size: 14))
+                            Text("Share")
+                                .font(SSTypography.labelMedium)
+                        }
+                        .foregroundColor(ThemeManager.shared.primary)
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 10)
+                        .background(SSColors.glassBg)
+                        .clipShape(RoundedRectangle(cornerRadius: 16))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 16)
+                                .stroke(SSColors.glassBorder, lineWidth: 0.5)
+                        )
+                    }
                 }
             }
         }

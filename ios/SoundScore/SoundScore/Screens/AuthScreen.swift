@@ -18,7 +18,7 @@ struct AuthScreen: View {
                 VStack(spacing: 8) {
                     Image(systemName: "waveform.circle.fill")
                         .font(.system(size: 64))
-                        .foregroundColor(SSColors.accentGreen)
+                        .foregroundColor(ThemeManager.shared.primary)
                     Text("SoundScore")
                         .font(SSTypography.headlineMedium)
                         .foregroundColor(SSColors.chromeLight)
@@ -85,7 +85,7 @@ struct AuthScreen: View {
                                     : "Don't have an account? Sign up"
                             )
                             .font(SSTypography.bodySmall)
-                            .foregroundColor(SSColors.accentGreen)
+                            .foregroundColor(ThemeManager.shared.primary)
                         }
                     }
                 }

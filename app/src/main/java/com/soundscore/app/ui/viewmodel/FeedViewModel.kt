@@ -2,6 +2,7 @@ package com.soundscore.app.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.soundscore.app.data.model.Album
 import com.soundscore.app.data.model.FeedItem
 import com.soundscore.app.data.repository.AppContainer
 import kotlinx.coroutines.flow.SharingStarted
@@ -12,6 +13,7 @@ import kotlinx.coroutines.launch
 
 data class FeedUiState(
     val items: List<FeedItem> = emptyList(),
+    val trendingAlbums: List<Album> = emptyList(),
     val syncMessage: String? = null,
 )
 
@@ -20,9 +22,14 @@ class FeedViewModel : ViewModel() {
 
     val uiState: StateFlow<FeedUiState> = combine(
         repository.feedItems,
+        repository.albums,
         repository.syncMessage,
-    ) { items, syncMessage ->
-        FeedUiState(items = items, syncMessage = syncMessage)
+    ) { items, albums, syncMessage ->
+        FeedUiState(
+            items = items,
+            trendingAlbums = buildTrendingAlbums(albums),
+            syncMessage = syncMessage,
+        )
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5_000),

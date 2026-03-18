@@ -1,35 +1,61 @@
 package com.soundscore.app.ui.screens
 
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.soundscore.app.data.model.Album
-import com.soundscore.app.ui.components.AlbumArtPlaceholder
-import com.soundscore.app.ui.components.StarRating
-import com.soundscore.app.ui.theme.*
-import com.soundscore.app.ui.viewmodel.LogViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.soundscore.app.data.model.Album
+import com.soundscore.app.ui.components.AlbumArtwork
+import com.soundscore.app.ui.components.GlassCard
+import com.soundscore.app.ui.components.ScreenHeader
+import com.soundscore.app.ui.components.SectionHeader
+import com.soundscore.app.ui.components.StarRating
+import com.soundscore.app.ui.components.StatPill
+import com.soundscore.app.ui.components.SyncBanner
+import com.soundscore.app.ui.components.TimelineEntry
+import com.soundscore.app.ui.theme.AccentAmber
+import com.soundscore.app.ui.theme.AccentGreen
+import com.soundscore.app.ui.theme.AccentGreenDim
+import com.soundscore.app.ui.theme.ChromeLight
+import com.soundscore.app.ui.theme.DarkBase
+import com.soundscore.app.ui.theme.FeedItemBorder
+import com.soundscore.app.ui.theme.GlassBg
+import com.soundscore.app.ui.theme.GlassBorder
+import com.soundscore.app.ui.theme.TextSecondary
+import com.soundscore.app.ui.theme.TextTertiary
+import com.soundscore.app.ui.viewmodel.LogUiState
+import com.soundscore.app.ui.viewmodel.LogViewModel
+import com.soundscore.app.ui.viewmodel.RecentLogEntry
 
 @Composable
 fun LogScreen(
@@ -38,164 +64,252 @@ fun LogScreen(
 ) {
     val uiState by logViewModel.uiState.collectAsStateWithLifecycle()
 
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState()),
-    ) {
-        // ── Header ──
-        Row(
+    Box(modifier = modifier.fillMaxSize()) {
+        LogScreenContent(
+            uiState = uiState,
+            onRate = logViewModel::updateRating,
+        )
+
+        FloatingActionButton(
+            onClick = { /* TODO: Open album search/log sheet */ },
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 18.dp, vertical = 8.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
+                .align(Alignment.BottomEnd)
+                .padding(end = 20.dp, bottom = 24.dp),
+            shape = CircleShape,
+            containerColor = AccentGreen,
+            contentColor = DarkBase,
         ) {
-            Text("Log", style = MaterialTheme.typography.headlineMedium)
-            Text("+ Manual", style = MaterialTheme.typography.labelLarge, color = ElectricBlue)
+            Icon(Icons.Filled.Add, contentDescription = "Log Album")
         }
-
-        // ── Recently played ──
-        SectionLabel("Recently played")
-
-        // 3-column grid via chunked rows
-        uiState.albums.chunked(3).forEach { rowAlbums ->
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 12.dp)
-                    .padding(bottom = 7.dp),
-                horizontalArrangement = Arrangement.spacedBy(7.dp),
-            ) {
-                rowAlbums.forEach { album ->
-                    AlbumTile(
-                        album = album,
-                        rating = uiState.ratings[album.id] ?: 0f,
-                        onRate = { logViewModel.updateRating(album.id, it) },
-                        modifier = Modifier.weight(1f),
-                    )
-                }
-                // Fill remaining slots if row is not full
-                repeat(3 - rowAlbums.size) {
-                    Spacer(Modifier.weight(1f))
-                }
-            }
-        }
-
-        // ── Write later queue ──
-        Spacer(Modifier.height(7.dp))
-        SectionLabel("Write later queue")
-
-        uiState.writeLaterQueue.forEach { album ->
-            QueueItem(album = album)
-        }
-
-        Spacer(Modifier.height(16.dp))
     }
 }
 
 @Composable
-private fun AlbumTile(
+fun LogScreenContent(
+    uiState: LogUiState,
+    onRate: (String, Float) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    LazyColumn(
+        modifier = modifier.fillMaxSize(),
+        contentPadding = PaddingValues(start = 20.dp, top = 16.dp, end = 20.dp, bottom = 120.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+    ) {
+        item {
+            SyncBanner(message = uiState.syncMessage)
+        }
+
+        item {
+            ScreenHeader(
+                title = "Diary",
+                subtitle = "Your listening journal. Rate, log, repeat.",
+            )
+        }
+
+        item {
+            GlassCard(
+                cornerRadius = 22.dp,
+                borderColor = FeedItemBorder,
+                frosted = true,
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                ) {
+                    uiState.summaryStats.forEach { stat ->
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Text(
+                                text = stat.value,
+                                style = MaterialTheme.typography.headlineMedium,
+                                color = if (stat.label == "This week") AccentGreen else ChromeLight,
+                                fontWeight = FontWeight.Black,
+                            )
+                            Spacer(Modifier.height(2.dp))
+                            Text(
+                                text = stat.label.uppercase(),
+                                style = MaterialTheme.typography.labelSmall,
+                                color = TextTertiary,
+                            )
+                        }
+                    }
+                }
+            }
+        }
+
+        item {
+            SectionHeader(
+                eyebrow = "Quick rate",
+                title = "Tap to rate",
+            )
+        }
+
+        item {
+            LazyRow(
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                contentPadding = PaddingValues(end = 8.dp),
+            ) {
+                items(uiState.quickLogAlbums, key = { it.id }) { album ->
+                    QuickRateCard(
+                        album = album,
+                        rating = uiState.ratings[album.id] ?: 0f,
+                        onRate = { onRate(album.id, it) },
+                    )
+                }
+            }
+        }
+
+        if (uiState.recentLogs.isNotEmpty()) {
+            item {
+                SectionHeader(
+                    eyebrow = "Recent",
+                    title = "Your diary entries",
+                )
+            }
+
+            items(uiState.recentLogs, key = { "${it.album.id}-${it.timeLabel}" }) { entry ->
+                TimelineEntry(
+                    dateLabel = entry.dateLabel,
+                    timeLabel = entry.timeLabel,
+                ) {
+                    DiaryEntryCard(entry = entry)
+                }
+            }
+        }
+
+        item {
+            GlassCard(
+                cornerRadius = 20.dp,
+                borderColor = FeedItemBorder,
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    Text(
+                        text = "Write Later",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = ChromeLight,
+                    )
+                    Spacer(Modifier.height(4.dp))
+                    Text(
+                        text = "Queue albums for later review — coming soon",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = TextTertiary,
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun QuickRateCard(
     album: Album,
     rating: Float,
     onRate: (Float) -> Unit,
-    modifier: Modifier = Modifier,
 ) {
-    var isPressed by remember { mutableStateOf(false) }
-    
-    // Album tile press ripple effect
-    val scale by animateFloatAsState(
-        targetValue = if (isPressed) 0.94f else 1f,
-        animationSpec = spring(dampingRatio = 0.7f, stiffness = 400f),
-        label = "albumTileScale"
-    )
-
-    val shape = RoundedCornerShape(11.dp)
-    Box(
-        modifier = modifier
-            .graphicsLayer {
-                scaleX = scale
-                scaleY = scale
-            }
-            .clip(shape)
-            .background(Color(0x0AFFFFFF))
-            .border(1.dp, FeedItemBorder, shape)
-            .pointerInput(Unit) {
-                detectTapGestures(
-                    onPress = {
-                        isPressed = true
-                        tryAwaitRelease()
-                        isPressed = false
-                    }
-                )
-            },
+    GlassCard(
+        modifier = Modifier.width(140.dp),
+        cornerRadius = 20.dp,
+        fillMaxWidth = false,
+        borderColor = FeedItemBorder,
+        contentPadding = PaddingValues(8.dp),
     ) {
-        Column {
-            AlbumArtPlaceholder(
-                colors = album.artColors,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .aspectRatio(1f),
-                cornerRadius = 0.dp,
-            )
-            Column(modifier = Modifier.padding(horizontal = 6.dp, vertical = 5.dp)) {
-                Text(
-                    album.title,
-                    style = MaterialTheme.typography.labelSmall,
-                    color = ChromeMedium,
-                    maxLines = 1,
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Box {
+                AlbumArtwork(
+                    artworkUrl = album.artworkUrl,
+                    colors = album.artColors,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(130.dp),
+                    cornerRadius = 14.dp,
                 )
-                Spacer(Modifier.height(3.dp))
-                StarRating(
-                    rating = rating,
-                    starSize = 10.dp,
-                    onRate = onRate,
-                )
+                if (rating > 0f) {
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .padding(6.dp)
+                            .clip(RoundedCornerShape(10.dp))
+                            .background(DarkBase.copy(alpha = 0.7f))
+                            .padding(horizontal = 6.dp, vertical = 3.dp),
+                    ) {
+                        Text(
+                            text = String.format("%.1f", rating),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = AccentAmber,
+                            fontWeight = FontWeight.Bold,
+                        )
+                    }
+                }
             }
+            Text(
+                text = album.title,
+                style = MaterialTheme.typography.titleSmall,
+                maxLines = 1,
+                fontWeight = FontWeight.SemiBold,
+            )
+            Text(
+                text = album.artist,
+                style = MaterialTheme.typography.bodySmall,
+                color = TextSecondary,
+                maxLines = 1,
+            )
+            StarRating(
+                rating = rating,
+                onRate = onRate,
+                starSize = 14.dp,
+            )
         }
     }
 }
 
 @Composable
-private fun QueueItem(album: Album) {
-    val shape = RoundedCornerShape(10.dp)
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 12.dp, vertical = 3.dp)
-            .clip(shape)
-            .background(Color(0x0AFFFFFF))
-            .border(1.dp, FeedItemBorder, shape)
-            .padding(horizontal = 11.dp, vertical = 9.dp),
-        verticalAlignment = Alignment.CenterVertically,
+private fun DiaryEntryCard(entry: RecentLogEntry) {
+    GlassCard(
+        cornerRadius = 18.dp,
+        borderColor = FeedItemBorder,
+        contentPadding = PaddingValues(10.dp),
     ) {
-        AlbumArtPlaceholder(
-            colors = album.artColors,
-            modifier = Modifier.size(30.dp),
-            cornerRadius = 6.dp,
-        )
-        Spacer(Modifier.width(9.dp))
-        Text(
-            album.title,
-            style = MaterialTheme.typography.bodyMedium,
-            color = ChromeMedium,
-            modifier = Modifier.weight(1f),
-            maxLines = 1,
-        )
-        Text(
-            "Write →",
-            style = MaterialTheme.typography.labelSmall,
-            color = ElectricBlue,
-        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            AlbumArtwork(
+                artworkUrl = entry.album.artworkUrl,
+                colors = entry.album.artColors,
+                modifier = Modifier.size(56.dp),
+                cornerRadius = 14.dp,
+            )
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(2.dp),
+            ) {
+                Text(
+                    text = entry.album.title,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
+                )
+                Text(
+                    text = entry.album.artist,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = TextSecondary,
+                )
+                if (entry.caption.isNotBlank()) {
+                    Text(
+                        text = entry.caption,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = TextTertiary,
+                        maxLines = 1,
+                    )
+                }
+            }
+            StarRating(rating = entry.rating, starSize = 12.dp)
+        }
     }
 }
 
-@Composable
-private fun SectionLabel(text: String) {
-    Text(
-        text.uppercase(),
-        style = MaterialTheme.typography.labelMedium,
-        color = TextTertiary,
-        modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp),
-    )
-}
+

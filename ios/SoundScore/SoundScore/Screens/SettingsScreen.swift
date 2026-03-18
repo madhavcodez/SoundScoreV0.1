@@ -2,11 +2,15 @@ import SwiftUI
 
 struct SettingsScreen: View {
     @StateObject private var viewModel = ProfileViewModel()
+    @ObservedObject private var themeManager = ThemeManager.shared
+    @EnvironmentObject private var authManager: AuthManager
     @Environment(\.dismiss) private var dismiss
+    @State private var showDeleteConfirm = false
 
     var body: some View {
         ScrollView {
             LazyVStack(alignment: .leading, spacing: 16) {
+                themeSection
                 accountSection
                 notificationsSection
                 quietHoursSection
@@ -39,6 +43,56 @@ struct SettingsScreen: View {
                 .buttonStyle(.plain)
             }
         }
+        .alert("Delete Account", isPresented: $showDeleteConfirm) {
+            Button("Cancel", role: .cancel) {}
+            Button("Delete", role: .destructive) {
+                Task {
+                    try? await SoundScoreAPI().deleteAccount()
+                    await MainActor.run { authManager.logout() }
+                }
+            }
+        } message: {
+            Text("This will permanently delete your account and all your data. This cannot be undone.")
+        }
+    }
+
+    private var themeSection: some View {
+        GlassCard(cornerRadius: 22, borderColor: SSColors.feedItemBorder, frosted: true) {
+            VStack(alignment: .leading, spacing: 14) {
+                Text("Accent Theme")
+                    .font(SSTypography.headlineSmall)
+                    .foregroundColor(SSColors.chromeLight)
+                    .fontWeight(.bold)
+
+                HStack(spacing: 12) {
+                    ForEach(AccentTheme.allCases) { theme in
+                        Button {
+                            withAnimation(.easeInOut(duration: 0.25)) {
+                                themeManager.current = theme
+                            }
+                        } label: {
+                            ZStack {
+                                Circle()
+                                    .fill(theme.primary)
+                                    .frame(width: 36, height: 36)
+
+                                if themeManager.current == theme {
+                                    Circle()
+                                        .stroke(theme.primary, lineWidth: 2.5)
+                                        .frame(width: 44, height: 44)
+                                    Image(systemName: "checkmark")
+                                        .font(.system(size: 12, weight: .bold))
+                                        .foregroundColor(SSColors.darkBase)
+                                }
+                            }
+                            .frame(width: 44, height: 44)
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+                .frame(maxWidth: .infinity)
+            }
+        }
     }
 
     private var accountSection: some View {
@@ -69,6 +123,10 @@ struct SettingsScreen: View {
                 ToggleRow(label: "Reactions", isOn: $viewModel.notificationPreferences.reactionEnabled)
             }
         }
+        .onChange(of: viewModel.notificationPreferences.socialEnabled) { _, _ in viewModel.saveNotificationPreferences() }
+        .onChange(of: viewModel.notificationPreferences.recapEnabled) { _, _ in viewModel.saveNotificationPreferences() }
+        .onChange(of: viewModel.notificationPreferences.commentEnabled) { _, _ in viewModel.saveNotificationPreferences() }
+        .onChange(of: viewModel.notificationPreferences.reactionEnabled) { _, _ in viewModel.saveNotificationPreferences() }
     }
 
     private var quietHoursSection: some View {
@@ -84,10 +142,14 @@ struct SettingsScreen: View {
                         Text("Start")
                             .font(SSTypography.bodySmall)
                             .foregroundColor(SSColors.textTertiary)
-                        Text("\(viewModel.notificationPreferences.quietHoursStart):00")
-                            .font(SSTypography.titleLarge)
-                            .foregroundColor(SSColors.chromeLight)
-                            .fontWeight(.semibold)
+                        Stepper(
+                            "\(viewModel.notificationPreferences.quietHoursStart):00",
+                            value: $viewModel.notificationPreferences.quietHoursStart,
+                            in: 0...23
+                        )
+                        .font(SSTypography.titleLarge)
+                        .foregroundColor(SSColors.chromeLight)
+                        .fontWeight(.semibold)
                     }
                     Spacer()
                     Image(systemName: "moon.fill")
@@ -97,14 +159,20 @@ struct SettingsScreen: View {
                         Text("End")
                             .font(SSTypography.bodySmall)
                             .foregroundColor(SSColors.textTertiary)
-                        Text("\(viewModel.notificationPreferences.quietHoursEnd):00")
-                            .font(SSTypography.titleLarge)
-                            .foregroundColor(SSColors.chromeLight)
-                            .fontWeight(.semibold)
+                        Stepper(
+                            "\(viewModel.notificationPreferences.quietHoursEnd):00",
+                            value: $viewModel.notificationPreferences.quietHoursEnd,
+                            in: 0...23
+                        )
+                        .font(SSTypography.titleLarge)
+                        .foregroundColor(SSColors.chromeLight)
+                        .fontWeight(.semibold)
                     }
                 }
             }
         }
+        .onChange(of: viewModel.notificationPreferences.quietHoursStart) { _, _ in viewModel.saveNotificationPreferences() }
+        .onChange(of: viewModel.notificationPreferences.quietHoursEnd) { _, _ in viewModel.saveNotificationPreferences() }
     }
 
     private var dataSection: some View {
@@ -115,9 +183,21 @@ struct SettingsScreen: View {
                     .foregroundColor(SSColors.chromeLight)
                     .fontWeight(.bold)
 
-                SSGhostButton(text: "Export Data") {}
+                SSGhostButton(text: "Export Data") {
+                    Task {
+                        SoundScoreRepository.shared.outboxStore.enqueue(OutboxOperation(
+                            type: .exportData,
+                            payload: [:]
+                        ))
+                        await SoundScoreRepository.shared.syncOutbox()
+                    }
+                    viewModel.showExportSuccess = true
+                }
 
-                Button(action: {}) {
+                Button {
+                    UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                    showDeleteConfirm = true
+                } label: {
                     Text("Delete Account")
                         .font(SSTypography.labelLarge)
                         .foregroundColor(SSColors.accentCoral)
@@ -153,6 +233,22 @@ struct SettingsScreen: View {
                         .font(SSTypography.labelMedium)
                         .foregroundColor(SSColors.textTertiary)
                 }
+
+                Button {
+                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                    authManager.logout()
+                    dismiss()
+                } label: {
+                    HStack {
+                        Image(systemName: "rectangle.portrait.and.arrow.right")
+                            .font(.system(size: 14))
+                        Text("Sign Out")
+                    }
+                    .font(SSTypography.labelLarge)
+                    .foregroundColor(SSColors.accentCoral)
+                    .padding(.top, 8)
+                }
+                .buttonStyle(.plain)
             }
         }
     }
@@ -185,7 +281,7 @@ private struct ToggleRow: View {
                 .foregroundColor(SSColors.chromeLight)
             Spacer()
             Toggle("", isOn: $isOn)
-                .tint(SSColors.accentGreen)
+                .tint(ThemeManager.shared.primary)
                 .labelsHidden()
         }
     }

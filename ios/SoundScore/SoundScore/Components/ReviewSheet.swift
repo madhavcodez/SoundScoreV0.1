@@ -4,6 +4,7 @@ struct ReviewSheet: View {
     let album: Album
     @Binding var rating: Float
     @State private var reviewText = ""
+    @State private var isSaving = false
     @Environment(\.dismiss) private var dismiss
 
     private let maxChars = 500
@@ -75,10 +76,20 @@ struct ReviewSheet: View {
                     )
             }
 
-            SSButton(text: "Save Review") {
+            SSButton(text: isSaving ? "Saving..." : "Save Review") {
+                guard !isSaving else { return }
+                isSaving = true
                 UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                SoundScoreRepository.shared.saveReview(
+                    albumId: album.id,
+                    reviewText: reviewText,
+                    rating: rating
+                )
+                isSaving = false
                 dismiss()
             }
+            .opacity(rating > 0 || !reviewText.isEmpty ? 1.0 : 0.5)
+            .disabled(rating == 0 && reviewText.isEmpty)
 
             SSGhostButton(text: "Cancel") {
                 dismiss()
