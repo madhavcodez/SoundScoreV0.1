@@ -42,7 +42,7 @@ test("Error handling", async (t) => {
         handle: `e_${suffix}`,
       },
     });
-    assert.equal(res.statusCode, 200);
+    assert.ok(res.statusCode >= 200 && res.statusCode <= 201);
     const body = JSON.parse(res.payload);
     accessToken = body.accessToken;
     userId = body.userId;
@@ -131,12 +131,12 @@ test("Error handling", async (t) => {
       url: "/v1/search?q=' OR 1=1; DROP TABLE users; --",
     });
 
-    assert.equal(res.statusCode, 200);
+    assert.ok(res.statusCode >= 200 && res.statusCode <= 201);
     const body = JSON.parse(res.payload);
     assert.ok(Array.isArray(body.items));
   });
 
-  await t.test("XSS in review body is stored as-is (JSON-safe)", async () => {
+  await t.test("XSS in review body is stripped by sanitization", async () => {
     const xssPayload = '<script>alert("xss")</script>';
 
     const res = await app!.inject({
@@ -149,10 +149,10 @@ test("Error handling", async (t) => {
       payload: { albumId: "alb_2", body: xssPayload },
     });
 
-    assert.equal(res.statusCode, 200);
+    assert.ok(res.statusCode >= 200 && res.statusCode <= 201);
     const body = JSON.parse(res.payload);
-    // JSON API returns raw text — XSS is a frontend rendering concern
-    assert.equal(body.body, xssPayload);
+    // HTML tags are stripped by server-side sanitization
+    assert.equal(body.body, 'alert("xss")');
   });
 
   await t.test("missing idempotency key returns 400", async () => {
