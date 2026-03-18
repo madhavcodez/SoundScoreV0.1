@@ -53,6 +53,8 @@
 		E10000010000000000000003 /* AuthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E10000020000000000000003; };
 		E10000010000000000000004 /* OutboxStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E10000020000000000000004; };
 		E10000010000000000000005 /* SoundScoreRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = E10000020000000000000005; };
+		E10000010000000000000006 /* SpotifyService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E10000020000000000000006; };
+		G10000010000000000000001 /* Secrets.swift in Sources */ = {isa = PBXBuildFile; fileRef = G10000020000000000000001; };
 		A10000010000000000000013 /* AuthScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000013; };
 		F10000010000000000000001 /* AlbumDetailScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = F10000020000000000000001; };
 		F10000010000000000000002 /* SettingsScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = F10000020000000000000002; };
@@ -109,6 +111,9 @@
 		E10000020000000000000003 /* AuthManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthManager.swift; sourceTree = "<group>"; };
 		E10000020000000000000004 /* OutboxStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutboxStore.swift; sourceTree = "<group>"; };
 		E10000020000000000000005 /* SoundScoreRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundScoreRepository.swift; sourceTree = "<group>"; };
+		E10000020000000000000006 /* SpotifyService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotifyService.swift; sourceTree = "<group>"; };
+		G10000020000000000000001 /* Secrets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Secrets.swift; sourceTree = "<group>"; };
+		G10000020000000000000002 /* Secrets.swift.template */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Secrets.swift.template"; sourceTree = "<group>"; };
 		A10000020000000000000013 /* AuthScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthScreen.swift; sourceTree = "<group>"; };
 		F10000020000000000000001 /* AlbumDetailScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumDetailScreen.swift; sourceTree = "<group>"; };
 		F10000020000000000000002 /* SettingsScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsScreen.swift; sourceTree = "<group>"; };
@@ -137,6 +142,7 @@
 				A10000040000000000000007 /* Models */,
 				A10000040000000000000008 /* ViewModels */,
 				E10000040000000000000001 /* Services */,
+				G10000040000000000000001 /* Config */,
 			);
 			path = SoundScore;
 			sourceTree = "<group>";
@@ -237,8 +243,18 @@
 				E10000020000000000000003 /* AuthManager.swift */,
 				E10000020000000000000004 /* OutboxStore.swift */,
 				E10000020000000000000005 /* SoundScoreRepository.swift */,
+				E10000020000000000000006 /* SpotifyService.swift */,
 			);
 			path = Services;
+			sourceTree = "<group>";
+		};
+		G10000040000000000000001 /* Config */ = {
+			isa = PBXGroup;
+			children = (
+				G10000020000000000000001 /* Secrets.swift */,
+				G10000020000000000000002 /* Secrets.swift.template */,
+			);
+			path = Config;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -338,6 +354,8 @@
 				E10000010000000000000003 /* AuthManager.swift in Sources */,
 				E10000010000000000000004 /* OutboxStore.swift in Sources */,
 				E10000010000000000000005 /* SoundScoreRepository.swift in Sources */,
+				E10000010000000000000006 /* SpotifyService.swift in Sources */,
+				G10000010000000000000001 /* Secrets.swift in Sources */,
 				A10000010000000000000013 /* AuthScreen.swift in Sources */,
 				F10000010000000000000001 /* AlbumDetailScreen.swift in Sources */,
 				F10000010000000000000002 /* SettingsScreen.swift in Sources */,

@@ -3,6 +3,7 @@ import SwiftUI
 struct ContentView: View {
     @StateObject private var authManager = AuthManager.shared
     @StateObject private var repository = SoundScoreRepository.shared
+    @ObservedObject private var themeManager = ThemeManager.shared
     @State private var selectedTab: Tab = .feed
     @State private var selectedAlbum: Album?
     @State private var showSettings = false

@@ -6,6 +6,7 @@ struct SettingsScreen: View {
     @EnvironmentObject private var authManager: AuthManager
     @Environment(\.dismiss) private var dismiss
     @State private var showDeleteConfirm = false
+    @State private var previewTheme: AccentTheme = ThemeManager.shared.current
 
     var body: some View {
         ScrollView {
@@ -57,41 +58,40 @@ struct SettingsScreen: View {
     }
 
     private var themeSection: some View {
-        GlassCard(cornerRadius: 22, borderColor: SSColors.feedItemBorder, frosted: true) {
-            VStack(alignment: .leading, spacing: 14) {
-                Text("Accent Theme")
-                    .font(SSTypography.headlineSmall)
-                    .foregroundColor(SSColors.chromeLight)
-                    .fontWeight(.bold)
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Theme")
+                .font(SSTypography.headlineSmall)
+                .foregroundColor(SSColors.chromeLight)
+                .fontWeight(.bold)
+                .padding(.horizontal, 4)
 
-                HStack(spacing: 12) {
-                    ForEach(AccentTheme.allCases) { theme in
-                        Button {
-                            withAnimation(.easeInOut(duration: 0.25)) {
-                                themeManager.current = theme
-                            }
-                        } label: {
-                            ZStack {
-                                Circle()
-                                    .fill(theme.primary)
-                                    .frame(width: 36, height: 36)
-
-                                if themeManager.current == theme {
-                                    Circle()
-                                        .stroke(theme.primary, lineWidth: 2.5)
-                                        .frame(width: 44, height: 44)
-                                    Image(systemName: "checkmark")
-                                        .font(.system(size: 12, weight: .bold))
-                                        .foregroundColor(SSColors.darkBase)
-                                }
-                            }
-                            .frame(width: 44, height: 44)
-                        }
-                        .buttonStyle(.plain)
-                    }
+            TabView(selection: $previewTheme) {
+                ForEach(AccentTheme.allCases) { theme in
+                    ThemePreviewCard(
+                        theme: theme,
+                        isActive: themeManager.current == theme
+                    )
+                    .tag(theme)
                 }
-                .frame(maxWidth: .infinity)
             }
+            .tabViewStyle(.page(indexDisplayMode: .never))
+            .frame(height: 180)
+            .onChange(of: previewTheme) { _, newTheme in
+                withAnimation(.easeInOut(duration: 0.35)) {
+                    themeManager.current = newTheme
+                }
+                UIImpactFeedbackGenerator(style: .light).impactOccurred()
+            }
+            .onAppear { previewTheme = themeManager.current }
+
+            HStack(spacing: 8) {
+                ForEach(AccentTheme.allCases) { theme in
+                    Circle()
+                        .fill(theme == previewTheme ? theme.primary : Color.white.opacity(0.25))
+                        .frame(width: 6, height: 6)
+                }
+            }
+            .frame(maxWidth: .infinity)
         }
     }
 
@@ -251,6 +251,96 @@ struct SettingsScreen: View {
                 .buttonStyle(.plain)
             }
         }
+    }
+}
+
+private struct ThemePreviewCard: View {
+    let theme: AccentTheme
+    let isActive: Bool
+
+    var body: some View {
+        ZStack {
+            // Background gradient preview
+            RoundedRectangle(cornerRadius: 22)
+                .fill(
+                    LinearGradient(
+                        colors: [theme.colors.darkElevated, theme.colors.darkBase],
+                        startPoint: .top, endPoint: .bottom
+                    )
+                )
+
+            // Glow
+            RadialGradient(
+                colors: [theme.backdropGlow, Color.clear],
+                center: .topLeading,
+                startRadius: 0, endRadius: 200
+            )
+            .clipShape(RoundedRectangle(cornerRadius: 22))
+
+            // Content preview
+            VStack(spacing: 16) {
+                Text(theme.label)
+                    .font(SSTypography.headlineMedium)
+                    .foregroundColor(.white.opacity(0.94))
+                    .fontWeight(.bold)
+
+                // Mini UI preview
+                HStack(spacing: 10) {
+                    // Mock album card
+                    RoundedRectangle(cornerRadius: 10)
+                        .fill(
+                            LinearGradient(
+                                colors: [theme.primary.opacity(0.6), theme.secondary.opacity(0.4)],
+                                startPoint: .topLeading, endPoint: .bottomTrailing
+                            )
+                        )
+                        .frame(width: 50, height: 50)
+
+                    VStack(alignment: .leading, spacing: 4) {
+                        RoundedRectangle(cornerRadius: 4)
+                            .fill(Color.white.opacity(0.7))
+                            .frame(width: 90, height: 10)
+                        RoundedRectangle(cornerRadius: 4)
+                            .fill(Color.white.opacity(0.35))
+                            .frame(width: 60, height: 8)
+                        HStack(spacing: 3) {
+                            ForEach(0..<5, id: \.self) { i in
+                                Image(systemName: i < 4 ? "star.fill" : "star")
+                                    .font(.system(size: 8))
+                                    .foregroundColor(SSColors.accentAmber)
+                            }
+                        }
+                    }
+                    Spacer()
+                }
+                .padding(.horizontal, 14)
+                .padding(.vertical, 10)
+                .background(
+                    RoundedRectangle(cornerRadius: 14)
+                        .fill(.ultraThinMaterial)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 14)
+                                .stroke(Color.white.opacity(0.14), lineWidth: 0.5)
+                        )
+                )
+                .padding(.horizontal, 20)
+
+                // Mock tab bar dots
+                HStack(spacing: 20) {
+                    ForEach(0..<5, id: \.self) { i in
+                        Circle()
+                            .fill(i == 0 ? theme.primary : Color.white.opacity(0.3))
+                            .frame(width: 8, height: 8)
+                    }
+                }
+            }
+        }
+        .overlay(
+            RoundedRectangle(cornerRadius: 22)
+                .stroke(isActive ? theme.primary : Color.white.opacity(0.12), lineWidth: isActive ? 2 : 0.5)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 22))
+        .padding(.horizontal, 8)
     }
 }
 
