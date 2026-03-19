@@ -21,7 +21,14 @@ struct AlbumArtwork: View {
                         switch phase {
                         case .success(let image):
                             image.resizable().scaledToFill()
-                        default:
+                        case .failure(let error):
+                            #if DEBUG
+                            let _ = print("[AlbumArtwork] Failed to load \(url): \(error)")
+                            #endif
+                            Color.clear
+                        case .empty:
+                            shimmerOverlay(size: geo.size)
+                        @unknown default:
                             shimmerOverlay(size: geo.size)
                         }
                     }

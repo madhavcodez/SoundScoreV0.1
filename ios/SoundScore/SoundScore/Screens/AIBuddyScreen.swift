@@ -25,12 +25,25 @@ struct AIBuddyScreen: View {
                 confirmationBanner(confirmation)
             }
 
-            // Suggestion chips
-            if !viewModel.suggestions.isEmpty {
-                suggestionChips.padding(.bottom, 8)
+            // Inline search results from Cadence
+            if !viewModel.searchResults.isEmpty {
+                CadenceSearchResultsCard(
+                    results: viewModel.searchResults,
+                    onAdd: { viewModel.addSearchResultToLibrary($0) },
+                    onDismiss: { viewModel.dismissSearchResults() }
+                )
+                .padding(.horizontal, 16)
+                .padding(.bottom, 8)
+                .transition(.move(edge: .top).combined(with: .opacity))
             }
 
             chatArea
+
+            // Suggestion chips above input
+            if !viewModel.suggestions.isEmpty {
+                suggestionChips.padding(.bottom, 4)
+            }
+
             inputBar
         }
         .background(AppBackdrop())

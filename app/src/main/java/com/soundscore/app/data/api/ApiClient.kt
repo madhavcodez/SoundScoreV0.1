@@ -8,7 +8,7 @@ import retrofit2.Retrofit
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 
 object ApiClient {
-    private const val DEFAULT_BASE_URL = "http://10.0.2.2:8080"
+    private const val DEFAULT_BASE_URL = com.soundscore.app.BuildConfig.API_BASE_URL
 
     private val json = Json {
         ignoreUnknownKeys = true

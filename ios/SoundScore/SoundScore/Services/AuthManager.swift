@@ -19,7 +19,7 @@ class AuthManager: ObservableObject {
     }()
     private let encoder = JSONEncoder()
 
-    private init(baseURL: String = "http://localhost:8080") {
+    private init(baseURL: String = AppConfig.apiBaseURL) {
         self.baseURL = baseURL
         self.accessToken = UserDefaults.standard.string(forKey: "ss_accessToken")
         self.refreshTokenValue = UserDefaults.standard.string(forKey: "ss_refreshToken")
@@ -45,16 +45,20 @@ class AuthManager: ObservableObject {
         await applyAuth(response)
     }
 
-    @MainActor
-    func devLogin(handle: String) {
-        accessToken = "dev_token_\(UUID().uuidString)"
-        refreshTokenValue = "dev_refresh_\(UUID().uuidString)"
-        currentHandle = handle
-        isAuthenticated = true
-        UserDefaults.standard.set(accessToken, forKey: "ss_accessToken")
-        UserDefaults.standard.set(refreshTokenValue, forKey: "ss_refreshToken")
-        UserDefaults.standard.set(handle, forKey: "ss_handle")
+    #if DEBUG
+    /// Attempts signup with dev credentials, falls back to login if account already exists.
+    func devAutoSignup() async throws {
+        let email = "dev@soundscore.test"
+        let password = "devpass1234"
+        let handle = "madhav"
+        do {
+            try await signup(email: email, password: password, handle: handle)
+        } catch ApiError.serverError(let code, _) where code == 409 {
+            // Account already exists — fall back to login
+            try await login(email: email, password: password)
+        }
     }
+    #endif
 
     func refresh() async throws {
         guard let token = refreshTokenValue else { throw ApiError.unauthorized }

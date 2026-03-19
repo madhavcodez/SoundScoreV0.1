@@ -3,10 +3,10 @@ import SwiftUI
 struct AuthScreen: View {
     @EnvironmentObject var authManager: AuthManager
 
-    @State private var email = ""
-    @State private var password = ""
-    @State private var handle = ""
-    @State private var isSignup = false
+    @State private var email = "dev@soundscore.test"
+    @State private var password = "devpass1234"
+    @State private var handle = "madhav"
+    @State private var isSignup = true
     @State private var isLoading = false
     @State private var errorMessage: String?
 
@@ -113,9 +113,16 @@ struct AuthScreen: View {
         Task {
             do {
                 if isSignup {
-                    try await authManager.signup(
-                        email: email, password: password, handle: handle
-                    )
+                    do {
+                        try await authManager.signup(
+                            email: email, password: password, handle: handle
+                        )
+                    } catch ApiError.serverError(let code, _) where code == 409 {
+                        // Account already exists — fall back to login
+                        try await authManager.login(
+                            email: email, password: password
+                        )
+                    }
                 } else {
                     try await authManager.login(
                         email: email, password: password

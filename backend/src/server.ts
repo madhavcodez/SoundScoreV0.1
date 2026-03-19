@@ -103,7 +103,7 @@ export const buildServer = async () => {
 
   // CORS with explicit origin allowlist
   app.register(cors, {
-    origin: env.app.allowedOrigins,
+    origin: env.app.allowedOrigins.includes("*") ? true : env.app.allowedOrigins,
     credentials: true,
   });
 

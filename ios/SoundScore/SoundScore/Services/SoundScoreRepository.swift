@@ -343,10 +343,12 @@ class SoundScoreRepository: ObservableObject {
         let colors = SeedData.albums.first { $0.id == dto.id }?.artColors
             ?? SeedData.albums.randomElement()?.artColors
             ?? AlbumColors.forest
+        let genres = SeedData.albums.first { $0.id == dto.id }?.genres ?? []
         return Album(
             id: dto.id, title: dto.title, artist: dto.artist, year: dto.year,
             artColors: colors, artworkUrl: dto.artworkUrl,
-            avgRating: dto.avgRating, logCount: dto.logCount
+            avgRating: dto.avgRating, logCount: dto.logCount,
+            genres: genres
         )
     }
 

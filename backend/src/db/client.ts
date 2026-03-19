@@ -13,15 +13,20 @@ export type Db = {
 };
 
 export const createDb = (): Db => {
+  const isProduction = env.app.nodeEnv === "production";
   const pool = new Pool({
     connectionString: env.postgres.connectionString,
     connectionTimeoutMillis: 5_000,
+    ...(isProduction && { ssl: { rejectUnauthorized: false } }),
   });
 
-  const redis = new Redis(env.redis.url, {
+  const redisUrl = env.redis.url;
+  const useTls = redisUrl.startsWith("rediss://");
+  const redis = new Redis(redisUrl, {
     maxRetriesPerRequest: 1,
     lazyConnect: false,
     retryStrategy: (times) => (times <= 3 ? Math.min(times * 200, 2000) : null),
+    ...(useTls && { tls: {} }),
   });
 
   return {

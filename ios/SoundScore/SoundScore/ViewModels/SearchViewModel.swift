@@ -80,7 +80,9 @@ class SearchViewModel: ObservableObject {
                     artColors: AlbumColors.forest,
                     artworkUrl: result.artworkUrl,
                     avgRating: 0,
-                    logCount: 0
+                    logCount: 0,
+                    spotifyId: result.spotifyId,
+                    genres: result.genres
                 )
             }
 

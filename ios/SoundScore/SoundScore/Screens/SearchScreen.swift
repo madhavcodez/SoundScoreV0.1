@@ -168,25 +168,40 @@ private struct GenreCard: View {
             UIImpactFeedbackGenerator(style: .light).impactOccurred()
             onTap()
         } label: {
-            GlassCard(tintColor: genre.colors.last, cornerRadius: 20, borderColor: SSColors.feedItemBorder) {
-                VStack(alignment: .leading, spacing: 0) {
-                    RoundedRectangle(cornerRadius: 10)
-                        .fill(LinearGradient(colors: genre.colors, startPoint: .topLeading, endPoint: .bottomTrailing))
-                        .frame(width: 32, height: 32)
+            ZStack(alignment: .bottomLeading) {
+                LinearGradient(
+                    colors: genre.colors + [genre.colors.first?.opacity(0.6) ?? .clear],
+                    startPoint: .topTrailing,
+                    endPoint: .bottomLeading
+                )
+
+                // Subtle noise texture effect
+                LinearGradient(
+                    colors: [.white.opacity(0.08), .clear, .black.opacity(0.15)],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+
+                VStack(alignment: .leading, spacing: 4) {
                     Spacer()
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(genre.name)
-                            .font(SSTypography.titleMedium)
-                            .fontWeight(.bold)
-                            .foregroundColor(SSColors.chromeLight)
-                        Text(genre.caption)
-                            .font(SSTypography.bodySmall)
-                            .foregroundColor(SSColors.textSecondary)
-                    }
+                    Text(genre.name)
+                        .font(.system(size: 18, weight: .bold, design: .rounded))
+                        .foregroundColor(.white)
+                    Text(genre.caption)
+                        .font(SSTypography.labelSmall)
+                        .foregroundColor(.white.opacity(0.75))
+                        .lineLimit(2)
                 }
+                .padding(14)
             }
             .frame(maxWidth: .infinity)
-            .frame(height: 120)
+            .frame(height: 110)
+            .clipShape(RoundedRectangle(cornerRadius: 18))
+            .overlay(
+                RoundedRectangle(cornerRadius: 18)
+                    .stroke(.white.opacity(0.12), lineWidth: 0.5)
+            )
+            .shadow(color: genre.colors.first?.opacity(0.3) ?? .clear, radius: 8, y: 4)
         }
         .buttonStyle(.plain)
     }

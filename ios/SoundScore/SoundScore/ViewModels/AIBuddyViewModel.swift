@@ -17,6 +17,7 @@ class AIBuddyViewModel: ObservableObject {
     @Published var errorMessage: String?
     @Published var suggestions: [SuggestionChip] = []
     @Published var actionConfirmation: String?
+    @Published var searchResults: [SpotifyAlbumResult] = []
 
     init() {
         messages.append(ChatMessage(
@@ -80,6 +81,11 @@ class AIBuddyViewModel: ObservableObject {
                 self.messages.append(msg)
                 self.isThinking = false
                 self.cadenceState = .happy
+                // Handle search actions
+                let searchActions = result.actions.filter { $0.type == .searchAlbum }
+                if let first = searchActions.first {
+                    await self.handleSearchAction(query: first.value)
+                }
                 self.generateFollowUpSuggestions(hadActions: !result.actions.isEmpty)
                 DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                     if self.cadenceState == .happy { self.cadenceState = .idle }
@@ -121,6 +127,36 @@ class AIBuddyViewModel: ObservableObject {
         if let idx = messages.firstIndex(where: { $0.id == messageId }) {
             messages[idx].actions.removeAll { $0.id == actionId }
         }
+    }
+
+    // MARK: - Search Actions
+
+    func handleSearchAction(query: String) async {
+        let results = await SpotifyService.shared.searchAlbums(query: query, limit: 5)
+        self.searchResults = results
+    }
+
+    func addSearchResultToLibrary(_ result: SpotifyAlbumResult) {
+        let album = Album(
+            id: "spot_\(result.spotifyId)",
+            title: result.title,
+            artist: result.artist,
+            year: result.year,
+            artColors: AlbumColors.forest,
+            artworkUrl: result.artworkUrl,
+            spotifyId: result.spotifyId,
+            genres: result.genres
+        )
+        // Add to repository if not already present
+        if !SoundScoreRepository.shared.albums.contains(where: { $0.id == album.id }) {
+            SoundScoreRepository.shared.albums.append(album)
+        }
+        showConfirmation("Added \(result.title) to library")
+        searchResults = []
+    }
+
+    func dismissSearchResults() {
+        searchResults = []
     }
 
     private func showConfirmation(_ text: String) {

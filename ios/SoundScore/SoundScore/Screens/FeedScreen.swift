@@ -4,6 +4,7 @@ struct FeedScreen: View {
     @StateObject private var viewModel = FeedViewModel()
     var onSelectAlbum: (Album) -> Void = { _ in }
     @State private var appeared = false
+    @State private var trendingMode: Int = 0
 
     var body: some View {
         ScrollView {
@@ -16,7 +17,7 @@ struct FeedScreen: View {
 
                 ScreenHeader(
                     title: "Feed",
-                    subtitle: "What your people are logging right now."
+                    subtitle: "The pulse of your circle."
                 )
 
                 if viewModel.isLoading && viewModel.items.isEmpty {
@@ -29,17 +30,35 @@ struct FeedScreen: View {
                     if !viewModel.trendingAlbums.isEmpty {
                         SectionHeader(eyebrow: "Trending", title: "Hot this week")
 
-                        ScrollView(.horizontal, showsIndicators: false) {
-                            LazyHStack(spacing: 14) {
-                                ForEach(Array(viewModel.trendingAlbums.enumerated()), id: \.element.id) { index, album in
-                                    TrendingHeroCard(album: album, rank: index + 1)
-                                        .onTapGesture {
-                                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                                            onSelectAlbum(album)
-                                        }
+                        // Albums/Songs toggle
+                        GlassSegmentedControl(items: ["Albums", "Songs"], selection: $trendingMode)
+
+                        if trendingMode == 0 {
+                            ScrollView(.horizontal, showsIndicators: false) {
+                                LazyHStack(spacing: 14) {
+                                    ForEach(Array(viewModel.trendingAlbums.enumerated()), id: \.element.id) { index, album in
+                                        TrendingHeroCard(album: album, rank: index + 1)
+                                            .onTapGesture {
+                                                UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                                onSelectAlbum(album)
+                                            }
+                                    }
                                 }
+                                .padding(.trailing, 8)
                             }
-                            .padding(.trailing, 8)
+                        } else {
+                            ScrollView(.horizontal, showsIndicators: false) {
+                                LazyHStack(spacing: 12) {
+                                    ForEach(viewModel.trendingSongs.prefix(10)) { song in
+                                        TrendingSongCard(song: song)
+                                            .onTapGesture {
+                                                UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                                onSelectAlbum(song.album)
+                                            }
+                                    }
+                                }
+                                .padding(.trailing, 8)
+                            }
                         }
                     }
 
@@ -248,6 +267,38 @@ private struct FeedActivityCard: View {
                 }
             }
         }
+    }
+}
+
+// MARK: - Trending Song Card
+
+private struct TrendingSongCard: View {
+    let song: TrendingSong
+
+    var body: some View {
+        GlassCard(cornerRadius: 18, borderColor: SSColors.feedItemBorder,
+                  contentPadding: EdgeInsets(top: 10, leading: 10, bottom: 10, trailing: 10)) {
+            HStack(spacing: 10) {
+                AlbumArtwork(artworkUrl: song.album.artworkUrl, colors: song.album.artColors, cornerRadius: 12)
+                    .frame(width: 52, height: 52)
+
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(song.track.title)
+                        .font(SSTypography.titleMedium)
+                        .foregroundColor(SSColors.chromeLight)
+                        .fontWeight(.bold)
+                        .lineLimit(1)
+                    Text(song.album.artist)
+                        .font(SSTypography.bodySmall)
+                        .foregroundColor(SSColors.textSecondary)
+                        .lineLimit(1)
+                    StarRating(rating: song.avgRating, starSize: 11)
+                }
+
+                Spacer(minLength: 0)
+            }
+        }
+        .frame(width: 200)
     }
 }
 

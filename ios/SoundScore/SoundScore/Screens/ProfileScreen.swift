@@ -16,14 +16,12 @@ struct ProfileScreen: View {
                 }
 
                 heroBanner
-                statsRow
-                actionBar
 
                 if !viewModel.favoriteAlbums.isEmpty {
                     favoritesSection
                 }
 
-                if !viewModel.genres.isEmpty {
+                if viewModel.tasteDNA != nil {
                     tasteDNASection
                 }
 
@@ -72,7 +70,7 @@ struct ProfileScreen: View {
                     startPoint: .top, endPoint: .bottom
                 )
             }
-            .frame(height: 280)
+            .frame(height: 300)
 
             VStack(spacing: 10) {
                 ZStack {
@@ -104,74 +102,50 @@ struct ProfileScreen: View {
                     .foregroundColor(SSColors.textSecondary)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, 32)
+
+                // Inline stats
+                inlineStatsText()
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.75)
+                    .padding(.horizontal, 24)
             }
             .padding(.bottom, 20)
         }
+        .overlay(alignment: .topTrailing) {
+            Button { onOpenSettings() } label: {
+                Image(systemName: "gearshape")
+                    .font(.system(size: 15, weight: .medium))
+                    .foregroundColor(SSColors.chromeLight)
+                    .frame(width: 40, height: 40)
+                    .background(.ultraThinMaterial)
+                    .clipShape(Circle())
+                    .overlay(Circle().stroke(SSColors.glassBorder, lineWidth: 0.5))
+            }
+            .buttonStyle(.plain)
+            .padding(.top, 52)
+            .padding(.trailing, 16)
+        }
     }
 
-    // MARK: - Stats
-
-    private var statsRow: some View {
-        HStack(spacing: 10) {
-            ForEach(viewModel.metrics) { metric in
-                GlassCard(cornerRadius: 16, borderColor: SSColors.feedItemBorder,
-                          contentPadding: EdgeInsets(top: 12, leading: 8, bottom: 12, trailing: 8)) {
-                    VStack(spacing: 4) {
-                        Text(metric.value)
-                            .font(SSTypography.headlineMedium)
-                            .foregroundColor(metric.label == "Albums" ? ThemeManager.shared.primary : SSColors.chromeLight)
-                            .fontWeight(.black)
-                        Text(metric.label.uppercased())
-                            .font(SSTypography.labelSmall)
-                            .foregroundColor(SSColors.textTertiary)
-                    }
-                    .frame(maxWidth: .infinity)
-                }
+    private func inlineStatsText() -> Text {
+        let items = viewModel.metrics
+        var result = Text("")
+        for (index, metric) in items.enumerated() {
+            if index > 0 {
+                result = result + Text("  \u{00B7}  ")
+                    .font(SSTypography.bodySmall)
+                    .foregroundColor(SSColors.chromeDim)
             }
+            result = result
+                + Text(metric.value)
+                    .font(SSTypography.bodySmall)
+                    .fontWeight(.bold)
+                    .foregroundColor(ThemeManager.shared.primary)
+                + Text(" \(metric.label.lowercased())")
+                    .font(SSTypography.bodySmall)
+                    .foregroundColor(SSColors.textTertiary)
         }
-        .padding(.horizontal, 20)
-    }
-
-    // MARK: - Actions
-
-    private var actionBar: some View {
-        GlassCard(cornerRadius: 18, borderColor: SSColors.feedItemBorder,
-                  contentPadding: EdgeInsets(top: 10, leading: 14, bottom: 10, trailing: 14)) {
-            HStack(spacing: 12) {
-                Button {} label: {
-                    Text("Edit Profile")
-                        .font(SSTypography.labelLarge)
-                        .foregroundColor(SSColors.chromeLight)
-                        .padding(.horizontal, 20)
-                        .padding(.vertical, 8)
-                        .background(ThemeManager.shared.primary.opacity(0.25))
-                        .clipShape(Capsule())
-                }
-                .buttonStyle(.plain)
-
-                Spacer()
-
-                ShareLink(item: viewModel.shareProfileText()) {
-                    Image(systemName: "square.and.arrow.up")
-                        .font(.system(size: 16))
-                        .foregroundColor(SSColors.chromeMedium)
-                        .frame(width: 36, height: 36)
-                        .background(SSColors.glassBg)
-                        .clipShape(Circle())
-                }
-
-                Button { onOpenSettings() } label: {
-                    Image(systemName: "gearshape")
-                        .font(.system(size: 16))
-                        .foregroundColor(SSColors.chromeMedium)
-                        .frame(width: 36, height: 36)
-                        .background(SSColors.glassBg)
-                        .clipShape(Circle())
-                }
-                .buttonStyle(.plain)
-            }
-        }
-        .padding(.horizontal, 20)
+        return result
     }
 
     // MARK: - Favorites
@@ -229,37 +203,151 @@ struct ProfileScreen: View {
     // MARK: - Taste DNA
 
     private var tasteDNASection: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 14) {
             SectionHeader(eyebrow: "Your vibe", title: "Taste DNA")
                 .padding(.horizontal, 20)
 
-            ScrollView(.horizontal, showsIndicators: false) {
-                LazyHStack(spacing: 10) {
+            if let dna = viewModel.tasteDNA {
+                // Sound DNA summary (AI-generated 3-word tagline)
+                if let summary = viewModel.soundDNASummary {
+                    Text(summary)
+                        .font(.system(size: 26, weight: .black, design: .rounded))
+                        .foregroundStyle(
+                            LinearGradient(
+                                colors: [ThemeManager.shared.primary, SSColors.accentViolet],
+                                startPoint: .leading, endPoint: .trailing
+                            )
+                        )
+                        .padding(.horizontal, 20)
+                        .padding(.bottom, 4)
+                }
+
+                // Top Genres — horizontal bar chart with animated entry
+                VStack(alignment: .leading, spacing: 8) {
                     let palettes: [[Color]] = [
                         AlbumColors.forest, AlbumColors.orchid, AlbumColors.lagoon,
                         AlbumColors.ember, AlbumColors.rose, AlbumColors.midnight,
                     ]
-                    ForEach(Array(viewModel.genres.enumerated()), id: \.offset) { index, genre in
-                        Text(genre)
-                            .font(SSTypography.labelLarge)
-                            .fontWeight(.bold)
-                            .foregroundColor(.white)
-                            .padding(.horizontal, 16)
-                            .padding(.vertical, 14)
-                            .frame(height: 56)
-                            .background(
-                                LinearGradient(
-                                    colors: palettes[index % palettes.count],
-                                    startPoint: .topLeading, endPoint: .bottomTrailing
-                                )
-                            )
-                            .clipShape(RoundedRectangle(cornerRadius: 14))
-                            .overlay(RoundedRectangle(cornerRadius: 14).stroke(Color.white.opacity(0.15), lineWidth: 0.5))
+                    ForEach(Array(dna.topGenres.enumerated()), id: \.element.genre) { index, entry in
+                        GenreBarRow(
+                            genre: entry.genre,
+                            weight: entry.weight,
+                            colors: palettes[index % palettes.count],
+                            delay: Double(index) * 0.1
+                        )
                     }
                 }
                 .padding(.horizontal, 20)
+
+                // Taste Stats Row — 3 glass pills
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 10) {
+                        tasteStatPill(
+                            icon: "scalemass",
+                            label: dna.ratingStyle,
+                            colors: AlbumColors.amber
+                        )
+                        if let topDecade = dna.decadeBreakdown.first {
+                            tasteStatPill(
+                                icon: "calendar",
+                                label: "\(topDecade.decade) Native",
+                                colors: AlbumColors.lagoon
+                            )
+                        }
+                        tasteStatPill(
+                            icon: "globe",
+                            label: "Explorer \(String(format: "%.1f", dna.diversityScore))",
+                            colors: AlbumColors.orchid
+                        )
+                    }
+                    .padding(.horizontal, 20)
+                }
+
+                // Controversial Pick
+                if let pick = dna.controversialPick {
+                    GlassCard(tintColor: SSColors.accentCoral, cornerRadius: 18,
+                              borderColor: SSColors.accentCoral.opacity(0.3)) {
+                        VStack(alignment: .leading, spacing: 6) {
+                            HStack(spacing: 6) {
+                                Image(systemName: "flame.fill")
+                                    .foregroundColor(SSColors.accentCoral)
+                                    .font(.system(size: 14))
+                                Text("Hottest Take")
+                                    .font(SSTypography.labelMedium)
+                                    .foregroundColor(SSColors.accentCoral)
+                                    .fontWeight(.bold)
+                            }
+                            Text("You gave **\(pick.album)** a \(String(format: "%.1f", pick.rating)) when the community says \(String(format: "%.1f", pick.communityAvg))")
+                                .font(SSTypography.bodyMedium)
+                                .foregroundColor(SSColors.chromeLight)
+                        }
+                    }
+                    .padding(.horizontal, 20)
+                }
             }
         }
+        .onAppear { viewModel.generateSoundDNA() }
+    }
+
+    // MARK: - Animated Genre Bar
+
+    private struct GenreBarRow: View {
+        let genre: String
+        let weight: Float
+        let colors: [Color]
+        let delay: Double
+        @State private var animatedWidth: CGFloat = 0
+
+        var body: some View {
+            HStack(spacing: 10) {
+                Text(genre)
+                    .font(SSTypography.labelMedium)
+                    .foregroundColor(SSColors.chromeLight)
+                    .frame(width: 100, alignment: .leading)
+
+                GeometryReader { geo in
+                    RoundedRectangle(cornerRadius: 6)
+                        .fill(
+                            LinearGradient(
+                                colors: colors,
+                                startPoint: .leading, endPoint: .trailing
+                            )
+                        )
+                        .frame(width: animatedWidth)
+                        .onAppear {
+                            let target = max(geo.size.width * CGFloat(weight), 20)
+                            withAnimation(.spring(response: 0.6, dampingFraction: 0.7).delay(delay)) {
+                                animatedWidth = target
+                            }
+                        }
+                }
+                .frame(height: 20)
+
+                Text("\(Int(weight * 100))%")
+                    .font(SSTypography.labelSmall)
+                    .foregroundColor(SSColors.textTertiary)
+                    .frame(width: 36, alignment: .trailing)
+            }
+        }
+    }
+
+    private func tasteStatPill(icon: String, label: String, colors: [Color]) -> some View {
+        HStack(spacing: 6) {
+            Image(systemName: icon)
+                .font(.system(size: 13))
+                .foregroundStyle(
+                    LinearGradient(colors: colors, startPoint: .topLeading, endPoint: .bottomTrailing)
+                )
+            Text(label)
+                .font(SSTypography.labelMedium)
+                .foregroundColor(SSColors.chromeLight)
+                .fontWeight(.semibold)
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 10)
+        .background(SSColors.glassBg)
+        .clipShape(Capsule())
+        .overlay(Capsule().stroke(SSColors.glassBorder, lineWidth: 0.5))
     }
 
     // MARK: - Recap

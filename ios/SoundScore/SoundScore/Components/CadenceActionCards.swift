@@ -303,6 +303,96 @@ struct CadenceBatchRatingCard: View {
     }
 }
 
+// MARK: - Search Results Card
+
+struct CadenceSearchResultsCard: View {
+    let results: [SpotifyAlbumResult]
+    var onAdd: (SpotifyAlbumResult) -> Void
+    var onDismiss: () -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Image(systemName: "magnifyingglass")
+                    .foregroundColor(ThemeManager.shared.primary)
+                Text("Found Albums")
+                    .font(SSTypography.titleMedium)
+                    .foregroundColor(SSColors.chromeLight)
+                    .fontWeight(.bold)
+                Spacer()
+                Button { onDismiss() } label: {
+                    Image(systemName: "xmark")
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundColor(SSColors.chromeFaint)
+                        .frame(width: 28, height: 28)
+                        .background(SSColors.glassBg)
+                        .clipShape(Circle())
+                }
+                .buttonStyle(.plain)
+            }
+
+            ScrollView(.horizontal, showsIndicators: false) {
+                LazyHStack(spacing: 12) {
+                    ForEach(Array(results.enumerated()), id: \.element.spotifyId) { _, result in
+                        VStack(spacing: 8) {
+                            AsyncImage(url: URL(string: result.artworkUrl)) { phase in
+                                switch phase {
+                                case .success(let image):
+                                    image.resizable().scaledToFill()
+                                default:
+                                    LinearGradient(
+                                        colors: AlbumColors.forest,
+                                        startPoint: .topLeading, endPoint: .bottomTrailing
+                                    )
+                                }
+                            }
+                            .frame(width: 100, height: 100)
+                            .clipShape(RoundedRectangle(cornerRadius: 14))
+
+                            Text(result.title)
+                                .font(SSTypography.labelMedium)
+                                .foregroundColor(SSColors.chromeLight)
+                                .fontWeight(.bold)
+                                .lineLimit(1)
+                                .frame(width: 100)
+
+                            Text(result.artist)
+                                .font(SSTypography.labelSmall)
+                                .foregroundColor(SSColors.textSecondary)
+                                .lineLimit(1)
+                                .frame(width: 100)
+
+                            Button {
+                                UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                                onAdd(result)
+                            } label: {
+                                Text("Add")
+                                    .font(SSTypography.labelSmall)
+                                    .fontWeight(.bold)
+                                    .foregroundColor(SSColors.darkBase)
+                                    .padding(.horizontal, 16)
+                                    .padding(.vertical, 6)
+                                    .background(ThemeManager.shared.primary)
+                                    .clipShape(Capsule())
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    }
+                }
+            }
+        }
+        .padding(14)
+        .background(
+            RoundedRectangle(cornerRadius: 20).fill(.ultraThinMaterial)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 20)
+                        .stroke(ThemeManager.shared.primary.opacity(0.3), lineWidth: 1)
+                )
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 20))
+    }
+}
+
 // MARK: - Quick Rate Card
 
 struct CadenceQuickRateCard: View {
