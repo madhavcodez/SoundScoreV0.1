@@ -55,6 +55,7 @@
 		E10000010000000000000005 /* SoundScoreRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = E10000020000000000000005; };
 		E10000010000000000000006 /* SpotifyService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E10000020000000000000006; };
 		G10000010000000000000001 /* Secrets.swift in Sources */ = {isa = PBXBuildFile; fileRef = G10000020000000000000001; };
+		G10000010000000000000003 /* AppConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = G10000020000000000000003; };
 		A10000010000000000000013 /* AuthScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000013; };
 		F10000010000000000000001 /* AlbumDetailScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = F10000020000000000000001; };
 		F10000010000000000000002 /* SettingsScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = F10000020000000000000002; };
@@ -72,6 +73,7 @@
 		Q10000010000000000000001 /* CadenceActionCards.swift in Sources */ = {isa = PBXBuildFile; fileRef = Q10000020000000000000001; };
 		P10000010000000000000002 /* AlbumRatingSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = P10000020000000000000002; };
 		N10000010000000000000009 /* AIBuddyViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = N10000020000000000000009; };
+		Z10000010000000000000001 /* GlassSegmentedControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = Z10000020000000000000001; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -125,6 +127,7 @@
 		E10000020000000000000006 /* SpotifyService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotifyService.swift; sourceTree = "<group>"; };
 		G10000020000000000000001 /* Secrets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Secrets.swift; sourceTree = "<group>"; };
 		G10000020000000000000002 /* Secrets.swift.template */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Secrets.swift.template"; sourceTree = "<group>"; };
+		G10000020000000000000003 /* AppConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConfig.swift; sourceTree = "<group>"; };
 		A10000020000000000000013 /* AuthScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthScreen.swift; sourceTree = "<group>"; };
 		F10000020000000000000001 /* AlbumDetailScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumDetailScreen.swift; sourceTree = "<group>"; };
 		F10000020000000000000002 /* SettingsScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsScreen.swift; sourceTree = "<group>"; };
@@ -142,6 +145,7 @@
 		Q10000020000000000000001 /* CadenceActionCards.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CadenceActionCards.swift; sourceTree = "<group>"; };
 		P10000020000000000000002 /* AlbumRatingSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumRatingSheet.swift; sourceTree = "<group>"; };
 		N10000020000000000000009 /* AIBuddyViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIBuddyViewModel.swift; sourceTree = "<group>"; };
+		Z10000020000000000000001 /* GlassSegmentedControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlassSegmentedControl.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -208,6 +212,7 @@
 				P10000020000000000000001 /* SongRatingSheet.swift */,
 				P10000020000000000000002 /* AlbumRatingSheet.swift */,
 				Q10000020000000000000001 /* CadenceActionCards.swift */,
+				Z10000020000000000000001 /* GlassSegmentedControl.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -286,6 +291,7 @@
 			children = (
 				G10000020000000000000001 /* Secrets.swift */,
 				G10000020000000000000002 /* Secrets.swift.template */,
+				G10000020000000000000003 /* AppConfig.swift */,
 			);
 			path = Config;
 			sourceTree = "<group>";
@@ -389,6 +395,7 @@
 				E10000010000000000000005 /* SoundScoreRepository.swift in Sources */,
 				E10000010000000000000006 /* SpotifyService.swift in Sources */,
 				G10000010000000000000001 /* Secrets.swift in Sources */,
+				G10000010000000000000003 /* AppConfig.swift in Sources */,
 				A10000010000000000000013 /* AuthScreen.swift in Sources */,
 				F10000010000000000000001 /* AlbumDetailScreen.swift in Sources */,
 				F10000010000000000000002 /* SettingsScreen.swift in Sources */,
@@ -406,6 +413,7 @@
 				P10000010000000000000001 /* SongRatingSheet.swift in Sources */,
 				P10000010000000000000002 /* AlbumRatingSheet.swift in Sources */,
 				Q10000010000000000000001 /* CadenceActionCards.swift in Sources */,
+				Z10000010000000000000001 /* GlassSegmentedControl.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

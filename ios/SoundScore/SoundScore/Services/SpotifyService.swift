@@ -45,7 +45,11 @@ actor SpotifyService {
                     artist: album.artists.first?.name ?? "Unknown",
                     artworkUrl: imageUrl,
                     spotifyId: album.id,
-                    year: parseYear(album.releaseDate)
+                    year: parseYear(album.releaseDate),
+                    genres: album.genres ?? [],
+                    popularity: album.popularity ?? 0,
+                    totalTracks: album.totalTracks ?? 0,
+                    label: album.label
                 )
             }
         } catch {
@@ -65,6 +69,40 @@ actor SpotifyService {
         guard let first = results.first else { return nil }
         artworkCache[cacheKey] = first.artworkUrl
         return first.artworkUrl
+    }
+
+    /// Fetch full album detail (richer genre data than search)
+    func fetchAlbumDetail(spotifyId: String) async -> SpotifyAlbumResult? {
+        do {
+            let token = try await ensureToken()
+            guard let url = URL(string: "https://api.spotify.com/v1/albums/\(spotifyId)") else { return nil }
+
+            var request = URLRequest(url: url)
+            request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+
+            let (data, response) = try await URLSession.shared.data(for: request)
+            guard let http = response as? HTTPURLResponse, http.statusCode == 200 else { return nil }
+
+            let album = try JSONDecoder().decode(SpotifyAlbum.self, from: data)
+            guard let imageUrl = album.images.first?.url else { return nil }
+
+            return SpotifyAlbumResult(
+                title: album.name,
+                artist: album.artists.first?.name ?? "Unknown",
+                artworkUrl: imageUrl,
+                spotifyId: album.id,
+                year: parseYear(album.releaseDate),
+                genres: album.genres ?? [],
+                popularity: album.popularity ?? 0,
+                totalTracks: album.totalTracks ?? 0,
+                label: album.label
+            )
+        } catch {
+            #if DEBUG
+            print("[Spotify] Album detail error: \(error)")
+            #endif
+            return nil
+        }
     }
 
     /// Fetch tracks for a Spotify album
@@ -138,6 +176,23 @@ struct SpotifyAlbumResult {
     let artworkUrl: String
     let spotifyId: String
     let year: Int
+    var genres: [String]
+    var popularity: Int
+    var totalTracks: Int
+    var label: String?
+
+    init(title: String, artist: String, artworkUrl: String, spotifyId: String, year: Int,
+         genres: [String] = [], popularity: Int = 0, totalTracks: Int = 0, label: String? = nil) {
+        self.title = title
+        self.artist = artist
+        self.artworkUrl = artworkUrl
+        self.spotifyId = spotifyId
+        self.year = year
+        self.genres = genres
+        self.popularity = popularity
+        self.totalTracks = totalTracks
+        self.label = label
+    }
 }
 
 struct SpotifyTrackResult {
@@ -179,14 +234,20 @@ private struct SpotifyAlbum: Decodable {
     let artists: [SpotifyArtist]
     let images: [SpotifyImage]
     let releaseDate: String
+    let genres: [String]?
+    let label: String?
+    let popularity: Int?
+    let totalTracks: Int?
 
     enum CodingKeys: String, CodingKey {
-        case id, name, artists, images
+        case id, name, artists, images, genres, label, popularity
         case releaseDate = "release_date"
+        case totalTracks = "total_tracks"
     }
 }
 
 private struct SpotifyArtist: Decodable {
+    let id: String
     let name: String
 }
 

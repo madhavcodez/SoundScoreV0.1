@@ -6,6 +6,7 @@ class LogViewModel: ObservableObject {
     @Published var ratings: [String: Float]
     @Published var summaryStats: [LogSummaryStat]
     @Published var recentLogs: [RecentLogEntry]
+    @Published var recentSongLogs: [RecentSongLogEntry]
     @Published var syncMessage: String?
     @Published var isLoading: Bool
     @Published var errorMessage: String?
@@ -16,6 +17,11 @@ class LogViewModel: ObservableObject {
         self.ratings = repo.ratings
         self.summaryStats = buildLogSummaryStats(repo.ratings)
         self.recentLogs = buildRecentLogs(repo.albums, repo.ratings)
+        self.recentSongLogs = buildRecentSongLogs(
+            tracksByAlbum: repo.tracksByAlbum,
+            trackRatings: repo.trackRatings,
+            albums: repo.albums
+        )
         self.syncMessage = repo.syncMessage
         self.isLoading = repo.isLoading
         self.errorMessage = repo.errorMessage
@@ -37,6 +43,11 @@ class LogViewModel: ObservableObject {
             .receive(on: RunLoop.main)
             .map { buildRecentLogs($0, $1) }
             .assign(to: &$recentLogs)
+
+        Publishers.CombineLatest3(repo.$tracksByAlbum, repo.$trackRatings, repo.$albums)
+            .receive(on: RunLoop.main)
+            .map { buildRecentSongLogs(tracksByAlbum: $0, trackRatings: $1, albums: $2) }
+            .assign(to: &$recentSongLogs)
 
         repo.$syncMessage
             .receive(on: RunLoop.main)

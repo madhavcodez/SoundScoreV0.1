@@ -13,10 +13,9 @@ struct ContentView: View {
         Group {
             if showSplash {
                 SplashScreen {
-                    withAnimation(.easeInOut(duration: 0.3)) {
-                        showSplash = false
-                    }
+                    showSplash = false
                 }
+                .transition(.opacity)
             } else if authManager.isAuthenticated {
                 NavigationStack {
                     ZStack(alignment: .bottom) {

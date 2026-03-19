@@ -4,21 +4,22 @@ struct SyncBanner: View {
     let message: String?
 
     var body: some View {
-        if let message {
+        if message != nil {
             HStack(spacing: 8) {
-                Image(systemName: "icloud.slash")
-                    .font(.system(size: 14, weight: .medium))
-                Text(message)
-                    .font(SSTypography.bodySmall)
+                ProgressView()
+                    .tint(SSColors.accentAmber)
+                    .scaleEffect(0.8)
+                Text("Syncing...")
+                    .font(SSTypography.labelMedium)
+                    .fontWeight(.semibold)
             }
             .foregroundColor(SSColors.accentAmber)
-            .padding(.horizontal, 14)
-            .padding(.vertical, 10)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .background(
-                RoundedRectangle(cornerRadius: 14)
-                    .fill(SSColors.accentAmberDim)
-            )
+            .padding(.horizontal, 16)
+            .padding(.vertical, 8)
+            .background(SSColors.accentAmberDim)
+            .clipShape(Capsule())
+            .overlay(Capsule().stroke(SSColors.accentAmber.opacity(0.3), lineWidth: 0.5))
+            .frame(maxWidth: .infinity, alignment: .center)
             .transition(.move(edge: .top).combined(with: .opacity))
         }
     }

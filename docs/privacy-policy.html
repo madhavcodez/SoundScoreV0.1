@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SoundScore Privacy Policy</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --fg: #1a1a1a;
+      --muted: #555;
+      --border: #ddd;
+      --accent: #2563eb;
+      --max-width: 720px;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #111;
+        --fg: #e5e5e5;
+        --muted: #999;
+        --border: #333;
+        --accent: #60a5fa;
+      }
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--fg);
+      line-height: 1.7;
+      padding: 2rem 1.5rem;
+      max-width: var(--max-width);
+      margin: 0 auto;
+    }
+    h1 { font-size: 1.75rem; margin-bottom: 0.25rem; }
+    h2 { font-size: 1.25rem; margin-top: 2rem; margin-bottom: 0.5rem; }
+    h3 { font-size: 1.05rem; margin-top: 1.25rem; margin-bottom: 0.35rem; }
+    p, li { margin-bottom: 0.6rem; }
+    ul { padding-left: 1.5rem; }
+    .effective { color: var(--muted); font-size: 0.9rem; margin-bottom: 2rem; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+    .contact { background: var(--border); padding: 1rem 1.25rem; border-radius: 8px; margin-top: 1rem; }
+    .contact p { margin-bottom: 0.3rem; }
+  </style>
+</head>
+<body>
+
+<h1>SoundScore Privacy Policy</h1>
+<p class="effective">Effective date: March 19, 2026</p>
+
+<p>
+  SoundScore ("we", "us", or "our") is a music logging and rating application that
+  helps you track, rate, and review the albums you listen to. This Privacy Policy
+  explains what data we collect, how we use it, and what rights you have.
+</p>
+
+<hr>
+
+<h2>1. Information We Collect</h2>
+
+<h3>1.1 Account Information</h3>
+<p>When you create a SoundScore account, we collect:</p>
+<ul>
+  <li><strong>Email address</strong> -- used for authentication and account recovery.</li>
+  <li><strong>Handle (username)</strong> -- your public display name in the app.</li>
+  <li><strong>Password</strong> -- stored only as a salted bcrypt hash; we never store or transmit your plaintext password.</li>
+</ul>
+
+<h3>1.2 User-Generated Content</h3>
+<p>As you use SoundScore, we store:</p>
+<ul>
+  <li><strong>Album ratings</strong> (0--6 star scale), including per-track ratings.</li>
+  <li><strong>Reviews</strong> -- text reviews you write for albums.</li>
+  <li><strong>Lists</strong> -- curated album lists you create.</li>
+  <li><strong>Listening history</strong> -- records of albums you have listened to, including timestamps.</li>
+  <li><strong>Social activity</strong> -- follows, reactions, and comments on feed items.</li>
+</ul>
+
+<h3>1.3 Spotify Data</h3>
+<p>
+  If you connect your Spotify account, we access the following data through the
+  Spotify Web API with your explicit consent:
+</p>
+<ul>
+  <li><strong>Recently played tracks</strong> -- to import your listening history into SoundScore.</li>
+  <li><strong>Email address</strong> (from Spotify profile) -- for account linking purposes only.</li>
+  <li><strong>Library data</strong> -- to identify albums you have saved.</li>
+</ul>
+<p>
+  We do <strong>not</strong> access your Spotify playlists, payment information,
+  or any data beyond the scopes listed above. Spotify data is used solely to
+  enrich your SoundScore listening history and is never sold to third parties.
+</p>
+
+<h3>1.4 Device Information</h3>
+<p>
+  If you enable push notifications, we store your device token and platform type
+  (iOS or Android). We also collect your IP address and user agent string for
+  audit logging and abuse prevention purposes.
+</p>
+
+<h3>1.5 Analytics Events</h3>
+<p>
+  We record anonymized analytics events (e.g., "recap generated", "recap viewed")
+  to understand feature usage and improve the product. These events are tied to
+  your user ID but contain no personally identifiable information beyond that.
+</p>
+
+<hr>
+
+<h2>2. How We Use Your Data</h2>
+<ul>
+  <li><strong>Core functionality</strong> -- powering your ratings, reviews, lists, and listening history.</li>
+  <li><strong>Social features</strong> -- displaying your activity to followers and showing your feed.</li>
+  <li><strong>Weekly recaps</strong> -- generating personalized weekly listening summaries.</li>
+  <li><strong>Push notifications</strong> -- sending notifications about social activity and recaps (configurable).</li>
+  <li><strong>Abuse prevention</strong> -- rate limiting and audit logging to protect the platform.</li>
+  <li><strong>Product improvement</strong> -- aggregated analytics to understand feature usage.</li>
+</ul>
+<p>We do <strong>not</strong> sell your personal data to any third party.</p>
+
+<hr>
+
+<h2>3. Third-Party Services</h2>
+<p>SoundScore uses the following third-party services to operate:</p>
+<ul>
+  <li>
+    <strong>Supabase</strong> (supabase.com) -- hosts our database and runs our API
+    as Supabase Edge Functions. Your data is stored in Supabase-managed PostgreSQL.
+    Supabase's privacy policy applies to infrastructure-level data handling.
+  </li>
+  <li>
+    <strong>Upstash</strong> (upstash.com) -- provides Redis caching for rate
+    limiting and performance optimization. Cached data is ephemeral and automatically
+    expires.
+  </li>
+  <li>
+    <strong>Spotify</strong> (spotify.com) -- provides music metadata and listening
+    history import via their Web API. Spotify's Developer Terms of Service and Privacy
+    Policy apply to data exchanged through their API. You can disconnect Spotify at
+    any time from within the app.
+  </li>
+  <li>
+    <strong>MusicBrainz</strong> (musicbrainz.org) -- provides open-source music
+    metadata for album search. No user data is sent to MusicBrainz.
+  </li>
+</ul>
+
+<hr>
+
+<h2>4. Data Retention</h2>
+<ul>
+  <li>
+    <strong>Account data</strong> is retained for as long as your account is active.
+  </li>
+  <li>
+    <strong>Session tokens</strong> expire after 24 hours and expired sessions are
+    automatically purged.
+  </li>
+  <li>
+    <strong>OAuth states</strong> are single-use and expire automatically.
+  </li>
+  <li>
+    <strong>Cached data</strong> (Redis) expires automatically within seconds to
+    minutes depending on the data type.
+  </li>
+  <li>
+    <strong>Audit logs</strong> are retained for security and compliance purposes.
+  </li>
+</ul>
+
+<hr>
+
+<h2>5. Your Rights</h2>
+
+<h3>5.1 Data Export</h3>
+<p>
+  You can export all of your data at any time using the <strong>Account Export</strong>
+  feature in the app (Settings &gt; Export My Data). This provides a complete JSON
+  download of your profile, ratings, reviews, lists, listening history, social
+  connections, and activity feed.
+</p>
+
+<h3>5.2 Account Deletion</h3>
+<p>
+  You can permanently delete your account and all associated data using the
+  <strong>Delete Account</strong> feature in the app (Settings &gt; Delete Account).
+  This action is irreversible and removes all your data from our systems, including:
+</p>
+<ul>
+  <li>Profile information</li>
+  <li>Ratings and reviews</li>
+  <li>Lists</li>
+  <li>Listening history</li>
+  <li>Social connections (follows)</li>
+  <li>Notification preferences and device tokens</li>
+  <li>Provider connections</li>
+</ul>
+
+<h3>5.3 Spotify Data Removal</h3>
+<p>
+  You can disconnect your Spotify account at any time. When disconnecting, you may
+  choose to also purge all listening data that was imported from Spotify.
+</p>
+
+<h3>5.4 Notification Control</h3>
+<p>
+  You can configure which notification types you receive (social, recaps, comments,
+  reactions) and set quiet hours through the notification preferences screen.
+</p>
+
+<hr>
+
+<h2>6. GDPR (European Economic Area)</h2>
+<p>If you are located in the EEA, you have the following rights under the GDPR:</p>
+<ul>
+  <li><strong>Right of access</strong> -- use the Data Export feature.</li>
+  <li><strong>Right to rectification</strong> -- edit your profile, ratings, and reviews in the app.</li>
+  <li><strong>Right to erasure</strong> -- use the Delete Account feature.</li>
+  <li><strong>Right to data portability</strong> -- use the Data Export feature (JSON format).</li>
+  <li><strong>Right to object</strong> -- contact us to object to specific processing.</li>
+  <li><strong>Right to restrict processing</strong> -- contact us to request processing restrictions.</li>
+</ul>
+<p>
+  Our legal basis for processing your data is: (a) performance of a contract (providing
+  the SoundScore service), (b) legitimate interest (abuse prevention and product
+  improvement), and (c) consent (Spotify data access, push notifications).
+</p>
+
+<hr>
+
+<h2>7. CCPA (California)</h2>
+<p>If you are a California resident, you have the following rights under the CCPA:</p>
+<ul>
+  <li><strong>Right to know</strong> -- this policy describes what data we collect and how we use it.</li>
+  <li><strong>Right to delete</strong> -- use the Delete Account feature or contact us.</li>
+  <li><strong>Right to opt out of sale</strong> -- we do not sell your personal information.</li>
+  <li><strong>Right to non-discrimination</strong> -- we will not discriminate against you for exercising your rights.</li>
+</ul>
+
+<hr>
+
+<h2>8. Security</h2>
+<p>We protect your data through the following measures:</p>
+<ul>
+  <li>Passwords are hashed using bcrypt with configurable salt rounds.</li>
+  <li>All database connections use SSL/TLS encryption.</li>
+  <li>API rate limiting prevents brute-force and abuse attacks.</li>
+  <li>Session tokens are generated using cryptographically secure random number generators.</li>
+  <li>OAuth flows use CSRF-protected state parameters.</li>
+  <li>Sensitive operations are audit-logged with scrubbed payloads (no passwords or tokens recorded).</li>
+  <li>HTML content is sanitized to prevent XSS.</li>
+</ul>
+
+<hr>
+
+<h2>9. Children's Privacy</h2>
+<p>
+  SoundScore is not directed at children under the age of 13. We do not knowingly
+  collect personal information from children under 13. If you believe we have
+  collected data from a child under 13, please contact us so we can promptly delete it.
+</p>
+
+<hr>
+
+<h2>10. Changes to This Policy</h2>
+<p>
+  We may update this Privacy Policy from time to time. When we do, we will update
+  the "Effective date" at the top of this page and notify you through the app if
+  the changes are material.
+</p>
+
+<hr>
+
+<h2>11. Contact Us</h2>
+<div class="contact">
+  <p><strong>SoundScore</strong></p>
+  <p>Email: <a href="mailto:privacy@soundscore.app">privacy@soundscore.app</a></p>
+  <p>Web: <a href="https://soundscore.app">https://soundscore.app</a></p>
+</div>
+
+</body>
+</html>

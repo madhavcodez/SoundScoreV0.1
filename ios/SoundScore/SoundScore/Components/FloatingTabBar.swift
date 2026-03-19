@@ -22,9 +22,9 @@ struct FloatingTabBar: View {
                                     : SSColors.chromeDim
                             )
 
-                        Circle()
+                        Capsule()
                             .fill(ThemeManager.shared.primary)
-                            .frame(width: 4, height: 4)
+                            .frame(width: selectedTab == tab ? 16 : 0, height: 3)
                             .opacity(selectedTab == tab ? 1 : 0)
                     }
                     .frame(maxWidth: .infinity)

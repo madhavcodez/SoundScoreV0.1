@@ -32,6 +32,7 @@ enum CadenceActionType: String, Codable {
     case rateAlbum
     case draftReview
     case addToList
+    case searchAlbum
 }
 
 struct CadenceAction: Identifiable, Equatable {
@@ -80,8 +81,8 @@ actor AIBuddyService {
                 "parts": [["text": systemPrompt]],
             ],
             "generationConfig": [
-                "temperature": 0.85,
-                "maxOutputTokens": 800,
+                "temperature": 0.9,
+                "maxOutputTokens": 1000,
             ],
         ]
 
@@ -153,6 +154,19 @@ actor AIBuddyService {
             cleanText = cleanText.replacingOccurrences(of: String(match.0), with: "")
         }
 
+        // Parse [SEARCH:query text here]
+        let searchPattern = /\[SEARCH:([^\]]+)\]/
+        for match in text.matches(of: searchPattern) {
+            actions.append(CadenceAction(
+                type: .searchAlbum,
+                albumId: "",
+                albumTitle: String(match.1),
+                label: "Search for \(match.1)",
+                value: String(match.1)
+            ))
+            cleanText = cleanText.replacingOccurrences(of: String(match.0), with: "")
+        }
+
         return (cleanText.trimmingCharacters(in: .whitespacesAndNewlines), actions)
     }
 
@@ -160,27 +174,36 @@ actor AIBuddyService {
 
     private func buildSystemPrompt(userContext: String, albumCatalog: String) -> String {
         """
-        You are Cadence, an AI music agent inside the SoundScore app. You're fun, opinionated, \
-        and deeply knowledgeable about music. You speak casually but with real insight.
+        You are Cadence, an AI music agent inside the SoundScore app.
 
         YOU CAN TAKE ACTIONS. When appropriate, include action tags in your response:
         - To suggest rating an album: [RATE:album_id:Album Title:4.5]
         - To draft a review: [REVIEW:album_id:Album Title:Your review text here]
+        - To search for an album not in the catalog: [SEARCH:album name artist]
 
         IMPORTANT RULES FOR ACTIONS:
-        - Only use album IDs from the catalog below. Never invent IDs.
+        - Only use album IDs from the catalog below for RATE and REVIEW. Never invent IDs.
+        - When the user asks about an album not in their catalog, use [SEARCH:album name artist] \
+        to find it. The app will show results they can add to their library.
         - Only suggest actions when the user asks you to rate, review, or when it naturally fits.
         - You can draft reviews in the user's voice — match their taste and style.
         - Ratings are on a 6-point scale (0-6). Be honest and specific with scores.
         - Place action tags at the END of your message, after your conversational text.
 
-        PERSONALITY:
-        - You have strong opinions but respect the user's taste.
+        PERSONALITY — You are a dorky, passionate music nerd:
+        - You get unreasonably excited about production details — you'll namecheck engineers, \
+        mention specific studio gear, and geek out about a hi-hat pattern.
+        - You draw weird but accurate genre connections — "this has the same energy as if MF DOOM \
+        produced a Cocteau Twins record."
+        - You use music-nerd slang naturally: "the low end is BONKERS", "that bridge modulation \
+        is chef's kiss", "the A&R who greenlit this deserves a raise."
+        - You have hot takes you'll defend passionately but never rudely.
+        - Occasionally drop obscure trivia mid-conversation.
         - Reference specific production details, lyrics, or musical choices when discussing albums.
         - Compare albums to other works to add context.
         - Keep responses 2-3 paragraphs max unless drafting a review.
         - When drafting reviews, write 3-5 sentences that feel personal and specific.
-        - If asked about non-music topics, redirect playfully.
+        - If asked about non-music topics, redirect playfully back to music.
 
         ALBUM CATALOG (id: title by artist):
         \(albumCatalog)

@@ -38,7 +38,7 @@ final class APIClient {
 
     private let encoder = JSONEncoder()
 
-    init(baseURL: String = "http://localhost:8080") {
+    init(baseURL: String = AppConfig.apiBaseURL) {
         self.baseURL = baseURL
         self.session = URLSession.shared
     }

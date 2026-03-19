@@ -58,24 +58,45 @@ struct CompactListCard: View {
     var onSelectAlbum: (Album) -> Void = { _ in }
 
     var body: some View {
-        GlassCard(cornerRadius: 20, borderColor: SSColors.feedItemBorder, contentPadding: EdgeInsets(top: 10, leading: 10, bottom: 10, trailing: 10), onTap: {
+        Button {
             if let firstAlbum = showcase.coverAlbums.first {
                 UIImpactFeedbackGenerator(style: .light).impactOccurred()
                 onSelectAlbum(firstAlbum)
             }
-        }) {
-            VStack(alignment: .leading, spacing: 10) {
-                MosaicCover(albums: showcase.coverAlbums, cornerRadius: 14)
-                Text(showcase.list.title)
-                    .font(SSTypography.titleMedium)
-                    .foregroundColor(SSColors.chromeLight)
-                    .fontWeight(.semibold)
-                    .lineLimit(1)
-                Text("\(showcase.list.albumIds.count) albums")
-                    .font(SSTypography.bodySmall)
-                    .foregroundColor(SSColors.textTertiary)
+        } label: {
+            ZStack(alignment: .bottom) {
+                MosaicCover(albums: showcase.coverAlbums, cornerRadius: 20, size: 180)
+
+                // Gradient overlay
+                LinearGradient(
+                    colors: [.clear, .clear, SSColors.overlayDark.opacity(0.8), SSColors.overlayDark],
+                    startPoint: .init(x: 0.5, y: 0.0),
+                    endPoint: .bottom
+                )
+                .clipShape(RoundedRectangle(cornerRadius: 20))
+
+                VStack(spacing: 3) {
+                    Text(showcase.list.title)
+                        .font(SSTypography.titleMedium)
+                        .foregroundColor(SSColors.chromeLight)
+                        .fontWeight(.bold)
+                        .lineLimit(2)
+                        .multilineTextAlignment(.center)
+                    Text("\(showcase.list.curatorHandle) · \(showcase.list.albumIds.count) albums")
+                        .font(SSTypography.labelSmall)
+                        .foregroundColor(SSColors.textSecondary)
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.horizontal, 10)
+                .padding(.bottom, 12)
             }
+            .frame(width: 180, height: 180)
+            .clipShape(RoundedRectangle(cornerRadius: 20))
+            .overlay(
+                RoundedRectangle(cornerRadius: 20)
+                    .stroke(SSColors.feedItemBorder, lineWidth: 0.5)
+            )
         }
-        .frame(width: 180)
+        .buttonStyle(.plain)
     }
 }
