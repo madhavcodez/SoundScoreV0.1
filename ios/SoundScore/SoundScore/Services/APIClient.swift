@@ -135,6 +135,14 @@ final class APIClient {
         try await raw(method: "GET", path: path, authenticated: authenticated)
     }
 
+    func postRaw(
+        _ path: String,
+        body: Data? = nil,
+        authenticated: Bool = true
+    ) async throws -> Data {
+        try await raw(method: "POST", path: path, body: body, authenticated: authenticated)
+    }
+
     // MARK: - Core
 
     private func raw(

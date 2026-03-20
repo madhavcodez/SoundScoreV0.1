@@ -2,7 +2,7 @@
 
 Generated: 2026-03-19
 Branch: audit/deep-sweep-20260319
-Total Passes Completed: 6/9
+Total Passes Completed: 7/9
 
 ## Baseline Metrics
 
@@ -151,7 +151,7 @@ Total Passes Completed: 6/9
 
 ### [ISSUE-028] iOS export uses GET, backend requires POST | iOS | P1
 - **Description:** iOS calls `/v1/account/export` via GET but backend only implements POST. Export will 404.
-- **Status:** DOCUMENTED
+- **Status:** FIXED (Pass 7) — changed to `postRaw`, added `postRaw` method to APIClient
 
 ### [ISSUE-029] iOS has 3 track routes with no backend implementation | iOS | P1
 - **Description:** iOS client has methods for `/v1/albums/:id/tracks`, `/v1/albums/:id/track-ratings`, `/v1/track-ratings`. DB schema exists but NO route handlers. Calls will 404.
@@ -330,4 +330,15 @@ Total Passes Completed: 6/9
 - **Regression check:** No regressions from audit passes 2-4 (typecheck was clean before, still clean)
 - **Issues found:** 0 new (test failures are pre-existing, not caused by audit)
 - **Issues fixed:** 0
+- **Commit:** `a961924`
+
+### Pass 7 — Second-Pass Fixes
+- **Actions:**
+  - Fixed iOS build warning: `CadenceActionCards.swift:291` unused `withAnimation` result → added `_ =` prefix
+  - Fixed ISSUE-028: iOS export HTTP method mismatch → changed `getRaw` to `postRaw`, added `postRaw` method to APIClient
+  - Verified iOS build: BUILD SUCCEEDED (0 code warnings)
+  - Backend typecheck still clean, backend tests unchanged (9 pre-existing failures)
+- **Issues fixed:** 2
+  - iOS `withAnimation` warning (from Pass 6)
+  - ISSUE-028: iOS export GET→POST method mismatch
 - **Commit:** (this commit)
