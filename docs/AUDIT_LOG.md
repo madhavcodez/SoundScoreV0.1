@@ -2,7 +2,7 @@
 
 Generated: 2026-03-19
 Branch: audit/deep-sweep-20260319
-Total Passes Completed: 3/9
+Total Passes Completed: 4/9
 
 ## Baseline Metrics
 
@@ -100,6 +100,43 @@ Total Passes Completed: 3/9
 - **Description:** Uses `.white`, `.black` instead of SSColors theme tokens. AvatarCircle also uses Color.white.
 - **Status:** DOCUMENTED
 
+### [ISSUE-016] No strings.xml — all Android strings hardcoded | Android | P1
+- **Description:** No `strings.xml` file exists. 50+ user-facing strings are hardcoded across all 5 screens. Blocks localization entirely.
+- **Status:** DOCUMENTED
+
+### [ISSUE-017] 5 iOS screens missing from Android | Android | P1
+- **Description:** Android is missing AlbumDetailScreen, AuthScreen, AIBuddyScreen, SettingsScreen, SplashScreen. AlbumDetail and Auth are core features.
+- **Status:** DOCUMENTED
+
+### [ISSUE-018] 12 backend routes missing from Android API client | Android | P1
+- **Description:** Android missing: follow/unfollow, comment, recently-played, list detail, all provider routes, all mapping routes, all sync routes, test-recap.
+- **Status:** DOCUMENTED
+
+### [ISSUE-019] Android smoke tests are broken (stale assertions) | Android | P1
+- **Files:** `ScreenSmokeTest.kt`
+- **Description:** 5 smoke tests assert text strings that no longer match current screen code (e.g. `"Albums everyone is circling back to"` but screen says `"What your people are logging right now."`). Will FAIL at runtime.
+- **Status:** DOCUMENTED
+
+### [ISSUE-020] Android test coverage ~15-20% (target 80%) | Android | P1
+- **Description:** Only 14 test functions across 5 files. No ViewModel tests, no repository tests, no API tests, no edge cases. Smoke tests are broken.
+- **Status:** DOCUMENTED
+
+### [ISSUE-021] Large composables needing decomposition | Android | P2
+- **Files:** `ProfileScreen.kt` (ProfileScreenContent 163 lines), `LogScreen.kt` (LogScreenContent 118 lines), `FeedScreen.kt` (FeedActivityCard 101 lines)
+- **Status:** DOCUMENTED
+
+### [ISSUE-022] Android missing Track/TrackRating DTOs | Android | P2
+- **Description:** iOS has TrackDto, TrackRatingDto, ListDetailDto, ListItemDto. Android has none of these.
+- **Status:** DOCUMENTED
+
+### [ISSUE-023] iOS WeeklyRecapDto missing fields vs backend/Android | Cross-platform | P2
+- **Description:** iOS WeeklyRecapDto is missing userId, topAlbums, createdAt fields that backend and Android both have.
+- **Status:** DOCUMENTED
+
+### [ISSUE-024] iOS ActivityEventDto missing payload field | Cross-platform | P2
+- **Description:** Backend returns `payload` on activity events. Android includes it (`Map<String, JsonElement>`). iOS DTO is missing it entirely.
+- **Status:** DOCUMENTED
+
 ## Pass Log
 
 ### Pass 1 — Bootstrap + Baseline
@@ -168,4 +205,30 @@ Total Passes Completed: 3/9
   - 2 dead component files (GlassIconButton.swift, ReviewSheet.swift)
 - **Issues found:** 9 (ISSUE-007 through ISSUE-015)
 - **Issues fixed:** 1 (ISSUE-007 — iOS auth/online mode)
+- **Commit:** `b9beb57`
+
+### Pass 4 — Android Static Audit
+- **Actions:**
+  - Checked Screen↔ViewModel mapping (5/5 screens have VMs)
+  - Verified StateFlow usage (all correct, no mutableStateOf)
+  - Verified collectAsStateWithLifecycle (all 5 screens correct)
+  - Found 22 functions >50 lines (ProfileScreenContent 163, LogScreenContent 118, FeedActivityCard 101 worst)
+  - No composables >200 lines (largest 163)
+  - Found 50+ hardcoded strings, NO strings.xml file at all
+  - Compared Android vs iOS screens (5 missing from Android)
+  - Compared API models vs backend DTOs
+  - Compared Android API endpoints vs backend routes (12 missing)
+  - Verified ViewModel exposure (all correctly use StateFlow, not MutableStateFlow)
+  - Audited test quality (14 functions, 5 broken smoke tests)
+- **Key findings:**
+  - Android MVVM architecture is SOLID: StateFlow + collectAsStateWithLifecycle + Repository pattern
+  - NO strings.xml — all 50+ user-facing strings hardcoded (blocks i18n)
+  - 5 screens missing vs iOS (AlbumDetail, Auth, AIBuddy, Settings, Splash)
+  - 12 backend routes not in Android client (follow, comment, providers, sync, etc.)
+  - Smoke tests are BROKEN (assert stale text strings)
+  - Test coverage ~15-20% (far below 80% target)
+  - iOS WeeklyRecapDto missing 3 fields vs Android/backend
+  - iOS ActivityEventDto missing payload field vs Android/backend
+- **Issues found:** 9 (ISSUE-016 through ISSUE-024)
+- **Issues fixed:** 0 (all documented — no compilation available for verification)
 - **Commit:** (this commit)
