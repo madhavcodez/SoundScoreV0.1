@@ -2,7 +2,7 @@
 
 Generated: 2026-03-19
 Branch: audit/deep-sweep-20260319
-Total Passes Completed: 4/9
+Total Passes Completed: 5/9
 
 ## Baseline Metrics
 
@@ -137,6 +137,42 @@ Total Passes Completed: 4/9
 - **Description:** Backend returns `payload` on activity events. Android includes it (`Map<String, JsonElement>`). iOS DTO is missing it entirely.
 - **Status:** DOCUMENTED
 
+### [ISSUE-025] iOS Album model has orphan fields (spotifyId, genres) | iOS | P2
+- **Description:** iOS `Album.swift` has `spotifyId` and `genres` fields not in contract, backend response, or Android model. Cannot be populated from API.
+- **Status:** DOCUMENTED
+
+### [ISSUE-026] UserProfile UI models missing `id` field | Cross-platform | P2
+- **Description:** Both iOS and Android UserProfile models lack `id` while backend/DTOs return it. Code needing user ID from profile will fail.
+- **Status:** DOCUMENTED
+
+### [ISSUE-027] UserProfile has fields backend doesn't return | Cross-platform | P2
+- **Description:** Both platforms have topAlbums, genres, albumsCount, followingCount, followersCount, favoriteAlbums — none returned by backend. Only work with seed data.
+- **Status:** DOCUMENTED
+
+### [ISSUE-028] iOS export uses GET, backend requires POST | iOS | P1
+- **Description:** iOS calls `/v1/account/export` via GET but backend only implements POST. Export will 404.
+- **Status:** DOCUMENTED
+
+### [ISSUE-029] iOS has 3 track routes with no backend implementation | iOS | P1
+- **Description:** iOS client has methods for `/v1/albums/:id/tracks`, `/v1/albums/:id/track-ratings`, `/v1/track-ratings`. DB schema exists but NO route handlers. Calls will 404.
+- **Status:** DOCUMENTED
+
+### [ISSUE-030] 20/36 backend routes lack contract schemas | Backend | P2
+- **Description:** All Phase 2 routes (providers, mapping, sync) plus many Phase 1 routes have no typed contract. Undermines typed API goal.
+- **Status:** DOCUMENTED
+
+### [ISSUE-031] CONTEXT_04_CODEBASE_MAP.md significantly outdated | Docs | P2
+- **Description:** All paths valid but missing entire API layer, ViewModels, outbox system, deep links, and all iOS/backend/contracts code. Only covers ~40% of Android.
+- **Status:** DOCUMENTED
+
+### [ISSUE-032] Phase 2 has zero mobile client coverage | Cross-platform | P1
+- **Description:** All provider/mapping/sync routes are backend-only. Neither iOS nor Android has client methods for any Phase 2 endpoint.
+- **Status:** DOCUMENTED
+
+### [ISSUE-033] Provider fetch still mocked in import.ts | Backend | P2
+- **Description:** `processSync()` in import.ts calls `fetchRecentPlays` which is a mock. Not connected to real Spotify API yet.
+- **Status:** DOCUMENTED
+
 ## Pass Log
 
 ### Pass 1 — Bootstrap + Baseline
@@ -231,4 +267,48 @@ Total Passes Completed: 4/9
   - iOS ActivityEventDto missing payload field vs Android/backend
 - **Issues found:** 9 (ISSUE-016 through ISSUE-024)
 - **Issues fixed:** 0 (all documented — no compilation available for verification)
+- **Commit:** `3b081a5`
+
+### Pass 5 — Cross-Platform Consistency
+- **Actions:**
+  - Compared Album, FeedItem, UserProfile models across all 3 platforms
+  - Built API Endpoint Coverage Matrix (36 backend routes vs iOS 22 vs Android 18)
+  - Built Feature Parity Matrix (23 features compared)
+  - Verified CONTEXT_04_CODEBASE_MAP.md paths (all valid, but 60% of code undocumented)
+  - Checked Phase 2 execution progress against actual implementation
+- **Key findings:**
+  - iOS ahead of Android: 10 screens vs 5, covers 22 routes vs 18
+  - iOS Album model has orphan fields (spotifyId, genres) backend doesn't return
+  - Both platforms' UserProfile has fields backend doesn't return (topAlbums, genres, followers, etc.)
+  - iOS export calls GET but backend requires POST — will 404
+  - iOS has 3 track route client methods with NO backend handlers — will 404
+  - 20/36 backend routes lack typed contract schemas
+  - Phase 2: Wave 0 (contracts) mostly done, Wave 1 (core) backend-only, Wave 2 (hardening) partial
+  - Zero mobile coverage for any Phase 2 route
+  - Provider fetch in import.ts still mocked
+  - Codebase map covers ~40% of Android, 0% of iOS/backend
+
+#### Feature Parity Summary
+| Feature | Android | iOS | Backend |
+|---------|---------|-----|---------|
+| Auth | Full | Missing client | Full |
+| Feed | Partial | Partial | Full |
+| Search | Partial | Partial | Full |
+| Lists | Partial | Partial | Full |
+| Profile | Partial | Partial | Full |
+| Album Detail | Missing | Full | Partial |
+| Cadence AI | Missing | Full | N/A |
+| Settings | Missing | Full | Full |
+| Tracks | Missing | Full (DTOs) | Missing (routes) |
+| Provider Connect | Missing | Missing | Full |
+| Offline Sync | Full | Full | N/A |
+
+#### API Coverage Summary
+- Backend: 36 routes
+- iOS client: 22 routes (61%)
+- Android client: 18 routes (50%)
+- Contract schemas: 16 routes (44%)
+
+- **Issues found:** 9 (ISSUE-025 through ISSUE-033)
+- **Issues fixed:** 0
 - **Commit:** (this commit)
