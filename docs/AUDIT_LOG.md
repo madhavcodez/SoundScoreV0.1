@@ -2,7 +2,7 @@
 
 Generated: 2026-03-19
 Branch: audit/deep-sweep-20260319
-Total Passes Completed: 7/9
+Total Passes Completed: 8/9
 
 ## Baseline Metrics
 
@@ -341,4 +341,15 @@ Total Passes Completed: 7/9
 - **Issues fixed:** 2
   - iOS `withAnimation` warning (from Pass 6)
   - ISSUE-028: iOS export GET→POST method mismatch
+- **Commit:** `256eb5e`
+
+### Pass 8 — README Generation (Comprehensive)
+- **Actions:**
+  - Generated/replaced 5 README files totaling 1,252 lines
+  - Root `README.md`: 401 lines — architecture diagram, full API table (36 routes), DB schema, audit summary, docs index
+  - `app/README.md`: 219 lines — MVVM architecture, 5 screens, 7 VMs, data layer, offline-first, parity table
+  - `ios/README.md`: 286 lines — 13 screens, 8 VMs, 8 services, 27 components catalog, Cadence AI docs, theme system
+  - `backend/README.md`: 277 lines — 11 modules, 18 lib utilities, full DB schema, API routes, env vars, security
+  - `packages/contracts/README.md`: 69 lines — 8 source files, 27 type aliases, usage examples, coverage gap
+- **Deliverables:** 5 README files (all above target line counts)
 - **Commit:** (this commit)
