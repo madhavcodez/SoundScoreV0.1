@@ -32,6 +32,13 @@ class SoundScoreRepository: ObservableObject {
         self.latestRecap = SeedData.initialRecap
         self.syncMessage = nil
         Task { await enrichAlbumsWithArtwork() }
+        #if DEBUG
+        Task {
+            try? await AuthManager.shared.devAutoSignup()
+            await refresh()
+            await syncOutbox()
+        }
+        #endif
     }
 
     // MARK: - Spotify Artwork Enrichment
@@ -60,6 +67,11 @@ class SoundScoreRepository: ObservableObject {
     // MARK: - Refresh from API
 
     func refresh() async {
+        #if DEBUG
+        if !AuthManager.shared.isAuthenticated {
+            try? await AuthManager.shared.devAutoSignup()
+        }
+        #endif
         guard AuthManager.shared.isAuthenticated else { return }
 
         await MainActor.run {

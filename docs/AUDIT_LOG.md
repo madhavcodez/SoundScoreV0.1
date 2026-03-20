@@ -2,7 +2,7 @@
 
 Generated: 2026-03-19
 Branch: audit/deep-sweep-20260319
-Total Passes Completed: 2/9
+Total Passes Completed: 3/9
 
 ## Baseline Metrics
 
@@ -59,6 +59,47 @@ Total Passes Completed: 2/9
 - **Description:** Schema defined in contracts but no track-rating endpoint exists in backend. Dead code.
 - **Status:** DOCUMENTED
 
+### [ISSUE-007] iOS was stuck in offline/seed-data mode | iOS | P0
+- **Files:** `AuthManager.swift`, `SoundScoreRepository.swift`
+- **Description:** iOS never called `devAutoSignup()` or `refresh()` on startup. Dev credentials mismatched Android. App was permanently offline.
+- **Status:** FIXED — aligned dev credentials, added auto-auth + auto-refresh in DEBUG init
+
+### [ISSUE-008] ListsScreen is orphaned (unreachable) | iOS | P1
+- **Description:** ListsScreen is fully built with ViewModel, ErrorBanner, .refreshable but is NOT in the tab bar (Tab.swift has feed, log, search, aiBuddy, profile — no lists tab).
+- **Status:** DOCUMENTED
+
+### [ISSUE-009] AuthScreen has no ViewModel | iOS | P2
+- **Description:** Business logic (login/signup) lives inline in the view with @State. Should extract to AuthViewModel.
+- **Status:** DOCUMENTED
+
+### [ISSUE-010] 4 force-unwraps in iOS code | iOS | P2
+- **Files:** `AlbumDetailScreen.swift:281-282`, `LogScreen.swift:50`, `ProfileViewModel.swift:101`
+- **Description:** Force-unwraps on dictionary access and URL construction. The AlbumDetailScreen ones could crash during concurrent updates.
+- **Status:** DOCUMENTED
+
+### [ISSUE-011] 3 screens missing ErrorBanner | iOS | P2
+- **Files:** `AlbumDetailScreen.swift`, `AIBuddyScreen.swift`, `SettingsScreen.swift`
+- **Status:** DOCUMENTED
+
+### [ISSUE-012] 3 scrollable screens missing .refreshable | iOS | P2
+- **Files:** `AlbumDetailScreen.swift`, `SettingsScreen.swift`, `AIBuddyScreen.swift`
+- **Status:** DOCUMENTED
+
+### [ISSUE-013] @ObservedObject misuse on ThemeManager.shared | iOS | P3
+- **Files:** `ContentView.swift`, `SettingsScreen.swift`, `AppBackdrop.swift`
+- **Description:** ThemeManager.shared uses @ObservedObject but is a singleton initialized inline. Should use @EnvironmentObject (already injected).
+- **Status:** DOCUMENTED
+
+### [ISSUE-014] 2 unused component files (dead code) | iOS | P3
+- **Files:** `GlassIconButton.swift`, `ReviewSheet.swift`
+- **Description:** Components defined but never instantiated by any screen.
+- **Status:** DOCUMENTED
+
+### [ISSUE-015] Hardcoded colors in screens | iOS | P3
+- **Files:** `LogScreen.swift`, `SearchScreen.swift`, `SettingsScreen.swift`
+- **Description:** Uses `.white`, `.black` instead of SSColors theme tokens. AvatarCircle also uses Color.white.
+- **Status:** DOCUMENTED
+
 ## Pass Log
 
 ### Pass 1 — Bootstrap + Baseline
@@ -100,4 +141,31 @@ Total Passes Completed: 2/9
   - Fastify Pino logger properly configured with request IDs and structured output
 - **Issues found:** 6 (ISSUE-001 through ISSUE-006)
 - **Issues fixed:** 0 (all documented — no safe mechanical fixes this pass)
+- **Commit:** `ad4ee39`
+
+### Pass 3 — iOS Deep Audit + Auth/Online Fix
+- **Actions:**
+  - **FIXED: iOS auth + online mode** — aligned dev credentials with Android, added auto-auth (`devAutoSignup()`) + auto-refresh in `SoundScoreRepository.init()`, added inline auth attempt in `refresh()` for DEBUG
+  - Verified fix compiles: `xcodebuild BUILD SUCCEEDED` (0 warnings)
+  - Audited Screen↔ViewModel mapping (10 screens, 8 have VMs)
+  - Checked @Published usage (all 7 VMs correct)
+  - Checked ErrorBanner presence (5/8 screens have it)
+  - Checked .refreshable presence (5/8 scrollable screens have it)
+  - Found 4 force-unwraps outside #if DEBUG
+  - Checked retain cycles in .sink closures (0 issues, all use [weak self])
+  - Checked @StateObject vs @ObservedObject (3 misuses on ThemeManager.shared)
+  - Found 2 unused component files (GlassIconButton, ReviewSheet)
+  - Found hardcoded Color usage in 3 screens
+  - Discovered ListsScreen is orphaned (not reachable from tab bar)
+- **Key findings:**
+  - iOS build: PASS (0 errors, 0 warnings)
+  - Auth fix applied: iOS will now auto-authenticate and connect to backend in DEBUG
+  - ListsScreen is fully built but unreachable (no lists tab in Tab.swift)
+  - AuthScreen has no ViewModel (inline business logic)
+  - 4 force-unwraps could cause crashes (AlbumDetailScreen dictionary access, URL construction)
+  - 3 screens missing ErrorBanner, 3 missing .refreshable
+  - No retain cycle issues found
+  - 2 dead component files (GlassIconButton.swift, ReviewSheet.swift)
+- **Issues found:** 9 (ISSUE-007 through ISSUE-015)
+- **Issues fixed:** 1 (ISSUE-007 — iOS auth/online mode)
 - **Commit:** (this commit)
