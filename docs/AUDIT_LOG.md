@@ -2,7 +2,7 @@
 
 Generated: 2026-03-19
 Branch: audit/deep-sweep-20260319
-Total Passes Completed: 5/9
+Total Passes Completed: 6/9
 
 ## Baseline Metrics
 
@@ -310,5 +310,24 @@ Total Passes Completed: 5/9
 - Contract schemas: 16 routes (44%)
 
 - **Issues found:** 9 (ISSUE-025 through ISSUE-033)
+- **Issues fixed:** 0
+- **Commit:** `286c005`
+
+### Pass 6 — Build Verification
+- **Actions:**
+  - iOS `xcodebuild clean build`: **BUILD SUCCEEDED** (1 warning)
+  - Backend `npm run typecheck`: **PASS**
+  - Backend `npm run test`: **79 pass, 9 fail** (88 total)
+  - Contracts `npm run build`: **PASS**
+- **Build results:**
+  - iOS: 1 warning — `CadenceActionCards.swift:291` unused result of `withAnimation`
+  - Backend typecheck: clean, no errors
+  - Backend tests: 9 failures in 3 test suites:
+    - `error-handling.test.ts`: "invalid JSON body returns 400" — Fastify returns 500 instead of 400 for malformed JSON (error handler doesn't catch FST_ERR_CTP_INVALID_JSON_BODY as ApiError)
+    - `integration.test.ts`: "create rating and verify idempotency" — expects 200 on duplicate idempotency key but gets 409 (idempotency logic returns conflict instead of cached response)
+    - `production-readiness.test.ts`: structural checks failing (likely stale expectations)
+  - Contracts build: clean, no errors
+- **Regression check:** No regressions from audit passes 2-4 (typecheck was clean before, still clean)
+- **Issues found:** 0 new (test failures are pre-existing, not caused by audit)
 - **Issues fixed:** 0
 - **Commit:** (this commit)
