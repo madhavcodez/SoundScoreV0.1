@@ -2,7 +2,7 @@
 
 Generated: 2026-03-19
 Branch: audit/deep-sweep-20260319
-Total Passes Completed: 1/9
+Total Passes Completed: 2/9
 
 ## Baseline Metrics
 
@@ -32,7 +32,32 @@ Total Passes Completed: 1/9
 
 ## Issue Registry
 
-(Issues will be added by subsequent passes)
+### [ISSUE-001] Missing Zod validation in Phase 2 route handlers | Backend | P1
+- **Files:** `modules/catalog.ts`, `modules/import.ts`, `modules/mapping.ts`, `modules/providers.ts`
+- **Description:** 10+ route handlers use `request.body as {...}` type assertions instead of Zod schema `.parse()`. Produces 500 on malformed input instead of 400 validation error.
+- **Status:** DOCUMENTED (contracts schemas exist but are unused by these handlers)
+
+### [ISSUE-002] Dead exports in backend lib | Backend | P3
+- **Files:** `lib/dead-letter.ts`, `lib/token-refresh.ts`, `lib/mappers.ts` (`tryJsonParse`), `lib/pagination.ts` (`PaginationParams` type)
+- **Description:** 6 exported functions/types never imported by production code. `token-refresh.ts` is entirely dead.
+- **Status:** DOCUMENTED
+
+### [ISSUE-003] 8/11 backend modules have zero test files | Backend | P1
+- **Description:** Only `import`, `mapping`, and `providers` have partial test coverage (utility functions only). auth, catalog, opinions, social, lists, trust, push, recaps have NO tests. No route-level integration tests exist.
+- **Status:** DOCUMENTED
+
+### [ISSUE-004] Console.log in migration/config code | Backend | P3
+- **Files:** `config/env.ts`, `db/runMigrations.ts`, `db/migrate.ts`, `index.ts`
+- **Description:** 9 console.log/warn/error calls bypass Pino structured logger. Config/startup ones are acceptable (pre-Fastify), but runMigrations.ts should use app.log.
+- **Status:** DOCUMENTED (not fixing — pre-Fastify context makes console acceptable)
+
+### [ISSUE-005] No account lockout after failed logins | Backend | P2
+- **Description:** Auth rate limit is 10 req/min per IP, but no lockout after repeated failures. An attacker can try 10 passwords per minute continuously.
+- **Status:** DOCUMENTED
+
+### [ISSUE-006] CreateTrackRatingRequestSchema dead in contracts | Contracts | P3
+- **Description:** Schema defined in contracts but no track-rating endpoint exists in backend. Dead code.
+- **Status:** DOCUMENTED
 
 ## Pass Log
 
@@ -50,4 +75,29 @@ Total Passes Completed: 1/9
   - 47 hardcoded URLs need review
 - **Issues found:** 4 (baseline observations, detailed in subsequent passes)
 - **Issues fixed:** 0 (baseline only)
+- **Commit:** `4df1e49`
+
+### Pass 2 — Backend Deep Audit
+- **Actions:**
+  - Ran `npm run typecheck` for backend and contracts — both PASS clean
+  - Searched for `as any` casts — NONE found
+  - Checked SQL injection risk (template literal SQL) — NONE found (all parameterized)
+  - Compared 39 server routes against contracts schemas
+  - Identified dead exports in lib/
+  - Verified rate limiting on auth routes (10 req/min, per-IP)
+  - Checked logger setup (Pino structured logging via Fastify)
+  - Mapped test coverage across all 11 modules
+- **Key findings:**
+  - Typechecks: PASS (both backend and contracts)
+  - `as any` casts: 0 (clean)
+  - SQL injection: 0 risk (all parameterized queries)
+  - 10+ handlers bypass Zod validation (use type assertions instead of schema parse)
+  - 6 dead exports across lib/ (including entirely dead token-refresh.ts)
+  - 8/11 modules have zero test files — only utility functions tested
+  - Console.log used in 4 files (pre-Fastify startup context, acceptable)
+  - Rate limiting properly applied to auth (10/min), sensitive (3/hr), write (30/min)
+  - No account lockout mechanism after repeated failed logins
+  - Fastify Pino logger properly configured with request IDs and structured output
+- **Issues found:** 6 (ISSUE-001 through ISSUE-006)
+- **Issues fixed:** 0 (all documented — no safe mechanical fixes this pass)
 - **Commit:** (this commit)
