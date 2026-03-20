@@ -289,7 +289,7 @@ struct SoundScoreAPI {
     // MARK: Trust
 
     func exportData() async throws -> Data {
-        try await client.getRaw("/v1/account/export")
+        try await client.postRaw("/v1/account/export")
     }
 
     func deleteAccount() async throws {

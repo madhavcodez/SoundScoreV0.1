@@ -48,8 +48,8 @@ class AuthManager: ObservableObject {
     #if DEBUG
     /// Attempts signup with dev credentials, falls back to login if account already exists.
     func devAutoSignup() async throws {
-        let email = "dev@soundscore.test"
-        let password = "devpass1234"
+        let email = "phase1b@local.soundscore.app"
+        let password = "soundscore-dev-pass"
         let handle = "madhav"
         do {
             try await signup(email: email, password: password, handle: handle)

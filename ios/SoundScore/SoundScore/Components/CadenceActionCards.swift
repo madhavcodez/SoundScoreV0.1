@@ -288,7 +288,7 @@ struct CadenceBatchRatingCard: View {
     private func applyAllWithAnimation() {
         for (index, _) in ratings.enumerated() {
             DispatchQueue.main.asyncAfter(deadline: .now() + Double(index) * 0.3) {
-                withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
+                _ = withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
                     appliedIndices.insert(index)
                 }
                 UIImpactFeedbackGenerator(style: .light).impactOccurred()
